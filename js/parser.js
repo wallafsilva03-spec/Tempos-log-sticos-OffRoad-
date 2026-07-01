@@ -91,7 +91,7 @@ const Parser = (function () {
     const atividade = Utils.toStringSafe(r['Atividade']);
 
     return {
-      Data: r['Data'] || null,
+      Data: Utils.toDateSafe(r['Data']),
       Frente: Utils.toStringSafe(r['Frente']) || 'Não Informado',
       Equipamento: equipamento,
       Modelo: modelo || 'Não Informado',
@@ -102,8 +102,8 @@ const Parser = (function () {
       Fazenda: Utils.toStringSafe(r['Fazenda']) || 'Não Informado',
       cod_quadra: Utils.toStringSafe(r['cod_quadra']),
       cod_talhao: Utils.toStringSafe(r['cod_talhao']),
-      Inicio: r['Inicio'] || null,
-      Fim: r['Fim'] || null,
+      Inicio: Utils.toDateSafe(r['Inicio']),
+      Fim: Utils.toDateSafe(r['Fim']),
       TempoDecimal: Utils.toNumber(r['Tempo Decimal']),
       Hori_Odom_Ini: Utils.toNumber(r['Hori_Odom_Ini']),
       Hori_Odom_Fim: Utils.toNumber(r['Hori_Odom_Fim']),

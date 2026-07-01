@@ -29,7 +29,7 @@ const Render = (function () {
       label: 'Ciclo Médio (h)',
       data: [round2(r.cicloMedioCaminhoes), round2(r.cicloMedioOffroads)],
       backgroundColor: [APP_CONFIG.colors.primary, APP_CONFIG.colors.info]
-    }]);
+    }], { labelUnit: 'h' });
 
     // Gráfico 2: Distribuição dos Tempos (soma total de todas as atividades classificadas)
     const A1 = APP_CONFIG.atividadesCaminhao, A2 = APP_CONFIG.atividadesOffroad;
@@ -56,7 +56,7 @@ const Render = (function () {
       label: 'Distância Média (km)',
       data: [round2(r.distMediaCaminhoes), round2(r.distMediaOffroads)],
       backgroundColor: [APP_CONFIG.colors.secondary, APP_CONFIG.colors.accent]
-    }]);
+    }], { labelUnit: 'km' });
   }
 
   /* -------------------- TABELA CAMINHÕES -------------------- */
@@ -106,7 +106,31 @@ const Render = (function () {
 
   /* -------------------- TABELA OFFROADS -------------------- */
 
+  function renderOffroadCiclo(dataset) {
+    const rows = dataset.offroads;
+
+    const cicloMedio = Utils.avg(rows.map(o => o.cicloTotal));
+    const abastecimentoMedio = Utils.avg(rows.map(o => o.tempoAbastecimento));
+    const agCarregamentoMedio = Utils.avg(rows.map(o => o.tempoAgCarregamento));
+    const faltaInsumosMedio = Utils.avg(rows.map(o => o.tempoFaltaInsumos));
+    const agLiberacaoMedio = Utils.avg(rows.map(o => o.tempoAgLiberacao));
+    const deslocamentoMedio = Utils.avg(rows.map(o => o.tempoDeslocamento));
+
+    setText('offKpiCiclo', Utils.formatHoras(cicloMedio));
+    setText('offKpiAbastecimento', Utils.formatHoras(abastecimentoMedio));
+    setText('offKpiAgCarregamento', Utils.formatHoras(agCarregamentoMedio));
+    setText('offKpiFaltaInsumos', Utils.formatHoras(faltaInsumosMedio));
+    setText('offKpiAgLiberacao', Utils.formatHoras(agLiberacaoMedio));
+    setText('offKpiDeslocamento', Utils.formatHoras(deslocamentoMedio));
+
+    Charts.renderDoughnut('chartCicloOffroad',
+      ['Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'],
+      [abastecimentoMedio, agCarregamentoMedio, faltaInsumosMedio, agLiberacaoMedio, deslocamentoMedio].map(round2)
+    );
+  }
+
   function renderOffroadsTab(dataset) {
+    renderOffroadCiclo(dataset);
     const rows = dataset.offroads;
     popularFiltro('filtroOffroadEquip', rows.map(r => r.equipamento));
     popularFiltro('filtroOffroadFrente', rows.map(r => r.frente));
@@ -320,14 +344,14 @@ const Render = (function () {
         label: 'Horas',
         data: ativValores,
         backgroundColor: APP_CONFIG.colors.info
-      }]);
+      }], { labelUnit: 'h' });
     }
 
     const historicoBody = item.registros
       .slice()
       .sort((a, b) => (a.Inicio && b.Inicio) ? new Date(a.Inicio) - new Date(b.Inicio) : 0)
       .map(r => [
-        Utils.formatDate(r.Data),
+        Utils.formatDateOnly(r.Data),
         Utils.formatDate(r.Inicio),
         Utils.formatDate(r.Fim),
         Utils.escapeHtml(r.Atividade),

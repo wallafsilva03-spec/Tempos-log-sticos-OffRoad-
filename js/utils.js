@@ -15,6 +15,18 @@ const Utils = (function () {
     return removeAccents(String(str)).trim().toLowerCase().replace(/\s+/g, ' ');
   }
 
+  // Normalização tolerante para nomes de atividade: remove ordinais (1ª, 2º),
+  // conteúdo entre parênteses, pontuação e múltiplos espaços.
+  function normalizeAtividade(str) {
+    let n = normalize(str);
+    n = n.replace(/[ºª]/g, '');
+    n = n.replace(/\(.*?\)/g, ' ');
+    n = n.replace(/[.\-\/]/g, ' ');
+    n = n.replace(/\d+/g, ' ');
+    n = n.replace(/\s+/g, ' ').trim();
+    return n;
+  }
+
   function toNumber(val) {
     if (val === null || val === undefined || val === '') return 0;
     if (typeof val === 'number') return isFinite(val) ? val : 0;
@@ -72,12 +84,43 @@ const Utils = (function () {
     return `${formatNumber(n, decimals)}%`;
   }
 
+  // Converte um serial de data do Excel (número de dias desde 1899-12-30,
+  // incluindo fração para hora) em um objeto Date. Necessário porque
+  // algumas exportações gravam a célula como número puro, sem formatação
+  // de data, e o SheetJS não converte automaticamente nesse caso.
+  function parseExcelSerialDate(serial) {
+    if (!isFinite(serial)) return null;
+    const utcDays = Math.floor(serial - 25569);
+    const utcValue = utcDays * 86400;
+    const dateInfo = new Date(utcValue * 1000);
+    const fractionalDay = serial - Math.floor(serial) + 0.0000001;
+    let totalSeconds = Math.floor(86400 * fractionalDay);
+    const seconds = totalSeconds % 60;
+    totalSeconds -= seconds;
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor(totalSeconds / 60) % 60;
+    return new Date(dateInfo.getUTCFullYear(), dateInfo.getUTCMonth(), dateInfo.getUTCDate(), hours, minutes, seconds);
+  }
+
+  // Aceita Date, número serial do Excel ou string e retorna um Date válido ou null.
+  function toDateSafe(val) {
+    if (val === null || val === undefined || val === '') return null;
+    if (val instanceof Date) return isNaN(val) ? null : val;
+    if (typeof val === 'number') return parseExcelSerialDate(val);
+    const d = new Date(val);
+    return isNaN(d) ? null : d;
+  }
+
   function formatDate(val) {
-    if (!val) return '';
-    if (val instanceof Date && !isNaN(val)) {
-      return val.toLocaleString('pt-BR');
-    }
-    return String(val);
+    const d = val instanceof Date ? val : toDateSafe(val);
+    if (!d) return val === null || val === undefined ? '' : String(val);
+    return d.toLocaleString('pt-BR');
+  }
+
+  function formatDateOnly(val) {
+    const d = val instanceof Date ? val : toDateSafe(val);
+    if (!d) return val === null || val === undefined ? '' : String(val);
+    return d.toLocaleDateString('pt-BR');
   }
 
   function uniqueSorted(arr) {
@@ -100,8 +143,9 @@ const Utils = (function () {
   }
 
   return {
-    removeAccents, normalize, toNumber, toStringSafe, mode, sum, avg,
-    formatHoras, formatNumber, formatPercent, formatDate, uniqueSorted,
+    removeAccents, normalize, normalizeAtividade, toNumber, toStringSafe, mode, sum, avg,
+    formatHoras, formatNumber, formatPercent, formatDate, formatDateOnly,
+    parseExcelSerialDate, toDateSafe, uniqueSorted,
     debounce, escapeHtml
   };
 })();

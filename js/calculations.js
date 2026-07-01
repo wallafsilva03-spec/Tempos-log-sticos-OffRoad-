@@ -4,14 +4,28 @@
 
 const Calculations = (function () {
 
-  function sumTempoAtividade(rows, nomeAtividade) {
-    const alvo = Utils.normalize(nomeAtividade);
-    return Utils.sum(rows.filter(r => Utils.normalize(r.Atividade) === alvo).map(r => r.TempoDecimal));
+  // Casa uma linha com uma categoria de atividade { codes: [...], aliases: [...] }
+  // usando primeiro o código numérico (CD Atividade, estável entre exportações)
+  // e, como fallback, o texto normalizado (tolerante a acentos/pontuação/maiúsculas).
+  function matchesCategoria(row, categoria) {
+    const cod = Utils.toNumber(row.CD_Atividade);
+    if (categoria.codes && categoria.codes.length && cod && categoria.codes.includes(cod)) {
+      return true;
+    }
+    const textoLinha = Utils.normalizeAtividade(row.Atividade);
+    if (!textoLinha) return false;
+    return categoria.aliases.some(alias => {
+      const a = Utils.normalizeAtividade(alias);
+      return textoLinha === a || textoLinha.startsWith(a);
+    });
   }
 
-  function avgVelocidadeAtividade(rows, nomeAtividade) {
-    const alvo = Utils.normalize(nomeAtividade);
-    const vals = rows.filter(r => Utils.normalize(r.Atividade) === alvo && r.Velocidade > 0).map(r => r.Velocidade);
+  function sumTempoAtividade(rows, categoria) {
+    return Utils.sum(rows.filter(r => matchesCategoria(r, categoria)).map(r => r.TempoDecimal));
+  }
+
+  function avgVelocidadeAtividade(rows, categoria) {
+    const vals = rows.filter(r => matchesCategoria(r, categoria) && r.Velocidade > 0).map(r => r.Velocidade);
     return Utils.avg(vals);
   }
 

@@ -218,6 +218,15 @@ body {
   color: var(--primary-dark);
 }
 
+.section-subtitle {
+  font-size: 15px;
+  color: var(--slate);
+  margin: 24px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.section-subtitle:first-of-type { margin-top: 0; }
+
 /* -------------------- KPI CARDS -------------------- */
 
 .kpi-grid {

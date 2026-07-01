@@ -22,23 +22,32 @@ const APP_CONFIG = {
   offroadExcecaoEquipamento: '13085',
   offroadExcecaoModelo: 'MB AXOR 3344',
 
-  // Atividades - Caminhões
+  /*
+   * Atividades - Caminhões e Offroads
+   *
+   * A coluna "Atividade" vem em formatos de texto que variam entre
+   * exportações (com/sem acentuação, maiúsculas, abreviações como
+   * "Ag." vs "Aguardando", texto extra entre parênteses, etc). A coluna
+   * "CD Atividade" é um código numérico estável para cada atividade e é
+   * usada como critério principal de casamento; os aliases de texto
+   * (normalizados: sem acento, minúsculo, sem pontuação) servem de
+   * fallback caso o código não esteja presente no arquivo.
+   */
   atividadesCaminhao: {
-    carregamento: 'Carregamento',
-    agCarregamento: 'Ag.Carregamento',
-    transporte: 'Transporte Vinhaça',
-    agDescarregamento: 'Ag.Descarregamento',
-    descarregamento: 'Descarregamento',
-    deslocamentoVolta: 'Deslocamento Unid. Carregamento'
+    carregamento: { codes: [64], aliases: ['carregamento'] },
+    agCarregamento: { codes: [126], aliases: ['ag carregamento', 'aguardando carregamento'] },
+    transporte: { codes: [485, 143], aliases: ['transporte vinhaca', 'transp 1 apl vinhaca', 'transp vinhaca localizada'] },
+    agDescarregamento: { codes: [127], aliases: ['ag descarregamento', 'aguardando descarregamento'] },
+    descarregamento: { codes: [65], aliases: ['descarregamento'] },
+    deslocamentoVolta: { codes: [162], aliases: ['deslocamento unid carregamento'] }
   },
 
-  // Atividades - Offroads
   atividadesOffroad: {
-    abastecimento: 'Abastecimento - Insumos',
-    agCarregamento: 'Aguardando carregamento',
-    faltaInsumos: 'Falta de insumos',
-    agLiberacao: 'Aguardando liberação de serviço',
-    deslocamento: 'Deslocamento'
+    abastecimento: { codes: [57], aliases: ['abastecimento insumos'] },
+    agCarregamento: { codes: [126], aliases: ['ag carregamento', 'aguardando carregamento'] },
+    faltaInsumos: { codes: [27], aliases: ['falta de insumos'] },
+    agLiberacao: { codes: [7], aliases: ['aguardando liberacao servico', 'aguardando liberacao de servico'] },
+    deslocamento: { codes: [200], aliases: ['deslocamento'] }
   },
 
   // Paleta de cores corporativa (tema agroindustrial)

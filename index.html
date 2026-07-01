@@ -111,6 +111,24 @@
       <!-- OFFROADS -->
       <section class="tab-panel" id="tab-offroads">
         <h2 class="panel-title">Offroads</h2>
+
+        <h3 class="section-subtitle">Visão de Ciclo</h3>
+        <div class="kpi-grid">
+          <div class="kpi-card"><span>Ciclo Médio</span><strong id="offKpiCiclo">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Abastecimento</span><strong id="offKpiAbastecimento">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Ag. Carregamento</span><strong id="offKpiAgCarregamento">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Falta Insumos</span><strong id="offKpiFaltaInsumos">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Ag. Liberação</span><strong id="offKpiAgLiberacao">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Deslocamento</span><strong id="offKpiDeslocamento">-</strong></div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <h3>Composição do Ciclo Médio - Offroad</h3>
+            <div class="chart-container"><canvas id="chartCicloOffroad"></canvas></div>
+          </div>
+        </div>
+
+        <h3 class="section-subtitle">Detalhamento por Equipamento</h3>
         <div class="filters-bar">
           <select id="filtroOffroadEquip"><option value="">Equipamento (Todos)</option></select>
           <select id="filtroOffroadFrente"><option value="">Frente (Todas)</option></select>
@@ -185,6 +203,7 @@
 <script src="vendor/jquery.min.js"></script>
 <script src="vendor/jquery.dataTables.min.js"></script>
 <script src="vendor/chart.umd.js"></script>
+<script src="vendor/chartjs-plugin-datalabels.min.js"></script>
 
 <!-- ==================== APP (JS PRÓPRIO) ==================== -->
 <script src="js/config.js"></script>
