@@ -40,7 +40,17 @@ const App = (function () {
   function bindExport() {
     const btn = document.getElementById('btnGerarPdf');
     if (!btn) return;
-    btn.addEventListener('click', () => ExportModule.gerarPdfExecutivo(dataset));
+    btn.addEventListener('click', async () => {
+      const textoOriginal = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Gerando PDF...';
+      try {
+        await ExportModule.gerarPdfExecutivo(dataset);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+      }
+    });
   }
 
   async function processFile(file) {

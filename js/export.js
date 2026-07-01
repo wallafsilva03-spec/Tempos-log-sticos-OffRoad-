@@ -1,22 +1,27 @@
 /* ============================================================
    EXPORT.JS - Geração do PDF Executivo (via impressão do navegador)
+   Contém apenas a Visão de Ciclo de Caminhões e Offroads.
    ============================================================ */
 
 const ExportModule = (function () {
 
-  function gerarPdfExecutivo(dataset) {
+  async function gerarPdfExecutivo(dataset) {
     if (!dataset) {
       alert('Importe um arquivo XLSX antes de gerar o PDF.');
       return;
     }
-    const r = Calculations.resumoExecutivo(dataset);
     const area = document.getElementById('printArea');
     const agora = new Date().toLocaleString('pt-BR');
 
-    const imgCiclo = Charts.getImage('chartCicloPorEquipamento');
-    const imgDistCaminhoes = Charts.getImage('chartDistribuicaoCaminhoes');
-    const imgDistOffroads = Charts.getImage('chartDistribuicaoOffroads');
-    const imgDistTipo = Charts.getImage('chartDistanciaPorTipo');
+    const cam = cicloMedioCaminhao(dataset.caminhoes);
+    const off = cicloMedioOffroad(dataset.offroads);
+
+    const painelOriginal = document.querySelector('.tab-panel.active');
+    const [imgCam, imgOff] = await capturarImagensCiclo(dataset);
+    if (painelOriginal) {
+      document.querySelectorAll('.tab-panel.active').forEach(p => p.classList.remove('active'));
+      painelOriginal.classList.add('active');
+    }
 
     area.innerHTML = `
       <div class="print-header">
@@ -24,39 +29,28 @@ const ExportModule = (function () {
         <p>Gerado em ${agora} • ${dataset.totalLinhas} registros processados</p>
       </div>
 
-      <h2>1. Resumo Executivo</h2>
+      <h2>Visão de Ciclo - Caminhões</h2>
       <div class="print-kpis">
-        ${printKpi('Qtd. Caminhões', r.qtdCaminhoes)}
-        ${printKpi('Qtd. Offroads', r.qtdOffroads)}
-        ${printKpi('Ciclo Médio Caminhões', Utils.formatHoras(r.cicloMedioCaminhoes))}
-        ${printKpi('Ciclo Médio Offroads', Utils.formatHoras(r.cicloMedioOffroads))}
-        ${printKpi('Distância Média Caminhões', `${Utils.formatNumber(r.distMediaCaminhoes)} km`)}
-        ${printKpi('Distância Média Offroads', `${Utils.formatNumber(r.distMediaOffroads)} km`)}
-        ${printKpi('Eficiência Operacional', Utils.formatPercent(r.percMedioOperacional))}
-        ${printKpi('Tempo de Espera', Utils.formatPercent(r.percMedioEspera))}
+        ${printKpi('Ciclo Médio', Utils.formatHoras(cam.cicloMedio))}
+        ${printKpi('Tempo Médio Carregamento', Utils.formatHoras(cam.carregamentoMedio))}
+        ${printKpi('Tempo Médio Ag. Carregamento', Utils.formatHoras(cam.agCarregamentoMedio))}
+        ${printKpi('Tempo Médio Transporte', Utils.formatHoras(cam.transporteMedio))}
+        ${printKpi('Tempo Médio Ag. Descarregamento', Utils.formatHoras(cam.agDescarregamentoMedio))}
+        ${printKpi('Tempo Médio Descarregamento', Utils.formatHoras(cam.descarregamentoMedio))}
+        ${printKpi('Tempo Médio Deslocamento Volta', Utils.formatHoras(cam.deslocamentoMedio))}
       </div>
+      ${imgCam ? `<div class="print-charts"><div><h4>Composição do Ciclo Médio - Caminhão</h4><img src="${imgCam}"/></div></div>` : ''}
 
-      <h2>2. Indicadores Gerais</h2>
-      <p>Total de equipamentos analisados: ${dataset.caminhoes.length + dataset.offroads.length}
-        (${dataset.caminhoes.length} caminhões, ${dataset.offroads.length} offroads)${
-        dataset.outros.length ? `, ${dataset.outros.length} não classificados` : ''}.</p>
-
-      <h2>3. Consolidado Caminhões</h2>
-      ${tabelaConsolidadoCaminhoes(dataset.caminhoes)}
-
-      <h2>4. Consolidado Offroads</h2>
-      ${tabelaConsolidadoOffroads(dataset.offroads)}
-
-      <h2>5. Rankings</h2>
-      ${blocoRankings(dataset)}
-
-      <h2>6. Gráficos Principais</h2>
-      <div class="print-charts">
-        ${imgCiclo ? `<div><h4>Ciclo por Equipamento</h4><img src="${imgCiclo}"/></div>` : ''}
-        ${imgDistCaminhoes ? `<div><h4>Distribuição dos Tempos - Caminhões</h4><img src="${imgDistCaminhoes}"/></div>` : ''}
-        ${imgDistOffroads ? `<div><h4>Distribuição dos Tempos - Offroads</h4><img src="${imgDistOffroads}"/></div>` : ''}
-        ${imgDistTipo ? `<div><h4>Distância Média por Tipo</h4><img src="${imgDistTipo}"/></div>` : ''}
+      <h2>Visão de Ciclo - Offroads</h2>
+      <div class="print-kpis">
+        ${printKpi('Ciclo Médio', Utils.formatHoras(off.cicloMedio))}
+        ${printKpi('Tempo Médio Abastecimento', Utils.formatHoras(off.abastecimentoMedio))}
+        ${printKpi('Tempo Médio Ag. Carregamento', Utils.formatHoras(off.agCarregamentoMedio))}
+        ${printKpi('Tempo Médio Falta Insumos', Utils.formatHoras(off.faltaInsumosMedio))}
+        ${printKpi('Tempo Médio Ag. Liberação', Utils.formatHoras(off.agLiberacaoMedio))}
+        ${printKpi('Tempo Médio Deslocamento', Utils.formatHoras(off.deslocamentoMedio))}
       </div>
+      ${imgOff ? `<div class="print-charts"><div><h4>Composição do Ciclo Médio - Offroad</h4><img src="${imgOff}"/></div></div>` : ''}
     `;
 
     document.body.classList.add('print-mode');
@@ -64,73 +58,62 @@ const ExportModule = (function () {
     setTimeout(() => document.body.classList.remove('print-mode'), 500);
   }
 
+  // Os gráficos de composição do ciclo vivem nas abas Caminhões/Offroads.
+  // Se o usuário nunca visitou essas abas, o canvas foi criado dentro de um
+  // container display:none - o ResizeObserver do Chart.js ignora containers
+  // 0x0 na criação e o gráfico nunca chega a desenhar, então só chamar
+  // resize() depois não resolve. A solução é tornar a aba visível e
+  // recriar o gráfico nesse momento, quando o container já tem tamanho
+  // real; depois devolvemos a aba ativa original.
+  async function capturarImagensCiclo(dataset) {
+    const imgCam = await capturarUmaAba('tab-caminhoes', 'chartCicloCaminhao', () => Render.renderCaminhoesTab(dataset));
+    const imgOff = await capturarUmaAba('tab-offroads', 'chartCicloOffroad', () => Render.renderOffroadsTab(dataset));
+    return [imgCam, imgOff];
+  }
+
+  // Ativa uma única aba por vez, recria seu gráfico e captura a imagem.
+  // Processar uma de cada vez (em vez de deixar as duas visíveis ao mesmo
+  // tempo) evita que o navegador calcule um layout inconsistente durante
+  // a transição. A aba originalmente ativa é restaurada pelo chamador.
+  async function capturarUmaAba(painelId, canvasId, renderFn) {
+    const painel = document.getElementById(painelId);
+    document.querySelectorAll('.tab-panel.active').forEach(p => p.classList.remove('active'));
+    painel.classList.add('active');
+    renderFn();
+
+    // O gráfico acabou de ser (re)criado, então a animação de entrada do
+    // Chart.js (duração padrão de 1s) ainda está em andamento; capturar
+    // cedo demais pega um quadro parcial (arco "crescendo"). Espera a
+    // animação terminar antes de gerar a imagem.
+    await new Promise(resolve => setTimeout(resolve, 1100));
+    return Charts.getImage(canvasId);
+  }
+
+  function cicloMedioCaminhao(rows) {
+    return {
+      cicloMedio: Utils.avg(rows.map(c => c.cicloTotal)),
+      carregamentoMedio: Utils.avg(rows.map(c => c.tempoCarregamento)),
+      agCarregamentoMedio: Utils.avg(rows.map(c => c.tempoAgCarregamento)),
+      transporteMedio: Utils.avg(rows.map(c => c.tempoTransporte)),
+      agDescarregamentoMedio: Utils.avg(rows.map(c => c.tempoAgDescarregamento)),
+      descarregamentoMedio: Utils.avg(rows.map(c => c.tempoDescarregamento)),
+      deslocamentoMedio: Utils.avg(rows.map(c => c.tempoDeslocamentoVolta))
+    };
+  }
+
+  function cicloMedioOffroad(rows) {
+    return {
+      cicloMedio: Utils.avg(rows.map(o => o.cicloTotal)),
+      abastecimentoMedio: Utils.avg(rows.map(o => o.tempoAbastecimento)),
+      agCarregamentoMedio: Utils.avg(rows.map(o => o.tempoAgCarregamento)),
+      faltaInsumosMedio: Utils.avg(rows.map(o => o.tempoFaltaInsumos)),
+      agLiberacaoMedio: Utils.avg(rows.map(o => o.tempoAgLiberacao)),
+      deslocamentoMedio: Utils.avg(rows.map(o => o.tempoDeslocamento))
+    };
+  }
+
   function printKpi(label, value) {
     return `<div class="print-kpi"><span>${label}</span><strong>${value}</strong></div>`;
-  }
-
-  function tabelaConsolidadoCaminhoes(rows) {
-    if (!rows.length) return '<p>Nenhum caminhão encontrado.</p>';
-    return `<table class="print-table">
-      <thead><tr>
-        <th>Equipamento</th><th>Modelo</th><th>Ciclo Médio</th><th>Dist. Média/Ciclo</th>
-        <th>Eficiência Operacional</th><th>Tempo de Espera</th>
-      </tr></thead>
-      <tbody>
-        ${rows.map(c => `<tr>
-          <td>${Utils.escapeHtml(c.equipamento)}</td>
-          <td>${Utils.escapeHtml(c.modelo)}</td>
-          <td>${Utils.formatHoras(c.cicloTotal)}</td>
-          <td>${Utils.formatNumber(c.distTotal)} km</td>
-          <td>${Utils.formatPercent(c.percOperacional)}</td>
-          <td>${Utils.formatPercent(c.percEspera)}</td>
-        </tr>`).join('')}
-      </tbody></table>`;
-  }
-
-  function tabelaConsolidadoOffroads(rows) {
-    if (!rows.length) return '<p>Nenhum offroad encontrado.</p>';
-    return `<table class="print-table">
-      <thead><tr>
-        <th>Equipamento</th><th>Modelo</th><th>Ciclo Médio</th><th>Dist. Média/Ciclo</th>
-        <th>Tempo Espera Médio</th>
-      </tr></thead>
-      <tbody>
-        ${rows.map(o => `<tr>
-          <td>${Utils.escapeHtml(o.equipamento)}</td>
-          <td>${Utils.escapeHtml(o.modelo)}</td>
-          <td>${Utils.formatHoras(o.cicloTotal)}</td>
-          <td>${Utils.formatNumber(o.distPontoCarregamento)} km</td>
-          <td>${Utils.formatHoras(o.tempoEspera)}</td>
-        </tr>`).join('')}
-      </tbody></table>`;
-  }
-
-  function blocoRankings(dataset) {
-    const secoes = [
-      ['Caminhões - Maior Ciclo', rankTop(dataset.caminhoes, 'cicloTotal', true, 'h')],
-      ['Caminhões - Menor Ciclo', rankTop(dataset.caminhoes, 'cicloTotal', false, 'h')],
-      ['Caminhões - Maior Distância', rankTop(dataset.caminhoes, 'distTotal', true, 'km')],
-      ['Caminhões - Menor Distância', rankTop(dataset.caminhoes, 'distTotal', false, 'km')],
-      ['Caminhões - Maior Tempo de Espera', rankTop(dataset.caminhoes, 'tempoEspera', true, 'h')],
-      ['Offroads - Maior Ciclo', rankTop(dataset.offroads, 'cicloTotal', true, 'h')],
-      ['Offroads - Maior Tempo de Espera', rankTop(dataset.offroads, 'tempoEspera', true, 'h')],
-      ['Offroads - Maior Tempo de Deslocamento', rankTop(dataset.offroads, 'tempoDeslocamento', true, 'h')],
-      ['Offroads - Maior Tempo Falta de Insumos', rankTop(dataset.offroads, 'tempoFaltaInsumos', true, 'h')]
-    ];
-    return secoes.map(([titulo, html]) => `<h4>${titulo}</h4>${html}`).join('');
-  }
-
-  function rankTop(arr, field, desc, unit) {
-    const top = arr.slice().sort((a, b) => desc ? b[field] - a[field] : a[field] - b[field]).slice(0, 3);
-    if (!top.length) return '<p>Sem dados.</p>';
-    return `<table class="print-table print-table--small">
-      <tbody>
-        ${top.map((it, i) => `<tr>
-          <td>${i + 1}º</td>
-          <td>${Utils.escapeHtml(it.equipamento)}</td>
-          <td>${unit === 'h' ? Utils.formatHoras(it[field]) : `${Utils.formatNumber(it[field])} ${unit}`}</td>
-        </tr>`).join('')}
-      </tbody></table>`;
   }
 
   return { gerarPdfExecutivo };

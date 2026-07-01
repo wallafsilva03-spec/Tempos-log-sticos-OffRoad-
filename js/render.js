@@ -75,7 +75,33 @@ const Render = (function () {
 
   /* -------------------- TABELA CAMINHÕES -------------------- */
 
+  function renderCaminhaoCiclo(dataset) {
+    const rows = dataset.caminhoes;
+
+    const cicloMedio = Utils.avg(rows.map(c => c.cicloTotal));
+    const carregamentoMedio = Utils.avg(rows.map(c => c.tempoCarregamento));
+    const agCarregamentoMedio = Utils.avg(rows.map(c => c.tempoAgCarregamento));
+    const transporteMedio = Utils.avg(rows.map(c => c.tempoTransporte));
+    const agDescarregamentoMedio = Utils.avg(rows.map(c => c.tempoAgDescarregamento));
+    const descarregamentoMedio = Utils.avg(rows.map(c => c.tempoDescarregamento));
+    const deslocamentoMedio = Utils.avg(rows.map(c => c.tempoDeslocamentoVolta));
+
+    setText('camKpiCiclo', Utils.formatHoras(cicloMedio));
+    setText('camKpiCarregamento', Utils.formatHoras(carregamentoMedio));
+    setText('camKpiAgCarregamento', Utils.formatHoras(agCarregamentoMedio));
+    setText('camKpiTransporte', Utils.formatHoras(transporteMedio));
+    setText('camKpiAgDescarregamento', Utils.formatHoras(agDescarregamentoMedio));
+    setText('camKpiDescarregamento', Utils.formatHoras(descarregamentoMedio));
+    setText('camKpiDeslocamento', Utils.formatHoras(deslocamentoMedio));
+
+    Charts.renderDoughnut('chartCicloCaminhao',
+      ['Carregamento', 'Ag.Carregamento', 'Transporte', 'Ag.Descarregamento', 'Descarregamento', 'Deslocamento Volta'],
+      [carregamentoMedio, agCarregamentoMedio, transporteMedio, agDescarregamentoMedio, descarregamentoMedio, deslocamentoMedio].map(round2)
+    );
+  }
+
   function renderCaminhoesTab(dataset) {
+    renderCaminhaoCiclo(dataset);
     const rows = dataset.caminhoes;
     popularFiltro('filtroCaminhaoEquip', rows.map(r => r.equipamento));
     popularFiltro('filtroCaminhaoFrente', rows.map(r => r.frente));

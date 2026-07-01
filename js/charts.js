@@ -121,9 +121,18 @@ const Charts = (function () {
     return Utils.formatNumber(value);
   }
 
-  function getImage(canvasId) {
+  // Se o gráfico vive em uma aba que nunca foi exibida (display:none), seu
+  // canvas ainda tem tamanho 0x0 e a imagem exportada sairia em branco.
+  // Forçar um tamanho explícito antes de capturar resolve isso; depois
+  // devolve o gráfico ao modo responsivo normal.
+  function getImage(canvasId, forceWidth = 640, forceHeight = 360) {
     const chart = registry[canvasId];
-    return chart ? chart.toBase64Image() : null;
+    if (!chart) return null;
+    const precisaForcar = chart.width === 0 || chart.height === 0;
+    if (precisaForcar) chart.resize(forceWidth, forceHeight);
+    const img = chart.toBase64Image();
+    if (precisaForcar) chart.resize();
+    return img;
   }
 
   return { renderBar, renderDoughnut, renderHorizontalBar, destroy, destroyAll, getImage, registry };

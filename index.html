@@ -96,6 +96,25 @@
       <!-- CAMINHÕES -->
       <section class="tab-panel" id="tab-caminhoes">
         <h2 class="panel-title">Caminhões</h2>
+
+        <h3 class="section-subtitle">Visão de Ciclo</h3>
+        <div class="kpi-grid">
+          <div class="kpi-card"><span>Ciclo Médio</span><strong id="camKpiCiclo">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Carregamento</span><strong id="camKpiCarregamento">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Ag. Carregamento</span><strong id="camKpiAgCarregamento">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Transporte</span><strong id="camKpiTransporte">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Ag. Descarregamento</span><strong id="camKpiAgDescarregamento">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Descarregamento</span><strong id="camKpiDescarregamento">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Deslocamento Volta</span><strong id="camKpiDeslocamento">-</strong></div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <h3>Composição do Ciclo Médio - Caminhão</h3>
+            <div class="chart-container"><canvas id="chartCicloCaminhao"></canvas></div>
+          </div>
+        </div>
+
+        <h3 class="section-subtitle">Detalhamento por Equipamento</h3>
         <div class="filters-bar">
           <select id="filtroCaminhaoEquip"><option value="">Equipamento (Todos)</option></select>
           <select id="filtroCaminhaoFrente"><option value="">Frente (Todas)</option></select>
