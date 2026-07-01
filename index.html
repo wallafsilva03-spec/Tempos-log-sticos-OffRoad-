@@ -70,13 +70,21 @@
         </div>
 
         <div class="chart-grid">
-          <div class="chart-card">
-            <h3>Ciclo Médio por Tipo</h3>
-            <div class="chart-container"><canvas id="chartCicloPorTipo"></canvas></div>
+          <div class="chart-card chart-card--wide">
+            <h3>Ciclo por Equipamento</h3>
+            <div class="mini-legend">
+              <span><i class="dot dot--caminhao"></i>Caminhão</span>
+              <span><i class="dot dot--offroad"></i>Offroad</span>
+            </div>
+            <div class="chart-container chart-container--tall" id="chartCicloPorEquipamentoWrap"><canvas id="chartCicloPorEquipamento"></canvas></div>
           </div>
           <div class="chart-card">
-            <h3>Distribuição dos Tempos</h3>
-            <div class="chart-container"><canvas id="chartDistribuicaoTempos"></canvas></div>
+            <h3>Distribuição dos Tempos - Caminhões</h3>
+            <div class="chart-container"><canvas id="chartDistribuicaoCaminhoes"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Distribuição dos Tempos - Offroads</h3>
+            <div class="chart-container"><canvas id="chartDistribuicaoOffroads"></canvas></div>
           </div>
           <div class="chart-card">
             <h3>Distância Média por Tipo</h3>

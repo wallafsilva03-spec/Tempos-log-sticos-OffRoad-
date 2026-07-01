@@ -13,8 +13,9 @@ const ExportModule = (function () {
     const area = document.getElementById('printArea');
     const agora = new Date().toLocaleString('pt-BR');
 
-    const imgCiclo = Charts.getImage('chartCicloPorTipo');
-    const imgDist = Charts.getImage('chartDistribuicaoTempos');
+    const imgCiclo = Charts.getImage('chartCicloPorEquipamento');
+    const imgDistCaminhoes = Charts.getImage('chartDistribuicaoCaminhoes');
+    const imgDistOffroads = Charts.getImage('chartDistribuicaoOffroads');
     const imgDistTipo = Charts.getImage('chartDistanciaPorTipo');
 
     area.innerHTML = `
@@ -51,8 +52,9 @@ const ExportModule = (function () {
 
       <h2>6. Gráficos Principais</h2>
       <div class="print-charts">
-        ${imgCiclo ? `<div><h4>Ciclo Médio por Tipo</h4><img src="${imgCiclo}"/></div>` : ''}
-        ${imgDist ? `<div><h4>Distribuição dos Tempos</h4><img src="${imgDist}"/></div>` : ''}
+        ${imgCiclo ? `<div><h4>Ciclo por Equipamento</h4><img src="${imgCiclo}"/></div>` : ''}
+        ${imgDistCaminhoes ? `<div><h4>Distribuição dos Tempos - Caminhões</h4><img src="${imgDistCaminhoes}"/></div>` : ''}
+        ${imgDistOffroads ? `<div><h4>Distribuição dos Tempos - Offroads</h4><img src="${imgDistOffroads}"/></div>` : ''}
         ${imgDistTipo ? `<div><h4>Distância Média por Tipo</h4><img src="${imgDistTipo}"/></div>` : ''}
       </div>
     `;

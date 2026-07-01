@@ -24,32 +24,46 @@ const Render = (function () {
     setText('kpiPercOperacional', Utils.formatPercent(r.percMedioOperacional));
     setText('kpiPercEspera', Utils.formatPercent(r.percMedioEspera));
 
-    // Gráfico 1: Ciclo Médio por Tipo
-    Charts.renderBar('chartCicloPorTipo', ['Caminhões', 'Offroads'], [{
-      label: 'Ciclo Médio (h)',
-      data: [round2(r.cicloMedioCaminhoes), round2(r.cicloMedioOffroads)],
-      backgroundColor: [APP_CONFIG.colors.primary, APP_CONFIG.colors.info]
-    }], { labelUnit: 'h' });
+    // Gráfico 1: Ciclo por Equipamento (granularidade individual, não só a média do tipo)
+    const equipamentosCiclo = [
+      ...dataset.caminhoes.map(c => ({ equipamento: c.equipamento, ciclo: c.cicloTotal, tipo: 'CAMINHAO' })),
+      ...dataset.offroads.map(o => ({ equipamento: o.equipamento, ciclo: o.cicloTotal, tipo: 'OFFROAD' }))
+    ].sort((a, b) => b.ciclo - a.ciclo);
 
-    // Gráfico 2: Distribuição dos Tempos (soma total de todas as atividades classificadas)
-    const A1 = APP_CONFIG.atividadesCaminhao, A2 = APP_CONFIG.atividadesOffroad;
-    const labelsTempo = [
-      'Carregamento', 'Ag.Carregamento', 'Transporte', 'Ag.Descarregamento',
-      'Descarregamento', 'Deslocamento Volta', 'Abastecimento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento Offroad'
-    ];
-    const valoresTempo = [
+    const wrapEl = document.getElementById('chartCicloPorEquipamentoWrap');
+    if (wrapEl) wrapEl.style.height = `${Math.max(320, equipamentosCiclo.length * 30)}px`;
+
+    Charts.renderHorizontalBar('chartCicloPorEquipamento',
+      equipamentosCiclo.map(e => e.equipamento),
+      [{
+        label: 'Ciclo (h)',
+        data: equipamentosCiclo.map(e => round2(e.ciclo)),
+        backgroundColor: equipamentosCiclo.map(e => e.tipo === 'CAMINHAO' ? APP_CONFIG.colors.primary : APP_CONFIG.colors.info)
+      }],
+      { labelUnit: 'h' }
+    );
+
+    // Gráfico 2: Distribuição dos Tempos - separada por Caminhões e Offroads
+    const labelsCaminhao = ['Carregamento', 'Ag.Carregamento', 'Transporte', 'Ag.Descarregamento', 'Descarregamento', 'Deslocamento Volta'];
+    const valoresCaminhao = [
       Utils.sum(dataset.caminhoes.map(c => c.tempoCarregamento)),
       Utils.sum(dataset.caminhoes.map(c => c.tempoAgCarregamento)),
       Utils.sum(dataset.caminhoes.map(c => c.tempoTransporte)),
       Utils.sum(dataset.caminhoes.map(c => c.tempoAgDescarregamento)),
       Utils.sum(dataset.caminhoes.map(c => c.tempoDescarregamento)),
-      Utils.sum(dataset.caminhoes.map(c => c.tempoDeslocamentoVolta)),
+      Utils.sum(dataset.caminhoes.map(c => c.tempoDeslocamentoVolta))
+    ].map(round2);
+    Charts.renderDoughnut('chartDistribuicaoCaminhoes', labelsCaminhao, valoresCaminhao);
+
+    const labelsOffroad = ['Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'];
+    const valoresOffroad = [
       Utils.sum(dataset.offroads.map(o => o.tempoAbastecimento)),
+      Utils.sum(dataset.offroads.map(o => o.tempoAgCarregamento)),
       Utils.sum(dataset.offroads.map(o => o.tempoFaltaInsumos)),
       Utils.sum(dataset.offroads.map(o => o.tempoAgLiberacao)),
       Utils.sum(dataset.offroads.map(o => o.tempoDeslocamento))
     ].map(round2);
-    Charts.renderDoughnut('chartDistribuicaoTempos', labelsTempo, valoresTempo);
+    Charts.renderDoughnut('chartDistribuicaoOffroads', labelsOffroad, valoresOffroad);
 
     // Gráfico 3: Distância Média por Tipo
     Charts.renderBar('chartDistanciaPorTipo', ['Caminhões', 'Offroads'], [{
