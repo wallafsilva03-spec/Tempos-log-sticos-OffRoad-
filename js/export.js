@@ -72,7 +72,7 @@ const ExportModule = (function () {
     if (!rows.length) return '<p>Nenhum caminhão encontrado.</p>';
     return `<table class="print-table">
       <thead><tr>
-        <th>Equipamento</th><th>Modelo</th><th>Ciclo Total</th><th>Dist. Total</th>
+        <th>Equipamento</th><th>Modelo</th><th>Ciclo Médio</th><th>Dist. Média/Ciclo</th>
         <th>% Operacional</th><th>% Espera</th>
       </tr></thead>
       <tbody>
@@ -91,8 +91,8 @@ const ExportModule = (function () {
     if (!rows.length) return '<p>Nenhum offroad encontrado.</p>';
     return `<table class="print-table">
       <thead><tr>
-        <th>Equipamento</th><th>Modelo</th><th>Ciclo Total</th><th>Dist. Deslocamento</th>
-        <th>Tempo Espera</th>
+        <th>Equipamento</th><th>Modelo</th><th>Ciclo Médio</th><th>Dist. Média/Ciclo</th>
+        <th>Tempo Espera Médio</th>
       </tr></thead>
       <tbody>
         ${rows.map(o => `<tr>

@@ -24,6 +24,19 @@ const Calculations = (function () {
     return Utils.sum(rows.filter(r => matchesCategoria(r, categoria)).map(r => r.TempoDecimal));
   }
 
+  // Um equipamento executa a mesma atividade (ex.: Carregamento) várias
+  // vezes ao longo do período importado (um ciclo por viagem). O indicador
+  // de tempo de cada etapa é a MÉDIA de duração por ocorrência - o tempo
+  // médio daquela etapa em UM ciclo - e não a soma acumulada do período
+  // inteiro (que cresceria sem limite conforme mais dias fossem importados).
+  function avgTempoAtividade(rows, categoria) {
+    return Utils.avg(rows.filter(r => matchesCategoria(r, categoria)).map(r => r.TempoDecimal));
+  }
+
+  function countCategoria(rows, categoria) {
+    return rows.filter(r => matchesCategoria(r, categoria)).length;
+  }
+
   function avgVelocidadeAtividade(rows, categoria) {
     const vals = rows.filter(r => matchesCategoria(r, categoria) && r.Velocidade > 0).map(r => r.Velocidade);
     return Utils.avg(vals);
@@ -42,12 +55,13 @@ const Calculations = (function () {
   function calcularCaminhao(equipamento, rows) {
     const A = APP_CONFIG.atividadesCaminhao;
 
-    const tempoCarregamento = sumTempoAtividade(rows, A.carregamento);
-    const tempoAgCarregamento = sumTempoAtividade(rows, A.agCarregamento);
-    const tempoTransporte = sumTempoAtividade(rows, A.transporte);
-    const tempoAgDescarregamento = sumTempoAtividade(rows, A.agDescarregamento);
-    const tempoDescarregamento = sumTempoAtividade(rows, A.descarregamento);
-    const tempoDeslocamentoVolta = sumTempoAtividade(rows, A.deslocamentoVolta);
+    const tempoCarregamento = avgTempoAtividade(rows, A.carregamento);
+    const tempoAgCarregamento = avgTempoAtividade(rows, A.agCarregamento);
+    const tempoTransporte = avgTempoAtividade(rows, A.transporte);
+    const tempoAgDescarregamento = avgTempoAtividade(rows, A.agDescarregamento);
+    const tempoDescarregamento = avgTempoAtividade(rows, A.descarregamento);
+    const tempoDeslocamentoVolta = avgTempoAtividade(rows, A.deslocamentoVolta);
+    const numCiclos = countCategoria(rows, A.carregamento);
 
     const velMediaIda = avgVelocidadeAtividade(rows, A.transporte);
     const velMediaVolta = avgVelocidadeAtividade(rows, A.deslocamentoVolta);
@@ -72,6 +86,7 @@ const Calculations = (function () {
       frente: Utils.mode(rows.map(r => r.Frente)),
       fazenda: Utils.mode(rows.map(r => r.Fazenda)),
       tipo: 'CAMINHAO',
+      numCiclos,
       tempoCarregamento,
       tempoAgCarregamento,
       tempoTransporte,
@@ -94,11 +109,12 @@ const Calculations = (function () {
   function calcularOffroad(equipamento, rows) {
     const A = APP_CONFIG.atividadesOffroad;
 
-    const tempoAbastecimento = sumTempoAtividade(rows, A.abastecimento);
-    const tempoAgCarregamento = sumTempoAtividade(rows, A.agCarregamento);
-    const tempoFaltaInsumos = sumTempoAtividade(rows, A.faltaInsumos);
-    const tempoAgLiberacao = sumTempoAtividade(rows, A.agLiberacao);
-    const tempoDeslocamento = sumTempoAtividade(rows, A.deslocamento);
+    const tempoAbastecimento = avgTempoAtividade(rows, A.abastecimento);
+    const tempoAgCarregamento = avgTempoAtividade(rows, A.agCarregamento);
+    const tempoFaltaInsumos = avgTempoAtividade(rows, A.faltaInsumos);
+    const tempoAgLiberacao = avgTempoAtividade(rows, A.agLiberacao);
+    const tempoDeslocamento = avgTempoAtividade(rows, A.deslocamento);
+    const numCiclos = countCategoria(rows, A.deslocamento);
 
     const velMediaDeslocamento = avgVelocidadeAtividade(rows, A.deslocamento);
     const distPontoCarregamento = tempoDeslocamento * velMediaDeslocamento;
@@ -114,6 +130,7 @@ const Calculations = (function () {
       frente: Utils.mode(rows.map(r => r.Frente)),
       fazenda: Utils.mode(rows.map(r => r.Fazenda)),
       tipo: 'OFFROAD',
+      numCiclos,
       tempoAbastecimento,
       tempoAgCarregamento,
       tempoFaltaInsumos,
@@ -189,5 +206,5 @@ const Calculations = (function () {
     };
   }
 
-  return { buildDataset, resumoExecutivo, sumTempoAtividade, avgVelocidadeAtividade, groupBy };
+  return { buildDataset, resumoExecutivo, sumTempoAtividade, avgTempoAtividade, avgVelocidadeAtividade, countCategoria, groupBy };
 })();

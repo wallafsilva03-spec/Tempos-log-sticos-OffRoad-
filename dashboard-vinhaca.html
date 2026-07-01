@@ -612,11 +612,11 @@ body.print-mode #printArea { display: block; padding: 20px; }
         <div class="table-card">
           <table id="tabelaCaminhoes" class="display compact" style="width:100%">
             <thead><tr>
-              <th>Equipamento</th><th>Modelo</th><th>Frente</th><th>Fazenda</th>
-              <th>Tempo Carregamento</th><th>Tempo Ag.Carregamento</th><th>Tempo Transporte</th>
-              <th>Tempo Ag.Descarregamento</th><th>Tempo Descarregamento</th><th>Tempo Deslocamento</th>
-              <th>Vel. Ida</th><th>Vel. Volta</th><th>Dist. Ida</th><th>Dist. Volta</th>
-              <th>Dist. Total</th><th>Ciclo Total</th><th>% Operacional</th><th>% Espera</th>
+              <th>Equipamento</th><th>Modelo</th><th>Frente</th><th>Fazenda</th><th>Nº Ciclos</th>
+              <th>Tempo Médio Carregamento</th><th>Tempo Médio Ag.Carregamento</th><th>Tempo Médio Transporte</th>
+              <th>Tempo Médio Ag.Descarregamento</th><th>Tempo Médio Descarregamento</th><th>Tempo Médio Deslocamento</th>
+              <th>Vel. Ida</th><th>Vel. Volta</th><th>Dist. Ida (méd.)</th><th>Dist. Volta (méd.)</th>
+              <th>Dist. Média/Ciclo</th><th>Ciclo Médio</th><th>% Operacional</th><th>% Espera</th>
             </tr></thead>
             <tbody></tbody>
           </table>
@@ -653,10 +653,10 @@ body.print-mode #printArea { display: block; padding: 20px; }
         <div class="table-card">
           <table id="tabelaOffroads" class="display compact" style="width:100%">
             <thead><tr>
-              <th>Equipamento</th><th>Modelo</th><th>Frente</th><th>Fazenda</th>
-              <th>Tempo Abastecimento</th><th>Tempo Ag.Carregamento</th><th>Tempo Falta Insumos</th>
-              <th>Tempo Ag.Liberação</th><th>Tempo Deslocamento</th><th>Vel. Média</th>
-              <th>Dist. Ponto Carreg.</th><th>Ciclo Total</th>
+              <th>Equipamento</th><th>Modelo</th><th>Frente</th><th>Fazenda</th><th>Nº Ciclos</th>
+              <th>Tempo Médio Abastecimento</th><th>Tempo Médio Ag.Carregamento</th><th>Tempo Médio Falta Insumos</th>
+              <th>Tempo Médio Ag.Liberação</th><th>Tempo Médio Deslocamento</th><th>Vel. Média</th>
+              <th>Dist. Média/Ciclo</th><th>Ciclo Médio</th>
             </tr></thead>
             <tbody></tbody>
           </table>
@@ -1162,6 +1162,19 @@ const Calculations = (function () {
     return Utils.sum(rows.filter(r => matchesCategoria(r, categoria)).map(r => r.TempoDecimal));
   }
 
+  // Um equipamento executa a mesma atividade (ex.: Carregamento) várias
+  // vezes ao longo do período importado (um ciclo por viagem). O indicador
+  // de tempo de cada etapa é a MÉDIA de duração por ocorrência - o tempo
+  // médio daquela etapa em UM ciclo - e não a soma acumulada do período
+  // inteiro (que cresceria sem limite conforme mais dias fossem importados).
+  function avgTempoAtividade(rows, categoria) {
+    return Utils.avg(rows.filter(r => matchesCategoria(r, categoria)).map(r => r.TempoDecimal));
+  }
+
+  function countCategoria(rows, categoria) {
+    return rows.filter(r => matchesCategoria(r, categoria)).length;
+  }
+
   function avgVelocidadeAtividade(rows, categoria) {
     const vals = rows.filter(r => matchesCategoria(r, categoria) && r.Velocidade > 0).map(r => r.Velocidade);
     return Utils.avg(vals);
@@ -1180,12 +1193,13 @@ const Calculations = (function () {
   function calcularCaminhao(equipamento, rows) {
     const A = APP_CONFIG.atividadesCaminhao;
 
-    const tempoCarregamento = sumTempoAtividade(rows, A.carregamento);
-    const tempoAgCarregamento = sumTempoAtividade(rows, A.agCarregamento);
-    const tempoTransporte = sumTempoAtividade(rows, A.transporte);
-    const tempoAgDescarregamento = sumTempoAtividade(rows, A.agDescarregamento);
-    const tempoDescarregamento = sumTempoAtividade(rows, A.descarregamento);
-    const tempoDeslocamentoVolta = sumTempoAtividade(rows, A.deslocamentoVolta);
+    const tempoCarregamento = avgTempoAtividade(rows, A.carregamento);
+    const tempoAgCarregamento = avgTempoAtividade(rows, A.agCarregamento);
+    const tempoTransporte = avgTempoAtividade(rows, A.transporte);
+    const tempoAgDescarregamento = avgTempoAtividade(rows, A.agDescarregamento);
+    const tempoDescarregamento = avgTempoAtividade(rows, A.descarregamento);
+    const tempoDeslocamentoVolta = avgTempoAtividade(rows, A.deslocamentoVolta);
+    const numCiclos = countCategoria(rows, A.carregamento);
 
     const velMediaIda = avgVelocidadeAtividade(rows, A.transporte);
     const velMediaVolta = avgVelocidadeAtividade(rows, A.deslocamentoVolta);
@@ -1210,6 +1224,7 @@ const Calculations = (function () {
       frente: Utils.mode(rows.map(r => r.Frente)),
       fazenda: Utils.mode(rows.map(r => r.Fazenda)),
       tipo: 'CAMINHAO',
+      numCiclos,
       tempoCarregamento,
       tempoAgCarregamento,
       tempoTransporte,
@@ -1232,11 +1247,12 @@ const Calculations = (function () {
   function calcularOffroad(equipamento, rows) {
     const A = APP_CONFIG.atividadesOffroad;
 
-    const tempoAbastecimento = sumTempoAtividade(rows, A.abastecimento);
-    const tempoAgCarregamento = sumTempoAtividade(rows, A.agCarregamento);
-    const tempoFaltaInsumos = sumTempoAtividade(rows, A.faltaInsumos);
-    const tempoAgLiberacao = sumTempoAtividade(rows, A.agLiberacao);
-    const tempoDeslocamento = sumTempoAtividade(rows, A.deslocamento);
+    const tempoAbastecimento = avgTempoAtividade(rows, A.abastecimento);
+    const tempoAgCarregamento = avgTempoAtividade(rows, A.agCarregamento);
+    const tempoFaltaInsumos = avgTempoAtividade(rows, A.faltaInsumos);
+    const tempoAgLiberacao = avgTempoAtividade(rows, A.agLiberacao);
+    const tempoDeslocamento = avgTempoAtividade(rows, A.deslocamento);
+    const numCiclos = countCategoria(rows, A.deslocamento);
 
     const velMediaDeslocamento = avgVelocidadeAtividade(rows, A.deslocamento);
     const distPontoCarregamento = tempoDeslocamento * velMediaDeslocamento;
@@ -1252,6 +1268,7 @@ const Calculations = (function () {
       frente: Utils.mode(rows.map(r => r.Frente)),
       fazenda: Utils.mode(rows.map(r => r.Fazenda)),
       tipo: 'OFFROAD',
+      numCiclos,
       tempoAbastecimento,
       tempoAgCarregamento,
       tempoFaltaInsumos,
@@ -1327,7 +1344,7 @@ const Calculations = (function () {
     };
   }
 
-  return { buildDataset, resumoExecutivo, sumTempoAtividade, avgVelocidadeAtividade, groupBy };
+  return { buildDataset, resumoExecutivo, sumTempoAtividade, avgTempoAtividade, avgVelocidadeAtividade, countCategoria, groupBy };
 })();
 
 </script>
@@ -1554,6 +1571,7 @@ const Render = (function () {
       Utils.escapeHtml(c.modelo),
       Utils.escapeHtml(c.frente),
       Utils.escapeHtml(c.fazenda),
+      c.numCiclos,
       Utils.formatHoras(c.tempoCarregamento),
       Utils.formatHoras(c.tempoAgCarregamento),
       Utils.formatHoras(c.tempoTransporte),
@@ -1623,6 +1641,7 @@ const Render = (function () {
       Utils.escapeHtml(o.modelo),
       Utils.escapeHtml(o.frente),
       Utils.escapeHtml(o.fazenda),
+      o.numCiclos,
       Utils.formatHoras(o.tempoAbastecimento),
       Utils.formatHoras(o.tempoAgCarregamento),
       Utils.formatHoras(o.tempoFaltaInsumos),
@@ -1737,6 +1756,7 @@ const Render = (function () {
         <div><span class="info-label">Frente</span><span class="info-value">${Utils.escapeHtml(item.frente || '-')}</span></div>
         <div><span class="info-label">Fazenda</span><span class="info-value">${Utils.escapeHtml(item.fazenda || '-')}</span></div>
         <div><span class="info-label">Registros</span><span class="info-value">${item.registros.length}</span></div>
+        ${item.numCiclos !== undefined ? `<div><span class="info-label">Número de Ciclos</span><span class="info-value">${item.numCiclos}</span></div>` : ''}
       </div>`;
 
     let indicadoresHtml = '';
@@ -1744,16 +1764,16 @@ const Render = (function () {
 
     if (item.tipo === 'CAMINHAO') {
       indicadoresHtml = indicadorCards([
-        ['Tempo Carregamento', Utils.formatHoras(item.tempoCarregamento)],
-        ['Tempo Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
-        ['Tempo Transporte', Utils.formatHoras(item.tempoTransporte)],
-        ['Tempo Ag. Descarregamento', Utils.formatHoras(item.tempoAgDescarregamento)],
-        ['Tempo Descarregamento', Utils.formatHoras(item.tempoDescarregamento)],
-        ['Tempo Deslocamento Volta', Utils.formatHoras(item.tempoDeslocamentoVolta)],
+        ['Tempo Médio Carregamento', Utils.formatHoras(item.tempoCarregamento)],
+        ['Tempo Médio Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
+        ['Tempo Médio Transporte', Utils.formatHoras(item.tempoTransporte)],
+        ['Tempo Médio Ag. Descarregamento', Utils.formatHoras(item.tempoAgDescarregamento)],
+        ['Tempo Médio Descarregamento', Utils.formatHoras(item.tempoDescarregamento)],
+        ['Tempo Médio Deslocamento Volta', Utils.formatHoras(item.tempoDeslocamentoVolta)],
         ['Velocidade Média Ida', `${Utils.formatNumber(item.velMediaIda)} km/h`],
         ['Velocidade Média Volta', `${Utils.formatNumber(item.velMediaVolta)} km/h`],
-        ['Distância Total', `${Utils.formatNumber(item.distTotal)} km`],
-        ['Ciclo Total', Utils.formatHoras(item.cicloTotal)],
+        ['Distância Média/Ciclo', `${Utils.formatNumber(item.distTotal)} km`],
+        ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)],
         ['% Operacional', Utils.formatPercent(item.percOperacional)],
         ['% Espera', Utils.formatPercent(item.percEspera)]
       ]);
@@ -1762,14 +1782,14 @@ const Render = (function () {
         item.tempoAgDescarregamento, item.tempoDescarregamento, item.tempoDeslocamentoVolta];
     } else if (item.tipo === 'OFFROAD') {
       indicadoresHtml = indicadorCards([
-        ['Tempo Abastecimento', Utils.formatHoras(item.tempoAbastecimento)],
-        ['Tempo Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
-        ['Tempo Falta Insumos', Utils.formatHoras(item.tempoFaltaInsumos)],
-        ['Tempo Ag. Liberação', Utils.formatHoras(item.tempoAgLiberacao)],
-        ['Tempo Deslocamento', Utils.formatHoras(item.tempoDeslocamento)],
+        ['Tempo Médio Abastecimento', Utils.formatHoras(item.tempoAbastecimento)],
+        ['Tempo Médio Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
+        ['Tempo Médio Falta Insumos', Utils.formatHoras(item.tempoFaltaInsumos)],
+        ['Tempo Médio Ag. Liberação', Utils.formatHoras(item.tempoAgLiberacao)],
+        ['Tempo Médio Deslocamento', Utils.formatHoras(item.tempoDeslocamento)],
         ['Velocidade Média', `${Utils.formatNumber(item.velMediaDeslocamento)} km/h`],
-        ['Distância ao Ponto Carreg.', `${Utils.formatNumber(item.distPontoCarregamento)} km`],
-        ['Ciclo Total', Utils.formatHoras(item.cicloTotal)]
+        ['Distância Média/Ciclo', `${Utils.formatNumber(item.distPontoCarregamento)} km`],
+        ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)]
       ]);
       cicloLabels = ['Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'];
       cicloValores = [item.tempoAbastecimento, item.tempoAgCarregamento, item.tempoFaltaInsumos,
@@ -2021,7 +2041,7 @@ const ExportModule = (function () {
     if (!rows.length) return '<p>Nenhum caminhão encontrado.</p>';
     return `<table class="print-table">
       <thead><tr>
-        <th>Equipamento</th><th>Modelo</th><th>Ciclo Total</th><th>Dist. Total</th>
+        <th>Equipamento</th><th>Modelo</th><th>Ciclo Médio</th><th>Dist. Média/Ciclo</th>
         <th>% Operacional</th><th>% Espera</th>
       </tr></thead>
       <tbody>
@@ -2040,8 +2060,8 @@ const ExportModule = (function () {
     if (!rows.length) return '<p>Nenhum offroad encontrado.</p>';
     return `<table class="print-table">
       <thead><tr>
-        <th>Equipamento</th><th>Modelo</th><th>Ciclo Total</th><th>Dist. Deslocamento</th>
-        <th>Tempo Espera</th>
+        <th>Equipamento</th><th>Modelo</th><th>Ciclo Médio</th><th>Dist. Média/Ciclo</th>
+        <th>Tempo Espera Médio</th>
       </tr></thead>
       <tbody>
         ${rows.map(o => `<tr>

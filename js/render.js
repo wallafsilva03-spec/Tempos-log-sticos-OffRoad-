@@ -87,6 +87,7 @@ const Render = (function () {
       Utils.escapeHtml(c.modelo),
       Utils.escapeHtml(c.frente),
       Utils.escapeHtml(c.fazenda),
+      c.numCiclos,
       Utils.formatHoras(c.tempoCarregamento),
       Utils.formatHoras(c.tempoAgCarregamento),
       Utils.formatHoras(c.tempoTransporte),
@@ -156,6 +157,7 @@ const Render = (function () {
       Utils.escapeHtml(o.modelo),
       Utils.escapeHtml(o.frente),
       Utils.escapeHtml(o.fazenda),
+      o.numCiclos,
       Utils.formatHoras(o.tempoAbastecimento),
       Utils.formatHoras(o.tempoAgCarregamento),
       Utils.formatHoras(o.tempoFaltaInsumos),
@@ -270,6 +272,7 @@ const Render = (function () {
         <div><span class="info-label">Frente</span><span class="info-value">${Utils.escapeHtml(item.frente || '-')}</span></div>
         <div><span class="info-label">Fazenda</span><span class="info-value">${Utils.escapeHtml(item.fazenda || '-')}</span></div>
         <div><span class="info-label">Registros</span><span class="info-value">${item.registros.length}</span></div>
+        ${item.numCiclos !== undefined ? `<div><span class="info-label">Número de Ciclos</span><span class="info-value">${item.numCiclos}</span></div>` : ''}
       </div>`;
 
     let indicadoresHtml = '';
@@ -277,16 +280,16 @@ const Render = (function () {
 
     if (item.tipo === 'CAMINHAO') {
       indicadoresHtml = indicadorCards([
-        ['Tempo Carregamento', Utils.formatHoras(item.tempoCarregamento)],
-        ['Tempo Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
-        ['Tempo Transporte', Utils.formatHoras(item.tempoTransporte)],
-        ['Tempo Ag. Descarregamento', Utils.formatHoras(item.tempoAgDescarregamento)],
-        ['Tempo Descarregamento', Utils.formatHoras(item.tempoDescarregamento)],
-        ['Tempo Deslocamento Volta', Utils.formatHoras(item.tempoDeslocamentoVolta)],
+        ['Tempo Médio Carregamento', Utils.formatHoras(item.tempoCarregamento)],
+        ['Tempo Médio Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
+        ['Tempo Médio Transporte', Utils.formatHoras(item.tempoTransporte)],
+        ['Tempo Médio Ag. Descarregamento', Utils.formatHoras(item.tempoAgDescarregamento)],
+        ['Tempo Médio Descarregamento', Utils.formatHoras(item.tempoDescarregamento)],
+        ['Tempo Médio Deslocamento Volta', Utils.formatHoras(item.tempoDeslocamentoVolta)],
         ['Velocidade Média Ida', `${Utils.formatNumber(item.velMediaIda)} km/h`],
         ['Velocidade Média Volta', `${Utils.formatNumber(item.velMediaVolta)} km/h`],
-        ['Distância Total', `${Utils.formatNumber(item.distTotal)} km`],
-        ['Ciclo Total', Utils.formatHoras(item.cicloTotal)],
+        ['Distância Média/Ciclo', `${Utils.formatNumber(item.distTotal)} km`],
+        ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)],
         ['% Operacional', Utils.formatPercent(item.percOperacional)],
         ['% Espera', Utils.formatPercent(item.percEspera)]
       ]);
@@ -295,14 +298,14 @@ const Render = (function () {
         item.tempoAgDescarregamento, item.tempoDescarregamento, item.tempoDeslocamentoVolta];
     } else if (item.tipo === 'OFFROAD') {
       indicadoresHtml = indicadorCards([
-        ['Tempo Abastecimento', Utils.formatHoras(item.tempoAbastecimento)],
-        ['Tempo Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
-        ['Tempo Falta Insumos', Utils.formatHoras(item.tempoFaltaInsumos)],
-        ['Tempo Ag. Liberação', Utils.formatHoras(item.tempoAgLiberacao)],
-        ['Tempo Deslocamento', Utils.formatHoras(item.tempoDeslocamento)],
+        ['Tempo Médio Abastecimento', Utils.formatHoras(item.tempoAbastecimento)],
+        ['Tempo Médio Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
+        ['Tempo Médio Falta Insumos', Utils.formatHoras(item.tempoFaltaInsumos)],
+        ['Tempo Médio Ag. Liberação', Utils.formatHoras(item.tempoAgLiberacao)],
+        ['Tempo Médio Deslocamento', Utils.formatHoras(item.tempoDeslocamento)],
         ['Velocidade Média', `${Utils.formatNumber(item.velMediaDeslocamento)} km/h`],
-        ['Distância ao Ponto Carreg.', `${Utils.formatNumber(item.distPontoCarregamento)} km`],
-        ['Ciclo Total', Utils.formatHoras(item.cicloTotal)]
+        ['Distância Média/Ciclo', `${Utils.formatNumber(item.distPontoCarregamento)} km`],
+        ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)]
       ]);
       cicloLabels = ['Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'];
       cicloValores = [item.tempoAbastecimento, item.tempoAgCarregamento, item.tempoFaltaInsumos,
