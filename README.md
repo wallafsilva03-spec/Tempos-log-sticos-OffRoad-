@@ -6,7 +6,15 @@ banco de dados ou instalação de software.
 
 ## Como usar
 
-1. Abra `index.html` diretamente no navegador (duplo clique ou `Abrir com...`).
+**Recomendado:** abra `dashboard-vinhaca.html` — é um arquivo único e
+autocontido (CSS e JavaScript embutidos, sem depender de outras pastas).
+Basta baixar esse arquivo sozinho e dar duplo clique nele.
+
+Alternativa (estrutura modular, para desenvolvimento): abra `index.html`,
+mas nesse caso as pastas `css/`, `js/` e `vendor/` precisam estar juntas
+dele, na mesma estrutura de pastas do repositório.
+
+1. Abra o arquivo HTML diretamente no navegador (duplo clique ou `Abrir com...`).
 2. Clique em **Importar XLSX** e selecione o arquivo padrão da operação.
 3. O sistema processa e recalcula tudo automaticamente.
 4. Navegue pelo menu lateral: Resumo Executivo, Caminhões, Offroads,
