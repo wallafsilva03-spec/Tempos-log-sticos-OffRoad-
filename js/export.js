@@ -32,8 +32,8 @@ const ExportModule = (function () {
         ${printKpi('Ciclo Médio Offroads', Utils.formatHoras(r.cicloMedioOffroads))}
         ${printKpi('Distância Média Caminhões', `${Utils.formatNumber(r.distMediaCaminhoes)} km`)}
         ${printKpi('Distância Média Offroads', `${Utils.formatNumber(r.distMediaOffroads)} km`)}
-        ${printKpi('% Operacional Médio', Utils.formatPercent(r.percMedioOperacional))}
-        ${printKpi('% Espera Médio', Utils.formatPercent(r.percMedioEspera))}
+        ${printKpi('Eficiência Operacional', Utils.formatPercent(r.percMedioOperacional))}
+        ${printKpi('Tempo de Espera', Utils.formatPercent(r.percMedioEspera))}
       </div>
 
       <h2>2. Indicadores Gerais</h2>
@@ -73,7 +73,7 @@ const ExportModule = (function () {
     return `<table class="print-table">
       <thead><tr>
         <th>Equipamento</th><th>Modelo</th><th>Ciclo Médio</th><th>Dist. Média/Ciclo</th>
-        <th>% Operacional</th><th>% Espera</th>
+        <th>Eficiência Operacional</th><th>Tempo de Espera</th>
       </tr></thead>
       <tbody>
         ${rows.map(c => `<tr>

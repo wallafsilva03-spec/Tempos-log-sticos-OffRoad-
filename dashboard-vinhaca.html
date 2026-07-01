@@ -572,8 +572,8 @@ body.print-mode #printArea { display: block; padding: 20px; }
           <div class="kpi-card"><span>Ciclo Médio Offroads</span><strong id="kpiCicloOffroads">-</strong></div>
           <div class="kpi-card"><span>Distância Média Caminhões</span><strong id="kpiDistCaminhoes">-</strong></div>
           <div class="kpi-card"><span>Distância Média Offroads</span><strong id="kpiDistOffroads">-</strong></div>
-          <div class="kpi-card"><span>% Operacional Médio</span><strong id="kpiPercOperacional">-</strong></div>
-          <div class="kpi-card"><span>% Espera Médio</span><strong id="kpiPercEspera">-</strong></div>
+          <div class="kpi-card"><span>Eficiência Operacional</span><strong id="kpiPercOperacional">-</strong></div>
+          <div class="kpi-card"><span>Tempo de Espera</span><strong id="kpiPercEspera">-</strong></div>
         </div>
 
         <div class="chart-grid">
@@ -616,7 +616,7 @@ body.print-mode #printArea { display: block; padding: 20px; }
               <th>Tempo Médio Carregamento</th><th>Tempo Médio Ag.Carregamento</th><th>Tempo Médio Transporte</th>
               <th>Tempo Médio Ag.Descarregamento</th><th>Tempo Médio Descarregamento</th><th>Tempo Médio Deslocamento</th>
               <th>Vel. Ida</th><th>Vel. Volta</th><th>Dist. Ida (méd.)</th><th>Dist. Volta (méd.)</th>
-              <th>Dist. Média/Ciclo</th><th>Ciclo Médio</th><th>% Operacional</th><th>% Espera</th>
+              <th>Dist. Média/Ciclo</th><th>Ciclo Médio</th><th>Eficiência Operacional</th><th>Tempo de Espera</th>
             </tr></thead>
             <tbody></tbody>
           </table>
@@ -1774,8 +1774,8 @@ const Render = (function () {
         ['Velocidade Média Volta', `${Utils.formatNumber(item.velMediaVolta)} km/h`],
         ['Distância Média/Ciclo', `${Utils.formatNumber(item.distTotal)} km`],
         ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)],
-        ['% Operacional', Utils.formatPercent(item.percOperacional)],
-        ['% Espera', Utils.formatPercent(item.percEspera)]
+        ['Eficiência Operacional', Utils.formatPercent(item.percOperacional)],
+        ['Tempo de Espera', Utils.formatPercent(item.percEspera)]
       ]);
       cicloLabels = ['Carregamento', 'Ag.Carregamento', 'Transporte', 'Ag.Descarregamento', 'Descarregamento', 'Deslocamento Volta'];
       cicloValores = [item.tempoCarregamento, item.tempoAgCarregamento, item.tempoTransporte,
@@ -2001,8 +2001,8 @@ const ExportModule = (function () {
         ${printKpi('Ciclo Médio Offroads', Utils.formatHoras(r.cicloMedioOffroads))}
         ${printKpi('Distância Média Caminhões', `${Utils.formatNumber(r.distMediaCaminhoes)} km`)}
         ${printKpi('Distância Média Offroads', `${Utils.formatNumber(r.distMediaOffroads)} km`)}
-        ${printKpi('% Operacional Médio', Utils.formatPercent(r.percMedioOperacional))}
-        ${printKpi('% Espera Médio', Utils.formatPercent(r.percMedioEspera))}
+        ${printKpi('Eficiência Operacional', Utils.formatPercent(r.percMedioOperacional))}
+        ${printKpi('Tempo de Espera', Utils.formatPercent(r.percMedioEspera))}
       </div>
 
       <h2>2. Indicadores Gerais</h2>
@@ -2042,7 +2042,7 @@ const ExportModule = (function () {
     return `<table class="print-table">
       <thead><tr>
         <th>Equipamento</th><th>Modelo</th><th>Ciclo Médio</th><th>Dist. Média/Ciclo</th>
-        <th>% Operacional</th><th>% Espera</th>
+        <th>Eficiência Operacional</th><th>Tempo de Espera</th>
       </tr></thead>
       <tbody>
         ${rows.map(c => `<tr>

@@ -290,8 +290,8 @@ const Render = (function () {
         ['Velocidade Média Volta', `${Utils.formatNumber(item.velMediaVolta)} km/h`],
         ['Distância Média/Ciclo', `${Utils.formatNumber(item.distTotal)} km`],
         ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)],
-        ['% Operacional', Utils.formatPercent(item.percOperacional)],
-        ['% Espera', Utils.formatPercent(item.percEspera)]
+        ['Eficiência Operacional', Utils.formatPercent(item.percOperacional)],
+        ['Tempo de Espera', Utils.formatPercent(item.percEspera)]
       ]);
       cicloLabels = ['Carregamento', 'Ag.Carregamento', 'Transporte', 'Ag.Descarregamento', 'Descarregamento', 'Deslocamento Volta'];
       cicloValores = [item.tempoCarregamento, item.tempoAgCarregamento, item.tempoTransporte,
