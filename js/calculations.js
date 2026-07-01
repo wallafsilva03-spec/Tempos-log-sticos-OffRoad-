@@ -42,6 +42,26 @@ const Calculations = (function () {
     return Utils.avg(vals);
   }
 
+  // A coluna Classificacao_Ativ marca cada linha como PRODUTIVA, AUXILIAR,
+  // IMPRODUTIVO ou MANUTENCAO, independente da atividade específica. Usamos
+  // essa classificação (em vez de uma lista fixa de atividades) para achar
+  // o tempo produtivo de forma robusta a mudanças de nomenclatura.
+  function isProdutiva(row) {
+    return Utils.normalize(row.Classificacao_Ativ) === 'produtiva';
+  }
+
+  function avgTempoProdutivo(rows) {
+    return Utils.avg(rows.filter(isProdutiva).map(r => r.TempoDecimal));
+  }
+
+  // % do tempo total registrado (todas as atividades) que foi produtivo.
+  function percProdutivo(rows) {
+    const total = Utils.sum(rows.map(r => r.TempoDecimal));
+    if (total <= 0) return 0;
+    const produtivo = Utils.sum(rows.filter(isProdutiva).map(r => r.TempoDecimal));
+    return (produtivo / total) * 100;
+  }
+
   function groupBy(rows, key) {
     const map = new Map();
     rows.forEach(r => {
@@ -80,6 +100,13 @@ const Calculations = (function () {
       ? ((tempoCarregamento + tempoTransporte + tempoDescarregamento + tempoDeslocamentoVolta) / cicloTotal) * 100
       : 0;
 
+    // No caminhão a atividade produtiva (Classificacao_Ativ = PRODUTIVA) já
+    // corresponde ao Transporte + Deslocamento Volta, então já está contida
+    // no Ciclo Total acima - aqui só expomos o valor agregado e o % sobre
+    // o tempo total registrado.
+    const tempoProdutivo = tempoTransporte + tempoDeslocamentoVolta;
+    const percProd = percProdutivo(rows);
+
     return {
       equipamento,
       modelo: Utils.mode(rows.map(r => r.Modelo)),
@@ -93,6 +120,8 @@ const Calculations = (function () {
       tempoAgDescarregamento,
       tempoDescarregamento,
       tempoDeslocamentoVolta,
+      tempoProdutivo,
+      percProdutivo: percProd,
       velMediaIda,
       velMediaVolta,
       distIda,
@@ -119,10 +148,18 @@ const Calculations = (function () {
     const velMediaDeslocamento = avgVelocidadeAtividade(rows, A.deslocamento);
     const distPontoCarregamento = tempoDeslocamento * velMediaDeslocamento;
 
-    const cicloTotal = tempoAbastecimento + tempoAgCarregamento + tempoFaltaInsumos +
-      tempoAgLiberacao + tempoDeslocamento;
+    // O offroad não tinha nenhuma atividade "produtiva" (aplicação de
+    // vinhaça) nas categorias originais - ela usa códigos próprios que
+    // variam de exportação para exportação, então identificamos pelo
+    // Classificacao_Ativ = PRODUTIVA em vez de um código fixo. Sem isso o
+    // Ciclo Total do offroad não incluía o tempo do trabalho em si.
+    const tempoAplicacao = avgTempoProdutivo(rows);
+
+    const cicloTotal = tempoAplicacao + tempoAbastecimento + tempoAgCarregamento +
+      tempoFaltaInsumos + tempoAgLiberacao + tempoDeslocamento;
 
     const tempoEspera = tempoAgCarregamento + tempoAgLiberacao + tempoFaltaInsumos;
+    const percProd = percProdutivo(rows);
 
     return {
       equipamento,
@@ -131,6 +168,8 @@ const Calculations = (function () {
       fazenda: Utils.mode(rows.map(r => r.Fazenda)),
       tipo: 'OFFROAD',
       numCiclos,
+      tempoAplicacao,
+      percProdutivo: percProd,
       tempoAbastecimento,
       tempoAgCarregamento,
       tempoFaltaInsumos,
@@ -198,11 +237,15 @@ const Calculations = (function () {
     const percMedioOperacional = Utils.avg(caminhoes.map(c => c.percOperacional));
     const percMedioEspera = Utils.avg(caminhoes.map(c => c.percEspera));
 
+    const percProdutivoMedioCaminhoes = Utils.avg(caminhoes.map(c => c.percProdutivo));
+    const percProdutivoMedioOffroads = Utils.avg(offroads.map(o => o.percProdutivo));
+
     return {
       qtdCaminhoes, qtdOffroads,
       cicloMedioCaminhoes, cicloMedioOffroads,
       distMediaCaminhoes, distMediaOffroads,
-      percMedioOperacional, percMedioEspera
+      percMedioOperacional, percMedioEspera,
+      percProdutivoMedioCaminhoes, percProdutivoMedioOffroads
     };
   }
 

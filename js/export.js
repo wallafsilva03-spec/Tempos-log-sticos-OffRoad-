@@ -38,17 +38,20 @@ const ExportModule = (function () {
         ${printKpi('Tempo Médio Ag. Descarregamento', Utils.formatHoras(cam.agDescarregamentoMedio))}
         ${printKpi('Tempo Médio Descarregamento', Utils.formatHoras(cam.descarregamentoMedio))}
         ${printKpi('Tempo Médio Deslocamento Volta', Utils.formatHoras(cam.deslocamentoMedio))}
+        ${printKpi('% Produtiva', Utils.formatPercent(cam.percProdutivoMedio))}
       </div>
       ${imgCam ? `<div class="print-charts"><div><h4>Composição do Ciclo Médio - Caminhão</h4><img src="${imgCam}"/></div></div>` : ''}
 
       <h2>Visão de Ciclo - Offroads</h2>
       <div class="print-kpis">
         ${printKpi('Ciclo Médio', Utils.formatHoras(off.cicloMedio))}
+        ${printKpi('Tempo Médio Aplicação', Utils.formatHoras(off.aplicacaoMedio))}
         ${printKpi('Tempo Médio Abastecimento', Utils.formatHoras(off.abastecimentoMedio))}
         ${printKpi('Tempo Médio Ag. Carregamento', Utils.formatHoras(off.agCarregamentoMedio))}
         ${printKpi('Tempo Médio Falta Insumos', Utils.formatHoras(off.faltaInsumosMedio))}
         ${printKpi('Tempo Médio Ag. Liberação', Utils.formatHoras(off.agLiberacaoMedio))}
         ${printKpi('Tempo Médio Deslocamento', Utils.formatHoras(off.deslocamentoMedio))}
+        ${printKpi('% Produtiva', Utils.formatPercent(off.percProdutivoMedio))}
       </div>
       ${imgOff ? `<div class="print-charts"><div><h4>Composição do Ciclo Médio - Offroad</h4><img src="${imgOff}"/></div></div>` : ''}
     `;
@@ -97,18 +100,21 @@ const ExportModule = (function () {
       transporteMedio: Utils.avg(rows.map(c => c.tempoTransporte)),
       agDescarregamentoMedio: Utils.avg(rows.map(c => c.tempoAgDescarregamento)),
       descarregamentoMedio: Utils.avg(rows.map(c => c.tempoDescarregamento)),
-      deslocamentoMedio: Utils.avg(rows.map(c => c.tempoDeslocamentoVolta))
+      deslocamentoMedio: Utils.avg(rows.map(c => c.tempoDeslocamentoVolta)),
+      percProdutivoMedio: Utils.avg(rows.map(c => c.percProdutivo))
     };
   }
 
   function cicloMedioOffroad(rows) {
     return {
       cicloMedio: Utils.avg(rows.map(o => o.cicloTotal)),
+      aplicacaoMedio: Utils.avg(rows.map(o => o.tempoAplicacao)),
       abastecimentoMedio: Utils.avg(rows.map(o => o.tempoAbastecimento)),
       agCarregamentoMedio: Utils.avg(rows.map(o => o.tempoAgCarregamento)),
       faltaInsumosMedio: Utils.avg(rows.map(o => o.tempoFaltaInsumos)),
       agLiberacaoMedio: Utils.avg(rows.map(o => o.tempoAgLiberacao)),
-      deslocamentoMedio: Utils.avg(rows.map(o => o.tempoDeslocamento))
+      deslocamentoMedio: Utils.avg(rows.map(o => o.tempoDeslocamento)),
+      percProdutivoMedio: Utils.avg(rows.map(o => o.percProdutivo))
     };
   }
 
