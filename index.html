@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Operacional - Distribuição de Vinhaça</title>
+
+<!-- DataTables CSS (vendorizado localmente) -->
+<link rel="stylesheet" href="vendor/jquery.dataTables.min.css">
+<!-- App CSS -->
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h1>Vinhaça OffRoad</h1>
+      <span>Painel Operacional</span>
+    </div>
+    <ul class="nav-list">
+      <li><button class="nav-item active" data-target="tab-resumo">📊 Resumo Executivo</button></li>
+      <li><button class="nav-item" data-target="tab-caminhoes">🚛 Caminhões</button></li>
+      <li><button class="nav-item" data-target="tab-offroads">🚜 Offroads</button></li>
+      <li><button class="nav-item" data-target="tab-equipamentos">🔧 Equipamentos</button></li>
+      <li><button class="nav-item" data-target="tab-rankings">🏆 Rankings</button></li>
+      <li><button class="nav-item" data-target="tab-exportacao">📄 Exportação</button></li>
+    </ul>
+    <div class="sidebar-footer">Processamento 100% local · sem servidor</div>
+  </aside>
+
+  <!-- ==================== MAIN ==================== -->
+  <div class="main">
+
+    <header class="topbar">
+      <div class="file-import">
+        <label class="btn" for="fileInput">⬆ Importar XLSX</label>
+        <input type="file" id="fileInput" accept=".xlsx,.xls">
+        <span class="loading-indicator" id="loadingIndicator"><span class="spinner"></span> Processando...</span>
+        <span class="file-status" id="fileStatus">Nenhum arquivo importado ainda.</span>
+      </div>
+    </header>
+
+    <div class="error-banner" id="errorBanner"></div>
+
+    <!-- Estado vazio (antes de importar) -->
+    <div class="empty-state" id="emptyState">
+      <div class="icon">📂</div>
+      <h2>Nenhum dado carregado</h2>
+      <p>Importe o arquivo XLSX padrão da operação de vinhaça para gerar as análises automaticamente.</p>
+    </div>
+
+    <!-- ==================== APP CONTENT ==================== -->
+    <div class="app-content" id="appContent">
+
+      <!-- RESUMO EXECUTIVO -->
+      <section class="tab-panel active" id="tab-resumo">
+        <h2 class="panel-title">Resumo Executivo</h2>
+        <div class="kpi-grid">
+          <div class="kpi-card"><span>Qtd. Caminhões</span><strong id="kpiQtdCaminhoes">-</strong></div>
+          <div class="kpi-card"><span>Qtd. Offroads</span><strong id="kpiQtdOffroads">-</strong></div>
+          <div class="kpi-card"><span>Ciclo Médio Caminhões</span><strong id="kpiCicloCaminhoes">-</strong></div>
+          <div class="kpi-card"><span>Ciclo Médio Offroads</span><strong id="kpiCicloOffroads">-</strong></div>
+          <div class="kpi-card"><span>Distância Média Caminhões</span><strong id="kpiDistCaminhoes">-</strong></div>
+          <div class="kpi-card"><span>Distância Média Offroads</span><strong id="kpiDistOffroads">-</strong></div>
+          <div class="kpi-card"><span>% Operacional Médio</span><strong id="kpiPercOperacional">-</strong></div>
+          <div class="kpi-card"><span>% Espera Médio</span><strong id="kpiPercEspera">-</strong></div>
+        </div>
+
+        <div class="chart-grid">
+          <div class="chart-card">
+            <h3>Ciclo Médio por Tipo</h3>
+            <div class="chart-container"><canvas id="chartCicloPorTipo"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Distribuição dos Tempos</h3>
+            <div class="chart-container"><canvas id="chartDistribuicaoTempos"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Distância Média por Tipo</h3>
+            <div class="chart-container"><canvas id="chartDistanciaPorTipo"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CAMINHÕES -->
+      <section class="tab-panel" id="tab-caminhoes">
+        <h2 class="panel-title">Caminhões</h2>
+        <div class="filters-bar">
+          <select id="filtroCaminhaoEquip"><option value="">Equipamento (Todos)</option></select>
+          <select id="filtroCaminhaoFrente"><option value="">Frente (Todas)</option></select>
+          <select id="filtroCaminhaoFazenda"><option value="">Fazenda (Todas)</option></select>
+          <select id="filtroCaminhaoModelo"><option value="">Modelo (Todos)</option></select>
+        </div>
+        <div class="table-card">
+          <table id="tabelaCaminhoes" class="display compact" style="width:100%">
+            <thead><tr>
+              <th>Equipamento</th><th>Modelo</th><th>Frente</th><th>Fazenda</th>
+              <th>Tempo Carregamento</th><th>Tempo Ag.Carregamento</th><th>Tempo Transporte</th>
+              <th>Tempo Ag.Descarregamento</th><th>Tempo Descarregamento</th><th>Tempo Deslocamento</th>
+              <th>Vel. Ida</th><th>Vel. Volta</th><th>Dist. Ida</th><th>Dist. Volta</th>
+              <th>Dist. Total</th><th>Ciclo Total</th><th>% Operacional</th><th>% Espera</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- OFFROADS -->
+      <section class="tab-panel" id="tab-offroads">
+        <h2 class="panel-title">Offroads</h2>
+        <div class="filters-bar">
+          <select id="filtroOffroadEquip"><option value="">Equipamento (Todos)</option></select>
+          <select id="filtroOffroadFrente"><option value="">Frente (Todas)</option></select>
+          <select id="filtroOffroadFazenda"><option value="">Fazenda (Todas)</option></select>
+          <select id="filtroOffroadModelo"><option value="">Modelo (Todos)</option></select>
+        </div>
+        <div class="table-card">
+          <table id="tabelaOffroads" class="display compact" style="width:100%">
+            <thead><tr>
+              <th>Equipamento</th><th>Modelo</th><th>Frente</th><th>Fazenda</th>
+              <th>Tempo Abastecimento</th><th>Tempo Ag.Carregamento</th><th>Tempo Falta Insumos</th>
+              <th>Tempo Ag.Liberação</th><th>Tempo Deslocamento</th><th>Vel. Média</th>
+              <th>Dist. Ponto Carreg.</th><th>Ciclo Total</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- EQUIPAMENTOS -->
+      <section class="tab-panel" id="tab-equipamentos">
+        <h2 class="panel-title">Equipamentos</h2>
+        <div class="equip-layout">
+          <div class="equip-list-card" id="listaEquipamentos"></div>
+          <div class="equip-detail-card" id="painelEquipamento">
+            <p class="empty-msg">Selecione um equipamento na lista ao lado.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- RANKINGS -->
+      <section class="tab-panel" id="tab-rankings">
+        <h2 class="panel-title">Rankings</h2>
+
+        <h3>Caminhões</h3>
+        <div class="rank-grid">
+          <div class="rank-card"><h4>Maior Ciclo</h4><div id="rankCaminhaoMaiorCiclo"></div></div>
+          <div class="rank-card"><h4>Menor Ciclo</h4><div id="rankCaminhaoMenorCiclo"></div></div>
+          <div class="rank-card"><h4>Maior Distância</h4><div id="rankCaminhaoMaiorDistancia"></div></div>
+          <div class="rank-card"><h4>Menor Distância</h4><div id="rankCaminhaoMenorDistancia"></div></div>
+          <div class="rank-card"><h4>Maior Tempo de Espera</h4><div id="rankCaminhaoMaiorEspera"></div></div>
+        </div>
+
+        <h3 style="margin-top:26px;">Offroads</h3>
+        <div class="rank-grid">
+          <div class="rank-card"><h4>Maior Ciclo</h4><div id="rankOffroadMaiorCiclo"></div></div>
+          <div class="rank-card"><h4>Maior Tempo de Espera</h4><div id="rankOffroadMaiorEspera"></div></div>
+          <div class="rank-card"><h4>Maior Tempo de Deslocamento</h4><div id="rankOffroadMaiorDeslocamento"></div></div>
+          <div class="rank-card"><h4>Maior Tempo Falta de Insumos</h4><div id="rankOffroadMaiorFaltaInsumos"></div></div>
+        </div>
+      </section>
+
+      <!-- EXPORTAÇÃO -->
+      <section class="tab-panel" id="tab-exportacao">
+        <h2 class="panel-title">Exportação</h2>
+        <div class="export-card">
+          <p>Gere um relatório executivo em PDF com o Resumo Executivo, Indicadores Gerais,
+             Consolidado de Caminhões e Offroads, Rankings e Gráficos principais.</p>
+          <button class="btn" id="btnGerarPdf">📄 Gerar PDF Executivo</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- Área usada exclusivamente para impressão/PDF -->
+<div id="printArea"></div>
+
+<!-- ==================== BIBLIOTECAS (vendorizadas localmente em /vendor) ==================== -->
+<script src="vendor/xlsx.full.min.js"></script>
+<script src="vendor/jquery.min.js"></script>
+<script src="vendor/jquery.dataTables.min.js"></script>
+<script src="vendor/chart.umd.js"></script>
+
+<!-- ==================== APP (JS PRÓPRIO) ==================== -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/parser.js"></script>
+<script src="js/calculations.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/render.js"></script>
+<script src="js/export.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
