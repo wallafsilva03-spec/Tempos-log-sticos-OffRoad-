@@ -260,6 +260,8 @@ body {
 
 .kpi-card span { display: block; font-size: 12.5px; color: var(--text-muted); margin-bottom: 6px; }
 .kpi-card strong { font-size: 22px; color: var(--text); }
+.kpi-card--highlight { border-left: 4px solid var(--accent); background: #fffdf9; }
+.kpi-card--highlight strong { color: var(--secondary); }
 
 /* -------------------- CHARTS -------------------- */
 
@@ -349,6 +351,39 @@ table.dataTable thead th {
 }
 table.dataTable tbody td { padding: 8px !important; }
 table.dataTable tbody tr:nth-child(even) { background: #f8faf8; }
+
+/* -------------------- CALCULADORA TAB -------------------- */
+.calculator-layout {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 20px;
+}
+@media (max-width: 1000px) {
+  .calculator-layout { grid-template-columns: 1fr; }
+}
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--text); }
+.form-group input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
+.form-group small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+.real-data-grid { display: grid; gap: 10px; }
+.real-data-item { display: flex; justify-content: space-between; font-size: 13px; padding-bottom: 6px; border-bottom: 1px dashed var(--border); }
+.real-data-item span { color: var(--text-muted); }
+.real-data-item strong { color: var(--primary-dark); }
+
+.highlight-card { background: linear-gradient(135deg, #fff 0%, #f0f7f2 100%); border-top: 4px solid var(--primary); }
+.result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 10px; }
+.result-item { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 15px; background: #fff; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.result-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+.result-value { font-size: 28px; font-weight: 800; color: var(--primary); line-height: 1; }
+.result-unit { font-size: 11px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.insights-container { display: flex; flex-direction: column; gap: 12px; }
+.insight-item { display: flex; gap: 10px; padding: 10px; border-radius: 8px; font-size: 13px; line-height: 1.4; }
+.insight-item--warning { background: #fff9f0; border: 1px solid #ffe8cc; color: #855d21; }
+.insight-item--success { background: #f0fdf4; border: 1px solid #dcfce7; color: #166534; }
+.insight-item--info { background: #f0f9ff; border: 1px solid #e0f2fe; color: #0369a1; }
+.insight-icon { font-size: 16px; flex-shrink: 0; }
 
 /* -------------------- EQUIPAMENTOS TAB -------------------- */
 
@@ -480,39 +515,95 @@ table.dataTable tbody tr:nth-child(even) { background: #f8faf8; }
   max-width: 520px;
 }
 .export-card p { color: var(--text-muted); margin-bottom: 20px; }
+.export-equip-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.export-equip-controls label { font-weight: 600; color: var(--text); font-size: 13.5px; }
+.export-equip-controls select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: #fff; color: var(--text); cursor: pointer; min-width: 220px; }
 
 /* -------------------- PRINT AREA (PDF) -------------------- */
 
 #printArea { display: none; }
 
 body.print-mode .app-shell { display: none; }
-body.print-mode #printArea { display: block; padding: 20px; }
+body.print-mode #printArea {
+  display: block;
+  padding: 20px;
+  background: #fff;
+  /* Garante que as variáveis CSS do tema estejam disponíveis */
+  --primary: #1f6f43;
+  --primary-dark: #154a2d;
+  --secondary: #8a5a2b;
+  --accent: #d9a441;
+  --danger: #b3392c;
+  --info: #2f6f8f;
+  --slate: #334155;
+  --bg: #f4f6f5;
+  --card-bg: #ffffff;
+  --border: #e2e6e4;
+  --text: #1f2a24;
+  --text-muted: #667165;
+}
 
-.print-header { text-align: center; margin-bottom: 20px; border-bottom: 3px solid var(--primary); padding-bottom: 12px; }
-.print-header h1 { color: var(--primary-dark); margin: 0 0 4px; }
+.print-header { text-align: center; margin-bottom: 20px; border-bottom: 3px solid var(--primary); padding-bottom: 12px; background: #f4f6f5; padding: 16px; border-radius: 8px; }
+.print-header h1 { color: var(--primary-dark); margin: 0 0 4px; font-size: 20px; }
 .print-header p { color: var(--text-muted); font-size: 12px; margin: 0; }
 
-#printArea h2 { color: var(--primary-dark); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-top: 26px; }
+#printArea h2 {
+  color: #fff;
+  background: var(--primary-dark);
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 26px;
+  font-size: 14px;
+}
 #printArea h4 { margin: 14px 0 6px; color: var(--slate); }
 
-.print-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.print-kpi { border: 1px solid var(--border); border-radius: 6px; padding: 8px; text-align: center; }
-.print-kpi span { display: block; font-size: 10.5px; color: var(--text-muted); }
-.print-kpi strong { font-size: 15px; }
+.print-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+.print-kpi {
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: 6px;
+  padding: 10px 12px;
+  background: #fff;
+}
+.print-kpi span { display: block; font-size: 10.5px; color: var(--text-muted); margin-bottom: 4px; }
+.print-kpi strong { font-size: 15px; color: var(--text); font-weight: 700; }
+.print-kpi--highlight { border-left-color: var(--accent); background: #fffdf9; }
+.print-kpi--highlight strong { color: var(--secondary); }
 
 .print-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 10px; }
 .print-table th, .print-table td { border: 1px solid var(--border); padding: 5px 6px; text-align: left; }
-.print-table th { background: #eef3ef; }
+.print-table th { background: var(--primary-dark); color: #fff; }
+.print-table tbody tr:nth-child(even) { background: #f8faf8; }
 .print-table--small td:first-child { width: 30px; font-weight: 700; }
 
-.print-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.print-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
 .print-charts img { width: 100%; border: 1px solid var(--border); border-radius: 6px; }
 
+.print-rankings { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px; }
+.print-ranking-col { }
+.print-ranking-col h4 { margin: 14px 0 8px; font-size: 13px; color: var(--slate); border-left: 3px solid var(--accent); padding-left: 8px; }
+
+/* Bloco de um equipamento no relatório "por equipamento" */
+.equip-pdf-block { margin-top: 18px; }
+.equip-pdf-block + .equip-pdf-block { page-break-before: always; }
+
 @media print {
-  @page { margin: 14mm; }
+  .print-charts { page-break-inside: avoid; }
+  .print-ranking-col { page-break-inside: avoid; }
+  .print-table { page-break-inside: avoid; }
+  .equip-pdf-block { page-break-inside: avoid; }
+}
+
+@media print {
+  @page { margin: 14mm; size: A4 portrait; }
   body.print-mode { background: #fff; }
   .print-charts { grid-template-columns: 1fr; }
   #printArea h2 { page-break-before: auto; }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
 }
 
 </style>
@@ -533,6 +624,7 @@ body.print-mode #printArea { display: block; padding: 20px; }
       <li><button class="nav-item" data-target="tab-offroads">🚜 Offroads</button></li>
       <li><button class="nav-item" data-target="tab-equipamentos">🔧 Equipamentos</button></li>
       <li><button class="nav-item" data-target="tab-rankings">🏆 Rankings</button></li>
+      <li><button class="nav-item" data-target="tab-calculadora">🧮 Calculadora</button></li>
       <li><button class="nav-item" data-target="tab-exportacao">📄 Exportação</button></li>
     </ul>
     <div class="sidebar-footer">Processamento 100% local · sem servidor</div>
@@ -547,6 +639,18 @@ body.print-mode #printArea { display: block; padding: 20px; }
         <input type="file" id="fileInput" accept=".xlsx,.xls">
         <span class="loading-indicator" id="loadingIndicator"><span class="spinner"></span> Processando...</span>
         <span class="file-status" id="fileStatus">Nenhum arquivo importado ainda.</span>
+      </div>
+      <div class="global-filters" id="globalFilters" style="display: none; margin-left: auto; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <label style="font-weight: 600; color: var(--text); font-size: 13.5px;">Período:</label>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label for="filtroDataInicio" style="font-size: 12.5px; color: var(--text-muted);">De</label>
+          <input type="date" id="filtroDataInicio" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px; background: #fff; color: var(--text); cursor: pointer;">
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label for="filtroDataFim" style="font-size: 12.5px; color: var(--text-muted);">até</label>
+          <input type="date" id="filtroDataFim" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px; background: #fff; color: var(--text); cursor: pointer;">
+        </div>
+        <button id="btnLimparFiltroData" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 12.5px; background: var(--slate); color: #fff; cursor: pointer; font-weight: 600;">✕ Limpar</button>
       </div>
     </header>
 
@@ -570,12 +674,14 @@ body.print-mode #printArea { display: block; padding: 20px; }
           <div class="kpi-card"><span>Qtd. Offroads</span><strong id="kpiQtdOffroads">-</strong></div>
           <div class="kpi-card"><span>Ciclo Médio Caminhões</span><strong id="kpiCicloCaminhoes">-</strong></div>
           <div class="kpi-card"><span>Ciclo Médio Offroads</span><strong id="kpiCicloOffroads">-</strong></div>
-          <div class="kpi-card"><span>Distância Média Caminhões</span><strong id="kpiDistCaminhoes">-</strong></div>
-          <div class="kpi-card"><span>Distância Média Offroads</span><strong id="kpiDistOffroads">-</strong></div>
+          <div class="kpi-card"><span>Distância Média Ciclo (Caminhões)</span><strong id="kpiDistCaminhoes">-</strong></div>
+          <div class="kpi-card"><span>Distância Média Trecho (Offroads)</span><strong id="kpiDistOffroads">-</strong></div>
+          <div class="kpi-card"><span>Total Viagens Caminhões</span><strong id="kpiTotalViagensCaminhoes">-</strong></div>
           <div class="kpi-card"><span>Eficiência Operacional</span><strong id="kpiPercOperacional">-</strong></div>
           <div class="kpi-card"><span>Tempo de Espera</span><strong id="kpiPercEspera">-</strong></div>
           <div class="kpi-card"><span>% Produtiva Caminhões</span><strong id="kpiPercProdutivoCaminhoes">-</strong></div>
           <div class="kpi-card"><span>% Produtiva Offroads</span><strong id="kpiPercProdutivoOffroads">-</strong></div>
+          <div class="kpi-card kpi-card--highlight"><span>Volume Transportado Caminhões (m³)</span><strong id="kpiVolumeCaminhoes">-</strong></div>
         </div>
 
         <div class="chart-grid">
@@ -616,6 +722,9 @@ body.print-mode #printArea { display: block; padding: 20px; }
           <div class="kpi-card"><span>Tempo Médio Descarregamento</span><strong id="camKpiDescarregamento">-</strong></div>
           <div class="kpi-card"><span>Tempo Médio Deslocamento Volta</span><strong id="camKpiDeslocamento">-</strong></div>
           <div class="kpi-card"><span>% Produtiva</span><strong id="camKpiPercProdutivo">-</strong></div>
+          <div class="kpi-card"><span>Motor Ocioso (méd.)</span><strong id="camKpiMotorOcioso">-</strong></div>
+          <div class="kpi-card kpi-card--highlight"><span>Quantidade de Ciclos</span><strong id="camKpiQtdCiclos">-</strong></div>
+          <div class="kpi-card kpi-card--highlight"><span>Volume Total (m³)</span><strong id="camKpiVolumeTotal">-</strong></div>
         </div>
         <div class="chart-grid">
           <div class="chart-card">
@@ -635,10 +744,12 @@ body.print-mode #printArea { display: block; padding: 20px; }
           <table id="tabelaCaminhoes" class="display compact" style="width:100%">
             <thead><tr>
               <th>Equipamento</th><th>Modelo</th><th>Frente</th><th>Fazenda</th><th>Nº Ciclos</th>
+              <th>Capacidade (m³)</th><th>Volume Total (m³)</th>
+              <th>Motor Ocioso</th>
               <th>Tempo Médio Carregamento</th><th>Tempo Médio Ag.Carregamento</th><th>Tempo Médio Transporte</th>
               <th>Tempo Médio Ag.Descarregamento</th><th>Tempo Médio Descarregamento</th><th>Tempo Médio Deslocamento</th>
-              <th>Vel. Ida</th><th>Vel. Volta</th><th>Dist. Ida (méd.)</th><th>Dist. Volta (méd.)</th>
-              <th>Dist. Média/Ciclo</th><th>Ciclo Médio</th><th>Eficiência Operacional</th><th>Tempo de Espera</th><th>% Produtiva</th>
+              <th>Vel. Ida</th><th>Vel. Volta</th>              <th>Dist. Ida (km)</th><th>Dist. Volta (km)</th>
+              <th>Dist. Total/Ciclo</th><th>Ciclo Médio</th><th>Eficiência Operacional</th><th>Tempo de Espera</th><th>% Produtiva</th>
             </tr></thead>
             <tbody></tbody>
           </table>
@@ -657,8 +768,11 @@ body.print-mode #printArea { display: block; padding: 20px; }
           <div class="kpi-card"><span>Tempo Médio Ag. Carregamento</span><strong id="offKpiAgCarregamento">-</strong></div>
           <div class="kpi-card"><span>Tempo Médio Falta Insumos</span><strong id="offKpiFaltaInsumos">-</strong></div>
           <div class="kpi-card"><span>Tempo Médio Ag. Liberação</span><strong id="offKpiAgLiberacao">-</strong></div>
-          <div class="kpi-card"><span>Tempo Médio Deslocamento</span><strong id="offKpiDeslocamento">-</strong></div>
+          <div class="kpi-card"><span>Tempo Médio Deslocamento (trecho)</span><strong id="offKpiDeslocamento">-</strong></div>
           <div class="kpi-card"><span>% Produtiva</span><strong id="offKpiPercProdutivo">-</strong></div>
+          <div class="kpi-card"><span>Motor Ocioso (méd.)</span><strong id="offKpiMotorOcioso">-</strong></div>
+          <div class="kpi-card kpi-card--highlight"><span>Quantidade de Aplicações</span><strong id="offKpiQtdCiclos">-</strong></div>
+          <div class="kpi-card kpi-card--highlight"><span>Volume Total (m³)</span><strong id="offKpiVolumeTotal">-</strong></div>
         </div>
         <div class="chart-grid">
           <div class="chart-card">
@@ -678,9 +792,11 @@ body.print-mode #printArea { display: block; padding: 20px; }
           <table id="tabelaOffroads" class="display compact" style="width:100%">
             <thead><tr>
               <th>Equipamento</th><th>Modelo</th><th>Frente</th><th>Fazenda</th><th>Nº Ciclos</th>
+              <th>Capacidade (m³)</th><th>Volume Total (m³)</th>
+              <th>Motor Ocioso</th>
               <th>Tempo Médio Aplicação</th><th>Tempo Médio Abastecimento</th><th>Tempo Médio Ag.Carregamento</th><th>Tempo Médio Falta Insumos</th>
-              <th>Tempo Médio Ag.Liberação</th><th>Tempo Médio Deslocamento</th><th>Vel. Média</th>
-              <th>Dist. Média/Ciclo</th><th>Ciclo Médio</th><th>% Produtiva</th>
+              <th>Tempo Médio Ag.Liberação</th><th>Tempo Médio Deslocamento (trecho)</th><th>Vel. Média</th>
+              <th>Dist. Trecho (méd.)</th><th>Ciclo Médio</th><th>Eficiência Operacional</th><th>% Produtiva</th>
             </tr></thead>
             <tbody></tbody>
           </table>
@@ -698,25 +814,104 @@ body.print-mode #printArea { display: block; padding: 20px; }
         </div>
       </section>
 
+      <!-- CALCULADORA -->
+      <section class="tab-panel" id="tab-calculadora">
+        <h2 class="panel-title">Calculadora de Necessidade Operacional</h2>
+        
+        <div class="calculator-layout">
+          <div class="calculator-inputs">
+            <div class="chart-card">
+              <h3>Parâmetros de Entrada</h3>
+              <div class="form-group">
+                <label for="calcLamina">Lâmina Desejada (mm):</label>
+                <select id="calcLamina"></select>
+                <small>Defina a lâmina para o cálculo de volume necessário.</small>
+              </div>
+              <div class="form-group">
+                <label for="calcArea">Área de Aplicação (ha):</label>
+                <input type="number" id="calcArea" value="1" step="1" min="0">
+                <small>Área total a ser aplicada.</small>
+              </div>
+              <div class="form-group">
+                <label for="calcQtdFrota">Quantidade de Caminhões (sua frota):</label>
+                <input type="number" id="calcQtdFrota" value="1" step="1" min="1">
+                <small>Nº de caminhões reais que você tem disponíveis.</small>
+              </div>
+              <div class="form-group">
+                <label for="calcHorasDia">Horas Disponíveis/Dia:</label>
+                <input type="number" id="calcHorasDia" value="18" step="1" min="1" max="24">
+              </div>
+            </div>
+
+            <div class="chart-card" style="margin-top: 20px;">
+              <h3>Dados Reais do Período</h3>
+              <div class="real-data-grid">
+                <div class="real-data-item"><span>Ciclo Médio (Caminhão):</span><strong id="calcRealCicloCam">-</strong></div>
+                <div class="real-data-item"><span>Ciclo Médio (Offroad):</span><strong id="calcRealCicloOff">-</strong></div>
+                <div class="real-data-item"><span>Eficiência Média:</span><strong id="calcRealEficiencia">-</strong></div>
+                <div class="real-data-item"><span>Capacidade Média:</span><strong id="calcRealCapacidade">-</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="calculator-results">
+            <div class="chart-card highlight-card">
+              <h3>Necessidade Estimada</h3>
+              <div class="result-grid">
+                <div class="result-item">
+                  <span class="result-label">Volume Total Necessário</span>
+                  <strong class="result-value" id="calcResultVolume">-</strong>
+                  <span class="result-unit">m³</span>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Total de Viagens Necessárias</span>
+                  <strong class="result-value" id="calcResultViagens">-</strong>
+                  <span class="result-unit">viagens</span>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Viagens por Caminhão (sua frota)</span>
+                  <strong class="result-value" id="calcResultViagensPorCam">-</strong>
+                  <span class="result-unit">viagens/caminhão</span>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Frota de Caminhões Necessária</span>
+                  <strong class="result-value" id="calcResultFrotaCam">-</strong>
+                  <span class="result-unit">caminhões (p/ concluir em 1 dia)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-card" style="margin-top: 20px; border-left: 4px solid var(--accent);">
+              <h3>💡 Insights e Gargalos Operacionais</h3>
+              <div id="calcInsights" class="insights-container">
+                <p class="empty-msg">Aguardando cálculos...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- RANKINGS -->
       <section class="tab-panel" id="tab-rankings">
         <h2 class="panel-title">Rankings</h2>
 
         <h3>Caminhões</h3>
         <div class="rank-grid">
+          <div class="rank-card"><h4>Maior Volume (m³)</h4><div id="rankCaminhaoMaiorVolume"></div></div>
+          <div class="rank-card"><h4>Quantidade de Ciclos</h4><div id="rankCaminhaoMaiorQtdCiclos"></div></div>
           <div class="rank-card"><h4>Maior Ciclo</h4><div id="rankCaminhaoMaiorCiclo"></div></div>
           <div class="rank-card"><h4>Menor Ciclo</h4><div id="rankCaminhaoMenorCiclo"></div></div>
           <div class="rank-card"><h4>Maior Distância</h4><div id="rankCaminhaoMaiorDistancia"></div></div>
-          <div class="rank-card"><h4>Menor Distância</h4><div id="rankCaminhaoMenorDistancia"></div></div>
           <div class="rank-card"><h4>Maior Tempo de Espera</h4><div id="rankCaminhaoMaiorEspera"></div></div>
         </div>
 
         <h3 style="margin-top:26px;">Offroads</h3>
         <div class="rank-grid">
+          <div class="rank-card"><h4>Maior Volume (m³)</h4><div id="rankOffroadMaiorVolume"></div></div>
+          <div class="rank-card"><h4>Quantidade de Aplicações</h4><div id="rankOffroadMaiorQtdCiclos"></div></div>
           <div class="rank-card"><h4>Maior Ciclo</h4><div id="rankOffroadMaiorCiclo"></div></div>
           <div class="rank-card"><h4>Maior Tempo de Espera</h4><div id="rankOffroadMaiorEspera"></div></div>
           <div class="rank-card"><h4>Maior Tempo de Deslocamento</h4><div id="rankOffroadMaiorDeslocamento"></div></div>
-          <div class="rank-card"><h4>Maior Tempo Falta de Insumos</h4><div id="rankOffroadMaiorFaltaInsumos"></div></div>
         </div>
       </section>
 
@@ -727,6 +922,19 @@ body.print-mode #printArea { display: block; padding: 20px; }
           <p>Gere um relatório executivo em PDF com o Resumo Executivo, Indicadores Gerais,
              Consolidado de Caminhões e Offroads, Rankings e Gráficos principais.</p>
           <button class="btn" id="btnGerarPdf">📄 Gerar PDF Executivo</button>
+        </div>
+
+        <div class="export-card" style="margin-top: 20px;">
+          <p>Gere um relatório detalhado <strong>por equipamento</strong>, com uma página por
+             equipamento contendo informações gerais, indicadores calculados e a composição do
+             ciclo. Escolha um equipamento específico ou exporte todos de uma vez.</p>
+          <div class="export-equip-controls">
+            <label for="exportEquipSelect">Equipamento:</label>
+            <select id="exportEquipSelect">
+              <option value="TODOS">Todos os equipamentos</option>
+            </select>
+          </div>
+          <button class="btn" id="btnGerarPdfEquip">📄 Gerar PDF por Equipamento</button>
         </div>
       </section>
 
@@ -854,6 +1062,13 @@ const APP_CONFIG = {
     faltaInsumos: { codes: [27], aliases: ['falta de insumos'] },
     agLiberacao: { codes: [7], aliases: ['aguardando liberacao servico', 'aguardando liberacao de servico'] },
     deslocamento: { codes: [200], aliases: ['deslocamento'] }
+  },
+
+  // Capacidades volumétricas por equipamento (m³)
+  capacidades: {
+    '180824': 22.5, '180522': 22.5, '180422': 15.0, '13085': 22.5,
+    '19224': 60, '19225': 60, '19227': 60, '19228': 60, '19229': 60, '19231': 60,
+    '111324': 70, '111424': 70, '111524': 60, '111624': 70
   },
 
   // Paleta de cores corporativa (tema agroindustrial)
@@ -1212,6 +1427,18 @@ const Calculations = (function () {
     return Utils.normalize(row.Classificacao_Ativ) === 'produtiva';
   }
 
+  function isDisponivel(row) {
+    const cat = Utils.normalize(row.Classificacao_Ativ);
+    return cat === 'produtiva' || cat === 'manutencao' || cat === 'improdutivo';
+  }
+
+  function calcularEficienciaOperacional(rows) {
+    const tempoDisponivel = Utils.sum(rows.filter(isDisponivel).map(r => r.TempoDecimal));
+    if (tempoDisponivel <= 0) return 0;
+    const tempoProdutivo = Utils.sum(rows.filter(isProdutiva).map(r => r.TempoDecimal));
+    return (tempoProdutivo / tempoDisponivel) * 100;
+  }
+
   function avgTempoProdutivo(rows) {
     return Utils.avg(rows.filter(isProdutiva).map(r => r.TempoDecimal));
   }
@@ -1243,7 +1470,8 @@ const Calculations = (function () {
     const tempoAgDescarregamento = avgTempoAtividade(rows, A.agDescarregamento);
     const tempoDescarregamento = avgTempoAtividade(rows, A.descarregamento);
     const tempoDeslocamentoVolta = avgTempoAtividade(rows, A.deslocamentoVolta);
-    const numCiclos = countCategoria(rows, A.carregamento);
+    // Para caminhões, o volume é por viagem de ida (transporte)
+    const numCiclos = countCategoria(rows, A.transporte);
 
     const velMediaIda = avgVelocidadeAtividade(rows, A.transporte);
     const velMediaVolta = avgVelocidadeAtividade(rows, A.deslocamentoVolta);
@@ -1255,12 +1483,15 @@ const Calculations = (function () {
     const cicloTotal = tempoAgCarregamento + tempoCarregamento + tempoTransporte +
       tempoAgDescarregamento + tempoDescarregamento + tempoDeslocamentoVolta;
 
+    const motorOcioso = Utils.avg(rows.map(r => r.MotorOcioso));
+
     const percEspera = cicloTotal > 0
       ? ((tempoAgCarregamento + tempoAgDescarregamento) / cicloTotal) * 100
       : 0;
-    const percOperacional = cicloTotal > 0
-      ? ((tempoCarregamento + tempoTransporte + tempoDescarregamento + tempoDeslocamentoVolta) / cicloTotal) * 100
-      : 0;
+    const percOperacional = calcularEficienciaOperacional(rows);
+
+    const cap = APP_CONFIG.capacidades[equipamento] || 0;
+    const volumeTotal = numCiclos * cap;
 
     // No caminhão a atividade produtiva (Classificacao_Ativ = PRODUTIVA) já
     // corresponde ao Transporte + Deslocamento Volta, então já está contida
@@ -1276,6 +1507,8 @@ const Calculations = (function () {
       fazenda: Utils.mode(rows.map(r => r.Fazenda)),
       tipo: 'CAMINHAO',
       numCiclos,
+      capacidade: cap,
+      volumeTotal,
       tempoCarregamento,
       tempoAgCarregamento,
       tempoTransporte,
@@ -1293,6 +1526,7 @@ const Calculations = (function () {
       percOperacional,
       percEspera,
       tempoEspera: tempoAgCarregamento + tempoAgDescarregamento,
+      motorOcioso,
       registros: rows
     };
   }
@@ -1305,23 +1539,31 @@ const Calculations = (function () {
     const tempoFaltaInsumos = avgTempoAtividade(rows, A.faltaInsumos);
     const tempoAgLiberacao = avgTempoAtividade(rows, A.agLiberacao);
     const tempoDeslocamento = avgTempoAtividade(rows, A.deslocamento);
-    const numCiclos = countCategoria(rows, A.deslocamento);
+    // Para offroad, o volume é a cada ciclo de volume aplicado (atividade produtiva)
+    // Voltando ao cálculo original: cada linha produtiva = 1 aplicação
+    const rowsProdutivas = rows.filter(isProdutiva);
+    const numCiclos = rowsProdutivas.length;
 
     const velMediaDeslocamento = avgVelocidadeAtividade(rows, A.deslocamento);
-    const distPontoCarregamento = tempoDeslocamento * velMediaDeslocamento;
+    const distPontoCarregamento = (tempoDeslocamento * velMediaDeslocamento) / 2;
+    // Tempo de deslocamento dividido por 2 conforme solicitado
+    const tempoDeslocamentoTrecho = tempoDeslocamento / 2;
 
-    // O offroad não tinha nenhuma atividade "produtiva" (aplicação de
-    // vinhaça) nas categorias originais - ela usa códigos próprios que
-    // variam de exportação para exportação, então identificamos pelo
-    // Classificacao_Ativ = PRODUTIVA em vez de um código fixo. Sem isso o
-    // Ciclo Total do offroad não incluía o tempo do trabalho em si.
-    const tempoAplicacao = avgTempoProdutivo(rows);
+    // O tempo médio de aplicação é a média do tempo das linhas produtivas
+    const tempoAplicacao = Utils.avg(rowsProdutivas.map(r => r.TempoDecimal));
 
     const cicloTotal = tempoAplicacao + tempoAbastecimento + tempoAgCarregamento +
       tempoFaltaInsumos + tempoAgLiberacao + tempoDeslocamento;
 
+    const motorOcioso = Utils.avg(rows.map(r => r.MotorOcioso));
+
+    const cap = APP_CONFIG.capacidades[equipamento] || 0;
+    // O volume total é a capacidade vezes o número de aplicações (ciclos produtivos)
+    const volumeTotal = numCiclos * cap;
+
     const tempoEspera = tempoAgCarregamento + tempoAgLiberacao + tempoFaltaInsumos;
     const percProd = percProdutivo(rows);
+    const percOperacional = calcularEficienciaOperacional(rows);
 
     return {
       equipamento,
@@ -1330,17 +1572,22 @@ const Calculations = (function () {
       fazenda: Utils.mode(rows.map(r => r.Fazenda)),
       tipo: 'OFFROAD',
       numCiclos,
+      capacidade: cap,
+      volumeTotal,
       tempoAplicacao,
       percProdutivo: percProd,
+      percOperacional,
       tempoAbastecimento,
       tempoAgCarregamento,
       tempoFaltaInsumos,
       tempoAgLiberacao,
       tempoDeslocamento,
+      tempoDeslocamentoTrecho,
       velMediaDeslocamento,
       distPontoCarregamento,
       cicloTotal,
       tempoEspera,
+      motorOcioso,
       registros: rows
     };
   }
@@ -1396,18 +1643,26 @@ const Calculations = (function () {
     const distMediaCaminhoes = Utils.avg(caminhoes.map(c => c.distTotal));
     const distMediaOffroads = Utils.avg(offroads.map(o => o.distPontoCarregamento));
 
-    const percMedioOperacional = Utils.avg(caminhoes.map(c => c.percOperacional));
+    const percMedioOperacional = Utils.avg([...caminhoes, ...offroads].map(e => e.percOperacional));
     const percMedioEspera = Utils.avg(caminhoes.map(c => c.percEspera));
 
     const percProdutivoMedioCaminhoes = Utils.avg(caminhoes.map(c => c.percProdutivo));
     const percProdutivoMedioOffroads = Utils.avg(offroads.map(o => o.percProdutivo));
+
+    const volumeTotalCaminhoes = Utils.sum(caminhoes.map(c => c.volumeTotal));
+    const volumeTotalOffroads = Utils.sum(offroads.map(o => o.volumeTotal));
+    const volumeTotal = volumeTotalCaminhoes + volumeTotalOffroads;
+    const totalViagensCaminhoes = Utils.sum(caminhoes.map(c => c.numCiclos));
+    const totalAplicacoesOffroads = Utils.sum(offroads.map(o => o.numCiclos));
 
     return {
       qtdCaminhoes, qtdOffroads,
       cicloMedioCaminhoes, cicloMedioOffroads,
       distMediaCaminhoes, distMediaOffroads,
       percMedioOperacional, percMedioEspera,
-      percProdutivoMedioCaminhoes, percProdutivoMedioOffroads
+      percProdutivoMedioCaminhoes, percProdutivoMedioOffroads,
+      volumeTotalCaminhoes, volumeTotalOffroads, volumeTotal,
+      totalViagensCaminhoes, totalAplicacoesOffroads
     };
   }
 
@@ -1543,12 +1798,15 @@ const Charts = (function () {
   // canvas ainda tem tamanho 0x0 e a imagem exportada sairia em branco.
   // Forçar um tamanho explícito antes de capturar resolve isso; depois
   // devolve o gráfico ao modo responsivo normal.
-  function getImage(canvasId, forceWidth = 640, forceHeight = 360) {
+  function getImage(canvasId, forceWidth = 640, forceHeight = 360, alwaysForce = false) {
     const chart = registry[canvasId];
     if (!chart) return null;
-    const precisaForcar = chart.width === 0 || chart.height === 0;
+    // Ao exportar para PDF forçamos sempre um tamanho fixo (alwaysForce) para
+    // obter uma imagem nítida e com proporção consistente, independente do
+    // tamanho que o container tem na tela naquele instante.
+    const precisaForcar = alwaysForce || chart.width === 0 || chart.height === 0;
     if (precisaForcar) chart.resize(forceWidth, forceHeight);
-    const img = chart.toBase64Image();
+    const img = chart.toBase64Image('image/png', 1);
     if (precisaForcar) chart.resize();
     return img;
   }
@@ -1585,6 +1843,10 @@ const Render = (function () {
     setText('kpiPercEspera', Utils.formatPercent(r.percMedioEspera));
     setText('kpiPercProdutivoCaminhoes', Utils.formatPercent(r.percProdutivoMedioCaminhoes));
     setText('kpiPercProdutivoOffroads', Utils.formatPercent(r.percProdutivoMedioOffroads));
+    setText('kpiVolumeTotal', `${Utils.formatNumber(r.volumeTotal)} m³`);
+    setText('kpiVolumeCaminhoes', `${Utils.formatNumber(r.volumeTotalCaminhoes)} m³`);
+    setText('kpiVolumeOffroads', `${Utils.formatNumber(r.volumeTotalOffroads)} m³`);
+    setText('kpiTotalViagensCaminhoes', r.totalViagensCaminhoes);
 
     // Gráfico 1: Ciclo por Equipamento (granularidade individual, não só a média do tipo)
     const equipamentosCiclo = [
@@ -1630,7 +1892,7 @@ const Render = (function () {
 
     // Gráfico 3: Distância Média por Tipo
     Charts.renderBar('chartDistanciaPorTipo', ['Caminhões', 'Offroads'], [{
-      label: 'Distância Média (km)',
+      label: 'Distância Média Trecho (km)',
       data: [round2(r.distMediaCaminhoes), round2(r.distMediaOffroads)],
       backgroundColor: [APP_CONFIG.colors.secondary, APP_CONFIG.colors.accent]
     }], { labelUnit: 'km' });
@@ -1649,6 +1911,7 @@ const Render = (function () {
     const descarregamentoMedio = Utils.avg(rows.map(c => c.tempoDescarregamento));
     const deslocamentoMedio = Utils.avg(rows.map(c => c.tempoDeslocamentoVolta));
     const percProdutivoMedio = Utils.avg(rows.map(c => c.percProdutivo));
+    const motorOciosoMedio = Utils.avg(rows.map(c => c.motorOcioso));
 
     setText('camKpiCiclo', Utils.formatHoras(cicloMedio));
     setText('camKpiCarregamento', Utils.formatHoras(carregamentoMedio));
@@ -1658,6 +1921,9 @@ const Render = (function () {
     setText('camKpiDescarregamento', Utils.formatHoras(descarregamentoMedio));
     setText('camKpiDeslocamento', Utils.formatHoras(deslocamentoMedio));
     setText('camKpiPercProdutivo', Utils.formatPercent(percProdutivoMedio));
+    setText('camKpiMotorOcioso', Utils.formatHoras(motorOciosoMedio));
+    setText('camKpiQtdCiclos', Utils.formatNumber(Utils.sum(rows.map(c => c.numCiclos))));
+    setText('camKpiVolumeTotal', `${Utils.formatNumber(Utils.sum(rows.map(c => c.volumeTotal)))} m³`);
 
     Charts.renderDoughnut('chartCicloCaminhao',
       ['Carregamento', 'Ag.Carregamento', 'Transporte', 'Ag.Descarregamento', 'Descarregamento', 'Deslocamento Volta'],
@@ -1679,6 +1945,9 @@ const Render = (function () {
       Utils.escapeHtml(c.frente),
       Utils.escapeHtml(c.fazenda),
       c.numCiclos,
+      Utils.formatNumber(c.capacidade),
+      Utils.formatNumber(c.volumeTotal),
+      Utils.formatHoras(c.motorOcioso),
       Utils.formatHoras(c.tempoCarregamento),
       Utils.formatHoras(c.tempoAgCarregamento),
       Utils.formatHoras(c.tempoTransporte),
@@ -1722,8 +1991,9 @@ const Render = (function () {
     const agCarregamentoMedio = Utils.avg(rows.map(o => o.tempoAgCarregamento));
     const faltaInsumosMedio = Utils.avg(rows.map(o => o.tempoFaltaInsumos));
     const agLiberacaoMedio = Utils.avg(rows.map(o => o.tempoAgLiberacao));
-    const deslocamentoMedio = Utils.avg(rows.map(o => o.tempoDeslocamento));
+    const deslocamentoMedio = Utils.avg(rows.map(o => o.tempoDeslocamentoTrecho));
     const percProdutivoMedio = Utils.avg(rows.map(o => o.percProdutivo));
+    const motorOciosoMedio = Utils.avg(rows.map(o => o.motorOcioso));
 
     setText('offKpiCiclo', Utils.formatHoras(cicloMedio));
     setText('offKpiAplicacao', Utils.formatHoras(aplicacaoMedio));
@@ -1733,6 +2003,9 @@ const Render = (function () {
     setText('offKpiAgLiberacao', Utils.formatHoras(agLiberacaoMedio));
     setText('offKpiDeslocamento', Utils.formatHoras(deslocamentoMedio));
     setText('offKpiPercProdutivo', Utils.formatPercent(percProdutivoMedio));
+    setText('offKpiMotorOcioso', Utils.formatHoras(motorOciosoMedio));
+    setText('offKpiQtdCiclos', Utils.formatNumber(Utils.sum(rows.map(o => o.numCiclos))));
+    setText('offKpiVolumeTotal', `${Utils.formatNumber(Utils.sum(rows.map(o => o.volumeTotal)))} m³`);
 
     Charts.renderDoughnut('chartCicloOffroad',
       ['Aplicação', 'Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'],
@@ -1754,15 +2027,19 @@ const Render = (function () {
       Utils.escapeHtml(o.frente),
       Utils.escapeHtml(o.fazenda),
       o.numCiclos,
+      Utils.formatNumber(o.capacidade),
+      Utils.formatNumber(o.volumeTotal),
+      Utils.formatHoras(o.motorOcioso),
       Utils.formatHoras(o.tempoAplicacao),
       Utils.formatHoras(o.tempoAbastecimento),
       Utils.formatHoras(o.tempoAgCarregamento),
       Utils.formatHoras(o.tempoFaltaInsumos),
       Utils.formatHoras(o.tempoAgLiberacao),
-      Utils.formatHoras(o.tempoDeslocamento),
+      Utils.formatHoras(o.tempoDeslocamentoTrecho),
       `${Utils.formatNumber(o.velMediaDeslocamento)} km/h`,
       `${Utils.formatNumber(o.distPontoCarregamento)} km`,
       Utils.formatHoras(o.cicloTotal),
+      Utils.formatPercent(o.percOperacional),
       Utils.formatPercent(o.percProdutivo)
     ]);
 
@@ -1871,6 +2148,8 @@ const Render = (function () {
         <div><span class="info-label">Fazenda</span><span class="info-value">${Utils.escapeHtml(item.fazenda || '-')}</span></div>
         <div><span class="info-label">Registros</span><span class="info-value">${item.registros.length}</span></div>
         ${item.numCiclos !== undefined ? `<div><span class="info-label">Número de Ciclos</span><span class="info-value">${item.numCiclos}</span></div>` : ''}
+        <div><span class="info-label">Capacidade</span><span class="info-value">${Utils.formatNumber(item.capacidade)} m³</span></div>
+        <div><span class="info-label">Volume Total</span><span class="info-value">${Utils.formatNumber(item.volumeTotal)} m³</span></div>
       </div>`;
 
     let indicadoresHtml = '';
@@ -1906,6 +2185,7 @@ const Render = (function () {
         ['Velocidade Média', `${Utils.formatNumber(item.velMediaDeslocamento)} km/h`],
         ['Distância Média/Ciclo', `${Utils.formatNumber(item.distPontoCarregamento)} km`],
         ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)],
+        ['Eficiência Operacional', Utils.formatPercent(item.percOperacional)],
         ['% Produtiva', Utils.formatPercent(item.percProdutivo)]
       ]);
       cicloLabels = ['Aplicação', 'Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'];
@@ -2001,25 +2281,29 @@ const Render = (function () {
   /* -------------------- RANKINGS -------------------- */
 
   function renderRankings(dataset) {
+    renderRankingTable('rankCaminhaoMaiorVolume',
+      topN(dataset.caminhoes, 'volumeTotal', 5, true), 'volumeTotal', 'm³');
+    renderRankingTable('rankCaminhaoMaiorQtdCiclos',
+      topN(dataset.caminhoes, 'numCiclos', 5, true), 'numCiclos', 'ciclos');
     renderRankingTable('rankCaminhaoMaiorCiclo',
       topN(dataset.caminhoes, 'cicloTotal', 5, true), 'cicloTotal', 'h');
     renderRankingTable('rankCaminhaoMenorCiclo',
       topN(dataset.caminhoes, 'cicloTotal', 5, false), 'cicloTotal', 'h');
     renderRankingTable('rankCaminhaoMaiorDistancia',
       topN(dataset.caminhoes, 'distTotal', 5, true), 'distTotal', 'km');
-    renderRankingTable('rankCaminhaoMenorDistancia',
-      topN(dataset.caminhoes, 'distTotal', 5, false), 'distTotal', 'km');
     renderRankingTable('rankCaminhaoMaiorEspera',
       topN(dataset.caminhoes, 'tempoEspera', 5, true), 'tempoEspera', 'h');
 
+    renderRankingTable('rankOffroadMaiorVolume',
+      topN(dataset.offroads, 'volumeTotal', 5, true), 'volumeTotal', 'm³');
+    renderRankingTable('rankOffroadMaiorQtdCiclos',
+      topN(dataset.offroads, 'numCiclos', 5, true), 'numCiclos', 'aplicações');
     renderRankingTable('rankOffroadMaiorCiclo',
       topN(dataset.offroads, 'cicloTotal', 5, true), 'cicloTotal', 'h');
     renderRankingTable('rankOffroadMaiorEspera',
       topN(dataset.offroads, 'tempoEspera', 5, true), 'tempoEspera', 'h');
     renderRankingTable('rankOffroadMaiorDeslocamento',
       topN(dataset.offroads, 'tempoDeslocamento', 5, true), 'tempoDeslocamento', 'h');
-    renderRankingTable('rankOffroadMaiorFaltaInsumos',
-      topN(dataset.offroads, 'tempoFaltaInsumos', 5, true), 'tempoFaltaInsumos', 'h');
   }
 
   function topN(arr, field, n, desc) {
@@ -2042,7 +2326,7 @@ const Render = (function () {
               <td>${i + 1}</td>
               <td>${Utils.escapeHtml(it.equipamento)}</td>
               <td>${Utils.escapeHtml(it.modelo)}</td>
-              <td>${unit === 'h' ? Utils.formatHoras(it[field]) : `${Utils.formatNumber(it[field])} ${unit}`}</td>
+              <td>${unit === 'h' ? Utils.formatHoras(it[field]) : (unit === 'm³' ? `${Utils.formatNumber(it[field])} m³` : `${Utils.formatNumber(it[field])} ${unit}`)}</td>
             </tr>`).join('')}
         </tbody>
       </table>`;
@@ -2077,6 +2361,171 @@ const Render = (function () {
     renderOffroadsTab(dataset);
     renderEquipamentosList(dataset);
     renderRankings(dataset);
+    renderCalculadora(dataset);
+    popularExportEquip(dataset);
+  }
+
+  // Preenche o seletor de equipamentos da aba Exportação (mantido em sincronia
+  // com o dataset atual / filtro de período aplicado).
+  function popularExportEquip(dataset) {
+    const el = document.getElementById('exportEquipSelect');
+    if (!el) return;
+    const todos = [...dataset.caminhoes, ...dataset.offroads, ...dataset.outros]
+      .sort((a, b) => a.equipamento.localeCompare(b.equipamento, 'pt-BR'));
+    const atual = el.value;
+    el.innerHTML = '<option value="TODOS">Todos os equipamentos</option>' +
+      todos.map(e => `<option value="${Utils.escapeHtml(e.equipamento)}">${Utils.escapeHtml(e.equipamento)} (${e.tipo})</option>`).join('');
+    if (atual && [...el.options].some(o => o.value === atual)) el.value = atual;
+  }
+
+  /* -------------------- CALCULADORA -------------------- */
+
+  function renderCalculadora(dataset) {
+    const res = Calculations.resumoExecutivo(dataset);
+    const cam = dataset.caminhoes;
+    const off = dataset.offroads;
+
+    // Popula seletor de lâmina (5 a 500 de 5 em 5)
+    const selLamina = document.getElementById('calcLamina');
+    if (selLamina && selLamina.options.length === 0) {
+      for (let i = 5; i <= 500; i += 5) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        // 1mm em 1ha = 10m3
+        const m3ha = i * 10;
+        opt.textContent = `${i} mm (${m3ha} m³/ha)`;
+        if (i === 10) opt.selected = true;
+        selLamina.appendChild(opt);
+      }
+    }
+
+    // Preenche dados reais
+    setText('calcRealCicloCam', Utils.formatHoras(res.cicloMedioCaminhoes));
+    setText('calcRealCicloOff', Utils.formatHoras(res.cicloMedioOffroads));
+    setText('calcRealEficiencia', Utils.formatPercent(res.percMedioOperacional));
+    
+    const capMedia = Utils.avg([...cam, ...off].map(e => e.capacidade));
+    setText('calcRealCapacidade', `${Utils.formatNumber(capMedia)} m³`);
+
+    // Listeners para recálculo
+    const inputs = ['calcLamina', 'calcArea', 'calcQtdFrota', 'calcHorasDia'];
+    inputs.forEach(id => {
+      const el = document.getElementById(id);
+      if (el.tagName === 'SELECT') {
+        el.onchange = () => calcularNecessidade(dataset);
+      } else {
+        el.oninput = () => calcularNecessidade(dataset);
+      }
+    });
+
+    calcularNecessidade(dataset);
+  }
+
+  function calcularNecessidade(dataset) {
+    const res = Calculations.resumoExecutivo(dataset);
+    const lamina = parseFloat(document.getElementById('calcLamina').value) || 0;
+    const area = parseFloat(document.getElementById('calcArea').value) || 0;
+    const qtdFrota = parseInt(document.getElementById('calcQtdFrota').value) || 1;
+    const horasDia = parseFloat(document.getElementById('calcHorasDia').value) || 1;
+
+    // 1 mm de lâmina em 1 ha = 10 m³
+    const volumeTotalNecessario = lamina * area * 10;
+
+    // Capacidade média SOMENTE dos caminhões (valores reais do HTML)
+    const capMediaCam = Utils.avg(dataset.caminhoes.map(e => e.capacidade)) || 1;
+
+    // Total de viagens = volume necessário / capacidade média por caminhão
+    const viagensNecessarias = Math.ceil(volumeTotalNecessario / capMediaCam);
+
+    // Viagens que cada caminhão da SUA frota precisa fazer
+    const viagensPorCaminhao = Math.ceil(viagensNecessarias / qtdFrota);
+
+    // Frota necessária para concluir tudo em 1 dia:
+    // Ciclos por Dia = (Horas Disponíveis * Eficiência) / Ciclo Médio
+    const eficiencia = res.percMedioOperacional / 100;
+    const ciclosDiaCam = res.cicloMedioCaminhoes > 0 ? (horasDia * eficiencia) / res.cicloMedioCaminhoes : 0;
+    const frotaCam = ciclosDiaCam > 0 ? Math.ceil(viagensNecessarias / ciclosDiaCam) : 0;
+
+    setText('calcResultVolume', Utils.formatNumber(volumeTotalNecessario, 0));
+    setText('calcResultViagens', Utils.formatNumber(viagensNecessarias, 0));
+    setText('calcResultViagensPorCam', Utils.formatNumber(viagensPorCaminhao, 0));
+    setText('calcResultFrotaCam', Utils.formatNumber(frotaCam, 0));
+
+    gerarInsights(dataset, res, frotaCam, qtdFrota, ciclosDiaCam, viagensNecessarias);
+  }
+
+  function gerarInsights(dataset, res, frotaCam, qtdFrota, ciclosDiaCam, viagensNecessarias) {
+    const container = document.getElementById('calcInsights');
+    if (!container) return;
+
+    const insights = [];
+
+    // Insight de Eficiência
+    if (res.percMedioOperacional < 50) {
+      insights.push({
+        type: 'warning',
+        icon: '⚠️',
+        text: `**Baixa Eficiência Operacional (${Utils.formatPercent(res.percMedioOperacional)}):** A frota passa muito tempo em atividades não produtivas. Verifique os tempos de manutenção e deslocamentos improdutivos.`
+      });
+    } else if (res.percMedioOperacional > 75) {
+      insights.push({
+        type: 'success',
+        icon: '✅',
+        text: `**Alta Eficiência Operacional:** A operação está com excelente aproveitamento do tempo disponível.`
+      });
+    }
+
+    // Insight de Espera
+    if (res.percMedioEspera > 20) {
+      insights.push({
+        type: 'warning',
+        icon: '⏳',
+        text: `**Gargalo de Espera (${Utils.formatPercent(res.percMedioEspera)}):** O tempo aguardando carregamento/liberação está elevado. Isso indica falta de sincronismo entre transporte e aplicação.`
+      });
+    }
+
+    // Insight de Ciclo
+    const maiorCicloCam = Math.max(...dataset.caminhoes.map(c => c.cicloTotal));
+    if (maiorCicloCam > res.cicloMedioCaminhoes * 1.5) {
+      insights.push({
+        type: 'info',
+        icon: '🔍',
+        text: `**Oportunidade no Ciclo:** Existem caminhões com ciclo 50% acima da média. Padronizar as rotas e velocidades pode reduzir a frota necessária em até ${Utils.formatNumber((1 - res.cicloMedioCaminhoes/maiorCicloCam)*100, 0)}%.`
+      });
+    }
+
+    // Insight de Frota (compara necessário x a frota que você informou)
+    if (frotaCam > qtdFrota) {
+      insights.push({
+        type: 'warning',
+        icon: '🚨',
+        text: `**Déficit de Frota:** Para concluir em 1 dia você precisaria de ~${Utils.formatNumber(frotaCam, 0)} caminhões, mas informou apenas ${qtdFrota}.`
+      });
+    } else if (qtdFrota >= frotaCam && frotaCam > 0) {
+      insights.push({
+        type: 'success',
+        icon: '✅',
+        text: `**Frota Suficiente:** Sua frota de ${qtdFrota} caminhões atende à necessidade (estimada em ${Utils.formatNumber(frotaCam, 0)} para 1 dia).`
+      });
+    }
+
+    // Estimativa de dias para concluir com a frota informada
+    const viagensDiaFrota = qtdFrota * ciclosDiaCam;
+    if (viagensDiaFrota > 0) {
+      const diasEstimados = Math.ceil(viagensNecessarias / viagensDiaFrota);
+      insights.push({
+        type: 'info',
+        icon: '📅',
+        text: `**Prazo Estimado:** Com ${qtdFrota} caminhões, concluir ${Utils.formatNumber(viagensNecessarias, 0)} viagens leva cerca de ${Utils.formatNumber(diasEstimados, 0)} dia(s).`
+      });
+    }
+
+    container.innerHTML = insights.map(i => `
+      <div class="insight-item insight-item--${i.type}">
+        <span class="insight-icon">${i.icon}</span>
+        <div class="insight-text">${i.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
+      </div>
+    `).join('') || '<p class="empty-msg">Nenhum gargalo crítico identificado com os parâmetros atuais.</p>';
   }
 
   return { renderAll, renderResumo, renderCaminhoesTab, renderOffroadsTab, renderEquipamentosList, renderRankings };
@@ -2101,19 +2550,55 @@ const ExportModule = (function () {
 
     const cam = cicloMedioCaminhao(dataset.caminhoes);
     const off = cicloMedioOffroad(dataset.offroads);
+    const res = Calculations.resumoExecutivo(dataset);
 
     const painelOriginal = document.querySelector('.tab-panel.active');
-    const [imgCam, imgOff] = await capturarImagensCiclo(dataset);
+    const imgs = await capturarImagensPdf(dataset);
     if (painelOriginal) {
       document.querySelectorAll('.tab-panel.active').forEach(p => p.classList.remove('active'));
       painelOriginal.classList.add('active');
     }
 
+    const filtroInicio = document.getElementById('filtroDataInicio')?.value || '';
+    const filtroFim = document.getElementById('filtroDataFim')?.value || '';
+    const periodoStr = filtroInicio || filtroFim
+      ? `Período: ${filtroInicio ? filtroInicio.split('-').reverse().join('/') : 'início'} a ${filtroFim ? filtroFim.split('-').reverse().join('/') : 'fim'} • `
+      : '';
+
     area.innerHTML = `
       <div class="print-header">
         <h1>Relatório Executivo - Operação de Vinhaça</h1>
-        <p>Gerado em ${agora} • ${dataset.totalLinhas} registros processados</p>
+        <p>${periodoStr}Gerado em ${agora} • ${dataset.totalLinhas} registros processados</p>
       </div>
+
+      <h2>Resumo Executivo</h2>
+      <div class="print-kpis">
+        ${printKpi('Volume Total Transportado', `${Utils.formatNumber(res.volumeTotal)} m³`, true)}
+        ${printKpi('Volume Caminhões', `${Utils.formatNumber(res.volumeTotalCaminhoes)} m³`)}
+        ${printKpi('Volume Offroads', `${Utils.formatNumber(res.volumeTotalOffroads)} m³`)}
+        ${printKpi('Total Viagens Caminhões', res.totalViagensCaminhoes)}
+        ${printKpi('Total Aplicações Offroads', res.totalAplicacoesOffroads)}
+        ${printKpi('Qtd. Caminhões', res.qtdCaminhoes)}
+        ${printKpi('Qtd. Offroads', res.qtdOffroads)}
+        ${printKpi('Ciclo Médio Caminhões', Utils.formatHoras(res.cicloMedioCaminhoes))}
+        ${printKpi('Ciclo Médio Offroads', Utils.formatHoras(res.cicloMedioOffroads))}
+        ${printKpi('Eficiência Operacional', Utils.formatPercent(res.percMedioOperacional))}
+        ${printKpi('Tempo de Espera', Utils.formatPercent(res.percMedioEspera))}
+        ${printKpi('% Produtiva Caminhões', Utils.formatPercent(res.percProdutivoMedioCaminhoes))}
+        ${printKpi('% Produtiva Offroads', Utils.formatPercent(res.percProdutivoMedioOffroads))}
+      </div>
+
+      <div class="print-charts">
+        <div><h4>Distribuição dos Tempos - Caminhões</h4><img src="${imgs.imgDistCaminhoes}"/></div>
+        <div><h4>Distribuição dos Tempos - Offroads</h4><img src="${imgs.imgDistOffroads}"/></div>
+      </div>
+
+      <div class="print-charts" style="margin-top:20px">
+        <div><h4>Distância Média por Tipo</h4><img src="${imgs.imgDistTipo}"/></div>
+        <div><h4>Ciclo Médio por Equipamento</h4><img src="${imgs.imgCicloEquip}"/></div>
+      </div>
+
+      <div style="page-break-before: always;"></div>
 
       <h2>Visão de Ciclo - Caminhões</h2>
       <div class="print-kpis">
@@ -2124,9 +2609,14 @@ const ExportModule = (function () {
         ${printKpi('Tempo Médio Ag. Descarregamento', Utils.formatHoras(cam.agDescarregamentoMedio))}
         ${printKpi('Tempo Médio Descarregamento', Utils.formatHoras(cam.descarregamentoMedio))}
         ${printKpi('Tempo Médio Deslocamento Volta', Utils.formatHoras(cam.deslocamentoMedio))}
+        ${printKpi('Eficiência Operacional', Utils.formatPercent(cam.percOperacionalMedio))}
         ${printKpi('% Produtiva', Utils.formatPercent(cam.percProdutivoMedio))}
+        ${printKpi('Qtd. Total de Ciclos', res.totalViagensCaminhoes, true)}
+        ${printKpi('Volume Total (m³)', `${Utils.formatNumber(res.volumeTotalCaminhoes)} m³`, true)}
       </div>
-      ${imgCam ? `<div class="print-charts"><div><h4>Composição do Ciclo Médio - Caminhão</h4><img src="${imgCam}"/></div></div>` : ''}
+      <div class="print-charts">
+        <div style="grid-column: 1 / -1"><h4>Composição do Ciclo Médio - Caminhão</h4><img src="${imgs.imgCam}" style="max-height:300px; width:auto; display:block; margin:0 auto;"/></div>
+      </div>
 
       <h2>Visão de Ciclo - Offroads</h2>
       <div class="print-kpis">
@@ -2137,9 +2627,30 @@ const ExportModule = (function () {
         ${printKpi('Tempo Médio Falta Insumos', Utils.formatHoras(off.faltaInsumosMedio))}
         ${printKpi('Tempo Médio Ag. Liberação', Utils.formatHoras(off.agLiberacaoMedio))}
         ${printKpi('Tempo Médio Deslocamento', Utils.formatHoras(off.deslocamentoMedio))}
+        ${printKpi('Eficiência Operacional', Utils.formatPercent(off.percOperacionalMedio))}
         ${printKpi('% Produtiva', Utils.formatPercent(off.percProdutivoMedio))}
+        ${printKpi('Qtd. Total de Aplicações', res.totalAplicacoesOffroads, true)}
+        ${printKpi('Volume Total (m³)', `${Utils.formatNumber(res.volumeTotalOffroads)} m³`, true)}
       </div>
-      ${imgOff ? `<div class="print-charts"><div><h4>Composição do Ciclo Médio - Offroad</h4><img src="${imgOff}"/></div></div>` : ''}
+      <div class="print-charts">
+        <div style="grid-column: 1 / -1"><h4>Composição do Ciclo Médio - Offroad</h4><img src="${imgs.imgOff}" style="max-height:300px; width:auto; display:block; margin:0 auto;"/></div>
+      </div>
+
+      <div style="page-break-before: always;"></div>
+
+      <h2>Rankings de Desempenho</h2>
+      <div class="print-rankings">
+        <div class="print-ranking-col">
+          ${printRankingTable('Caminhões - Maior Volume (m³)', topN(dataset.caminhoes, 'volumeTotal', 5, true), 'volumeTotal', 'm³')}
+          ${printRankingTable('Caminhões - Quantidade de Ciclos', topN(dataset.caminhoes, 'numCiclos', 5, true), 'numCiclos', 'ciclos')}
+          ${printRankingTable('Caminhões - Maior Ciclo', topN(dataset.caminhoes, 'cicloTotal', 5, true), 'cicloTotal', 'h')}
+        </div>
+        <div class="print-ranking-col">
+          ${printRankingTable('Offroads - Maior Volume (m³)', topN(dataset.offroads, 'volumeTotal', 5, true), 'volumeTotal', 'm³')}
+          ${printRankingTable('Offroads - Quantidade de Aplicações', topN(dataset.offroads, 'numCiclos', 5, true), 'numCiclos', 'aplicações')}
+          ${printRankingTable('Offroads - Maior Ciclo', topN(dataset.offroads, 'cicloTotal', 5, true), 'cicloTotal', 'h')}
+        </div>
+      </div>
     `;
 
     document.body.classList.add('print-mode');
@@ -2154,28 +2665,40 @@ const ExportModule = (function () {
   // resize() depois não resolve. A solução é tornar a aba visível e
   // recriar o gráfico nesse momento, quando o container já tem tamanho
   // real; depois devolvemos a aba ativa original.
-  async function capturarImagensCiclo(dataset) {
-    const imgCam = await capturarUmaAba('tab-caminhoes', 'chartCicloCaminhao', () => Render.renderCaminhoesTab(dataset));
-    const imgOff = await capturarUmaAba('tab-offroads', 'chartCicloOffroad', () => Render.renderOffroadsTab(dataset));
-    return [imgCam, imgOff];
+  async function capturarImagensPdf(dataset) {
+    const nEquip = dataset.caminhoes.length + dataset.offroads.length;
+
+    // RESUMO - renderiza a aba UMA vez e captura os quatro gráficos. Antes
+    // cada gráfico disparava um renderResumo próprio (4x o trabalho e mais
+    // chances de capturar um quadro em branco); agora renderizamos uma vez
+    // só e capturamos todos os canvas já prontos.
+    await ativarERenderizar('tab-resumo', () => Render.renderResumo(dataset));
+    const imgCicloEquip = Charts.getImage('chartCicloPorEquipamento', 760, Math.min(1100, Math.max(340, nEquip * 26)), true);
+    const imgDistCaminhoes = Charts.getImage('chartDistribuicaoCaminhoes', 560, 420, true);
+    const imgDistOffroads = Charts.getImage('chartDistribuicaoOffroads', 560, 420, true);
+    const imgDistTipo = Charts.getImage('chartDistanciaPorTipo', 620, 380, true);
+
+    await ativarERenderizar('tab-caminhoes', () => Render.renderCaminhoesTab(dataset));
+    const imgCam = Charts.getImage('chartCicloCaminhao', 640, 440, true);
+
+    await ativarERenderizar('tab-offroads', () => Render.renderOffroadsTab(dataset));
+    const imgOff = Charts.getImage('chartCicloOffroad', 640, 440, true);
+
+    return { imgCam, imgOff, imgCicloEquip, imgDistCaminhoes, imgDistOffroads, imgDistTipo };
   }
 
-  // Ativa uma única aba por vez, recria seu gráfico e captura a imagem.
-  // Processar uma de cada vez (em vez de deixar as duas visíveis ao mesmo
-  // tempo) evita que o navegador calcule um layout inconsistente durante
-  // a transição. A aba originalmente ativa é restaurada pelo chamador.
-  async function capturarUmaAba(painelId, canvasId, renderFn) {
+  // Torna uma aba visível e (re)renderiza seus gráficos. Precisamos disso
+  // porque um canvas criado dentro de um container display:none tem tamanho
+  // 0x0 e nunca chega a desenhar. Uma vez visível, esperamos a animação de
+  // entrada do Chart.js (≈1s) terminar antes de capturar. A aba ativa
+  // original é restaurada pelo chamador.
+  async function ativarERenderizar(painelId, renderFn) {
     const painel = document.getElementById(painelId);
+    if (!painel) return;
     document.querySelectorAll('.tab-panel.active').forEach(p => p.classList.remove('active'));
     painel.classList.add('active');
     renderFn();
-
-    // O gráfico acabou de ser (re)criado, então a animação de entrada do
-    // Chart.js (duração padrão de 1s) ainda está em andamento; capturar
-    // cedo demais pega um quadro parcial (arco "crescendo"). Espera a
-    // animação terminar antes de gerar a imagem.
     await new Promise(resolve => setTimeout(resolve, 1100));
-    return Charts.getImage(canvasId);
   }
 
   function cicloMedioCaminhao(rows) {
@@ -2187,6 +2710,7 @@ const ExportModule = (function () {
       agDescarregamentoMedio: Utils.avg(rows.map(c => c.tempoAgDescarregamento)),
       descarregamentoMedio: Utils.avg(rows.map(c => c.tempoDescarregamento)),
       deslocamentoMedio: Utils.avg(rows.map(c => c.tempoDeslocamentoVolta)),
+      percOperacionalMedio: Utils.avg(rows.map(c => c.percOperacional)),
       percProdutivoMedio: Utils.avg(rows.map(c => c.percProdutivo))
     };
   }
@@ -2200,15 +2724,219 @@ const ExportModule = (function () {
       faltaInsumosMedio: Utils.avg(rows.map(o => o.tempoFaltaInsumos)),
       agLiberacaoMedio: Utils.avg(rows.map(o => o.tempoAgLiberacao)),
       deslocamentoMedio: Utils.avg(rows.map(o => o.tempoDeslocamento)),
+      percOperacionalMedio: Utils.avg(rows.map(o => o.percOperacional)),
       percProdutivoMedio: Utils.avg(rows.map(o => o.percProdutivo))
     };
   }
 
-  function printKpi(label, value) {
-    return `<div class="print-kpi"><span>${label}</span><strong>${value}</strong></div>`;
+  function printKpi(label, value, highlight = false) {
+    const cls = highlight ? 'print-kpi print-kpi--highlight' : 'print-kpi';
+    return `<div class="${cls}"><span>${label}</span><strong>${value}</strong></div>`;
   }
 
-  return { gerarPdfExecutivo };
+  function printRankingTable(title, items, field, unit) {
+    if (!items || items.length === 0) return '';
+    return `
+      <div style="margin-bottom: 20px;">
+        <h4 style="margin-bottom: 8px; font-size: 13px; color: var(--slate); border-left: 3px solid var(--accent); padding-left: 8px;">${title}</h4>
+        <table class="print-table">
+          <thead><tr><th>#</th><th>Equipamento</th><th>Modelo</th><th style="text-align:right">Valor</th></tr></thead>
+          <tbody>
+            ${items.map((it, i) => `
+              <tr>
+                <td style="width:30px">${i + 1}</td>
+                <td>${Utils.escapeHtml(it.equipamento)}</td>
+                <td>${Utils.escapeHtml(it.modelo)}</td>
+                <td style="text-align:right; font-weight:600">${unit === 'h' ? Utils.formatHoras(it[field]) : (unit === 'm³' ? `${Utils.formatNumber(it[field])} m³` : `${Utils.formatNumber(it[field])} ${unit}`)}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  function topN(arr, field, n, desc) {
+    return arr.slice().sort((a, b) => desc ? b[field] - a[field] : a[field] - b[field]).slice(0, n);
+  }
+
+  /* ============================================================
+     RELATÓRIO POR EQUIPAMENTO
+     Gera um PDF com uma página por equipamento (ou apenas o
+     selecionado), contendo informações gerais, indicadores
+     calculados e o gráfico de composição do ciclo.
+     ============================================================ */
+
+  async function gerarPdfPorEquipamento(dataset, selecao = 'TODOS') {
+    if (!dataset) {
+      alert('Importe um arquivo XLSX antes de gerar o PDF.');
+      return;
+    }
+
+    const todos = [...dataset.caminhoes, ...dataset.offroads, ...dataset.outros]
+      .sort((a, b) => a.equipamento.localeCompare(b.equipamento, 'pt-BR'));
+
+    const lista = (selecao && selecao !== 'TODOS')
+      ? todos.filter(e => e.equipamento === selecao)
+      : todos;
+
+    if (lista.length === 0) {
+      alert('Nenhum equipamento disponível para exportar.');
+      return;
+    }
+
+    // Renderiza os gráficos de cada equipamento em um palco invisível fora da
+    // tela. Assim não precisamos alternar abas nem depender do layout atual -
+    // cada gráfico é desenhado num tamanho fixo e capturado como imagem.
+    const stage = criarPalcoGrafico();
+    const blocos = [];
+    try {
+      for (const item of lista) {
+        const dados = dadosEquipamento(item);
+        const imgCiclo = dados.cicloLabels.length
+          ? await capturarGraficoPalco(stage, dados.cicloLabels, dados.cicloValores)
+          : null;
+        blocos.push(blocoEquipamentoHtml(item, dados, imgCiclo));
+      }
+    } finally {
+      stage.remove();
+    }
+
+    const area = document.getElementById('printArea');
+    const titulo = lista.length === 1
+      ? `Relatório do Equipamento ${Utils.escapeHtml(lista[0].equipamento)}`
+      : 'Relatório por Equipamento';
+
+    area.innerHTML = `
+      ${cabecalhoHtml(dataset, titulo, `${lista.length} equipamento(s)`)}
+      ${blocos.join('')}
+    `;
+
+    document.body.classList.add('print-mode');
+    window.print();
+    setTimeout(() => document.body.classList.remove('print-mode'), 500);
+  }
+
+  // Cria (e devolve) um container invisível com um canvas para desenhar os
+  // gráficos do relatório por equipamento sem afetar a interface.
+  function criarPalcoGrafico() {
+    const stage = document.createElement('div');
+    stage.id = 'pdfChartStage';
+    stage.style.cssText = 'position:fixed; left:-10000px; top:0; width:560px; height:380px; pointer-events:none; opacity:0;';
+    stage.innerHTML = '<canvas id="pdfStageCanvas"></canvas>';
+    document.body.appendChild(stage);
+    return stage;
+  }
+
+  // Desenha um doughnut no palco (sem animação) e devolve a imagem base64.
+  async function capturarGraficoPalco(stage, labels, valores) {
+    stage.innerHTML = '<canvas id="pdfStageCanvas"></canvas>';
+    Charts.renderDoughnut('pdfStageCanvas', labels, valores.map(v => Math.round((v + Number.EPSILON) * 100) / 100), { animation: false });
+    // Sem animação o Chart.js ainda desenha no próximo frame; esperamos dois
+    // frames para garantir que o canvas já tem conteúdo antes de capturar.
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const img = Charts.getImage('pdfStageCanvas', 560, 380, true);
+    Charts.destroy('pdfStageCanvas');
+    return img;
+  }
+
+  // Extrai as informações, indicadores e a composição de ciclo de um
+  // equipamento, reaproveitando o mesmo modelo de dados da aba Equipamentos.
+  function dadosEquipamento(item) {
+    const info = [
+      ['Modelo', Utils.escapeHtml(item.modelo || '-')],
+      ['Tipo', item.tipo],
+      ['Frente', Utils.escapeHtml(item.frente || '-')],
+      ['Fazenda', Utils.escapeHtml(item.fazenda || '-')],
+      ['Registros', item.registros ? item.registros.length : 0]
+    ];
+    if (item.numCiclos !== undefined) info.push(['Nº de Ciclos', item.numCiclos]);
+    if (item.capacidade !== undefined) info.push(['Capacidade', `${Utils.formatNumber(item.capacidade)} m³`]);
+    if (item.volumeTotal !== undefined) info.push(['Volume Total', `${Utils.formatNumber(item.volumeTotal)} m³`]);
+
+    let indicadores = [];
+    let cicloLabels = [], cicloValores = [];
+
+    if (item.tipo === 'CAMINHAO') {
+      indicadores = [
+        ['Tempo Médio Carregamento', Utils.formatHoras(item.tempoCarregamento)],
+        ['Tempo Médio Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
+        ['Tempo Médio Transporte', Utils.formatHoras(item.tempoTransporte)],
+        ['Tempo Médio Ag. Descarregamento', Utils.formatHoras(item.tempoAgDescarregamento)],
+        ['Tempo Médio Descarregamento', Utils.formatHoras(item.tempoDescarregamento)],
+        ['Tempo Médio Deslocamento Volta', Utils.formatHoras(item.tempoDeslocamentoVolta)],
+        ['Velocidade Média Ida', `${Utils.formatNumber(item.velMediaIda)} km/h`],
+        ['Velocidade Média Volta', `${Utils.formatNumber(item.velMediaVolta)} km/h`],
+        ['Distância Média/Ciclo', `${Utils.formatNumber(item.distTotal)} km`],
+        ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)],
+        ['Eficiência Operacional', Utils.formatPercent(item.percOperacional)],
+        ['% Produtiva', Utils.formatPercent(item.percProdutivo)]
+      ];
+      cicloLabels = ['Carregamento', 'Ag.Carregamento', 'Transporte', 'Ag.Descarregamento', 'Descarregamento', 'Deslocamento Volta'];
+      cicloValores = [item.tempoCarregamento, item.tempoAgCarregamento, item.tempoTransporte,
+        item.tempoAgDescarregamento, item.tempoDescarregamento, item.tempoDeslocamentoVolta];
+    } else if (item.tipo === 'OFFROAD') {
+      indicadores = [
+        ['Tempo Médio Aplicação', Utils.formatHoras(item.tempoAplicacao)],
+        ['Tempo Médio Abastecimento', Utils.formatHoras(item.tempoAbastecimento)],
+        ['Tempo Médio Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
+        ['Tempo Médio Falta Insumos', Utils.formatHoras(item.tempoFaltaInsumos)],
+        ['Tempo Médio Ag. Liberação', Utils.formatHoras(item.tempoAgLiberacao)],
+        ['Tempo Médio Deslocamento', Utils.formatHoras(item.tempoDeslocamento)],
+        ['Velocidade Média', `${Utils.formatNumber(item.velMediaDeslocamento)} km/h`],
+        ['Distância Média/Ciclo', `${Utils.formatNumber(item.distPontoCarregamento)} km`],
+        ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)],
+        ['Eficiência Operacional', Utils.formatPercent(item.percOperacional)],
+        ['% Produtiva', Utils.formatPercent(item.percProdutivo)]
+      ];
+      cicloLabels = ['Aplicação', 'Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'];
+      cicloValores = [item.tempoAplicacao, item.tempoAbastecimento, item.tempoAgCarregamento,
+        item.tempoFaltaInsumos, item.tempoAgLiberacao, item.tempoDeslocamento];
+    }
+
+    return { info, indicadores, cicloLabels, cicloValores };
+  }
+
+  function blocoEquipamentoHtml(item, dados, imgCiclo) {
+    const indicadoresHtml = dados.indicadores.length ? `
+      <h4>Indicadores Calculados</h4>
+      <div class="print-kpis">
+        ${dados.indicadores.map(([l, v]) => printKpi(l, v)).join('')}
+      </div>` : '<p class="empty-msg">Equipamento não classificado como CAMINHÃO ou OFFROAD.</p>';
+
+    const graficoHtml = imgCiclo ? `
+      <div class="print-charts">
+        <div style="grid-column: 1 / -1"><h4>Composição do Ciclo</h4>
+          <img src="${imgCiclo}" style="max-height:300px; width:auto; display:block; margin:0 auto;"/>
+        </div>
+      </div>` : '';
+
+    return `
+      <div class="equip-pdf-block">
+        <h2>${Utils.escapeHtml(item.equipamento)} — ${item.tipo}</h2>
+        <div class="print-kpis">
+          ${dados.info.map(([l, v]) => printKpi(l, v)).join('')}
+        </div>
+        ${indicadoresHtml}
+        ${graficoHtml}
+      </div>`;
+  }
+
+  // Cabeçalho padrão (título + período + data de geração).
+  function cabecalhoHtml(dataset, titulo, subtitulo = '') {
+    const agora = new Date().toLocaleString('pt-BR');
+    const filtroInicio = document.getElementById('filtroDataInicio')?.value || '';
+    const filtroFim = document.getElementById('filtroDataFim')?.value || '';
+    const periodoStr = (filtroInicio || filtroFim)
+      ? `Período: ${filtroInicio ? filtroInicio.split('-').reverse().join('/') : 'início'} a ${filtroFim ? filtroFim.split('-').reverse().join('/') : 'fim'} • `
+      : '';
+    const extra = subtitulo ? `${subtitulo} • ` : '';
+    return `
+      <div class="print-header">
+        <h1>${titulo}</h1>
+        <p>${periodoStr}${extra}Gerado em ${agora} • ${dataset.totalLinhas} registros processados</p>
+      </div>`;
+  }
+
+  return { gerarPdfExecutivo, gerarPdfPorEquipamento };
 })();
 
 </script>
@@ -2219,12 +2947,14 @@ const ExportModule = (function () {
    ============================================================ */
 
 const App = (function () {
-  let dataset = null;
+  let dataset = null;      // dataset completo (sem filtro)
+  let rawRows = null;      // todas as linhas brutas do XLSX
 
   function init() {
     bindNav();
     bindFileInput();
     bindExport();
+    bindFiltroData();
     showEmptyState();
   }
 
@@ -2254,18 +2984,79 @@ const App = (function () {
 
   function bindExport() {
     const btn = document.getElementById('btnGerarPdf');
-    if (!btn) return;
-    btn.addEventListener('click', async () => {
-      const textoOriginal = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Gerando PDF...';
-      try {
-        await ExportModule.gerarPdfExecutivo(dataset);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = textoOriginal;
+    if (btn) {
+      btn.addEventListener('click', async () => {
+        const textoOriginal = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Gerando PDF...';
+        try {
+          await ExportModule.gerarPdfExecutivo(dataset);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = textoOriginal;
+        }
+      });
+    }
+
+    const btnEquip = document.getElementById('btnGerarPdfEquip');
+    if (btnEquip) {
+      btnEquip.addEventListener('click', async () => {
+        const textoOriginal = btnEquip.textContent;
+        btnEquip.disabled = true;
+        btnEquip.textContent = 'Gerando PDF...';
+        try {
+          const sel = document.getElementById('exportEquipSelect');
+          await ExportModule.gerarPdfPorEquipamento(dataset, sel ? sel.value : 'TODOS');
+        } finally {
+          btnEquip.disabled = false;
+          btnEquip.textContent = textoOriginal;
+        }
+      });
+    }
+  }
+
+  function bindFiltroData() {
+    const elInicio = document.getElementById('filtroDataInicio');
+    const elFim = document.getElementById('filtroDataFim');
+    const elLimpar = document.getElementById('btnLimparFiltroData');
+
+    function aplicarFiltro() {
+      if (!rawRows) return;
+      const inicio = elInicio?.value ? new Date(elInicio.value + 'T00:00:00') : null;
+      const fim = elFim?.value ? new Date(elFim.value + 'T23:59:59') : null;
+
+      const rowsFiltradas = rawRows.filter(r => {
+        const data = r.Data;
+        if (!data) return true;
+        if (inicio && data < inicio) return false;
+        if (fim && data > fim) return false;
+        return true;
+      });
+
+      dataset = Calculations.buildDataset(rowsFiltradas);
+      Charts.destroyAll();
+      Render.renderAll(dataset);
+      // Atualiza o status com contagem filtrada
+      const elStatus = document.getElementById('fileStatus');
+      if (elStatus && rawRows) {
+        const totalGeral = rawRows.length;
+        const totalFiltrado = rowsFiltradas.length;
+        const filtrado = totalFiltrado < totalGeral ? ` <span style="color:var(--info);">(${totalFiltrado} filtrados de ${totalGeral})</span>` : '';
+        const nomeArquivo = elStatus.querySelector('strong')?.textContent || '';
+        const agora = new Date().toLocaleString('pt-BR');
+        elStatus.innerHTML = `<strong>${Utils.escapeHtml(nomeArquivo)}</strong> · ${totalGeral} registros${filtrado} · atualizado em ${agora}`;
       }
-    });
+    }
+
+    if (elInicio) elInicio.addEventListener('change', aplicarFiltro);
+    if (elFim) elFim.addEventListener('change', aplicarFiltro);
+    if (elLimpar) {
+      elLimpar.addEventListener('click', () => {
+        if (elInicio) elInicio.value = '';
+        if (elFim) elFim.value = '';
+        aplicarFiltro();
+      });
+    }
   }
 
   async function processFile(file) {
@@ -2273,7 +3064,20 @@ const App = (function () {
     hideError();
     try {
       const rows = await Parser.readFile(file);
+      rawRows = rows;
       dataset = Calculations.buildDataset(rows);
+
+      // Preenche os campos de data com o range dos dados
+      const datas = rows.map(r => r.Data).filter(Boolean);
+      if (datas.length > 0) {
+        const minData = new Date(Math.min(...datas.map(d => d.getTime())));
+        const maxData = new Date(Math.max(...datas.map(d => d.getTime())));
+        const toInputDate = d => d.toISOString().slice(0, 10);
+        const elInicio = document.getElementById('filtroDataInicio');
+        const elFim = document.getElementById('filtroDataFim');
+        if (elInicio) elInicio.value = toInputDate(minData);
+        if (elFim) elFim.value = toInputDate(maxData);
+      }
 
       if (dataset.caminhoes.length === 0 && dataset.offroads.length === 0) {
         showWarning('Nenhum equipamento foi classificado como CAMINHÃO ou OFFROAD. ' +
@@ -2283,6 +3087,9 @@ const App = (function () {
       Render.renderAll(dataset);
       updateFileStatus(file.name, dataset);
       showApp();
+      // Exibe o painel de filtros
+      const gf = document.getElementById('globalFilters');
+      if (gf) gf.style.display = 'flex';
     } catch (err) {
       console.error(err);
       showError(err.message || 'Erro desconhecido ao processar o arquivo.');
@@ -2291,12 +3098,13 @@ const App = (function () {
     }
   }
 
-  function updateFileStatus(fileName, dataset) {
+  function updateFileStatus(fileName, ds) {
     const el = document.getElementById('fileStatus');
     if (!el) return;
     const agora = new Date().toLocaleString('pt-BR');
-    el.innerHTML = `<strong>${Utils.escapeHtml(fileName)}</strong> · ${dataset.totalLinhas} registros ·
-      atualizado em ${agora}`;
+    const totalGeral = rawRows ? rawRows.length : ds.totalLinhas;
+    const filtrado = ds.totalLinhas < totalGeral ? ` (${ds.totalLinhas} filtrados de ${totalGeral})` : '';
+    el.innerHTML = `<strong>${Utils.escapeHtml(fileName)}</strong> · ${totalGeral} registros${filtrado} · atualizado em ${agora}`;
   }
 
   function showLoadingBanner() {}
@@ -2339,7 +3147,7 @@ const App = (function () {
     document.getElementById('appContent').style.display = 'block';
   }
 
-  return { init, getDataset: () => dataset };
+  return { init, getDataset: () => dataset, getFullRows: () => rawRows, setDataset: (d) => { dataset = d; } };
 })();
 
 document.addEventListener('DOMContentLoaded', App.init);
