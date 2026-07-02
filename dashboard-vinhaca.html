@@ -577,7 +577,10 @@ body.print-mode #printArea {
 .print-table--small td:first-child { width: 30px; font-weight: 700; }
 
 .print-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
-.print-charts img { width: 100%; border: 1px solid var(--border); border-radius: 6px; }
+/* Altura limitada: sem isto, ao imprimir em A4 um gráfico ocupa ~688px de
+   largura e fica alto demais, empurrando o conteúdo e quebrando páginas no
+   meio dos gráficos. Mantemos a proporção com width/height auto. */
+.print-charts img { display: block; margin: 0 auto; max-width: 100%; max-height: 300px; width: auto; height: auto; border: 1px solid var(--border); border-radius: 6px; }
 
 .print-rankings { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px; }
 .print-ranking-col { }
@@ -589,15 +592,18 @@ body.print-mode #printArea {
 
 @media print {
   .print-charts { page-break-inside: avoid; }
+  .print-charts > div { page-break-inside: avoid; }
   .print-ranking-col { page-break-inside: avoid; }
   .print-table { page-break-inside: avoid; }
+  .print-kpis { page-break-inside: avoid; }
   .equip-pdf-block { page-break-inside: avoid; }
+  /* Não deixa um título órfão no fim de uma página */
+  #printArea h2, #printArea h4 { page-break-after: avoid; }
 }
 
 @media print {
   @page { margin: 14mm; size: A4 portrait; }
   body.print-mode { background: #fff; }
-  .print-charts { grid-template-columns: 1fr; }
   #printArea h2 { page-break-before: auto; }
   * {
     -webkit-print-color-adjust: exact !important;
@@ -1811,7 +1817,29 @@ const Charts = (function () {
     return img;
   }
 
-  return { renderBar, renderDoughnut, renderHorizontalBar, destroy, destroyAll, getImage, registry };
+  // Versão para PDF: força um tamanho fixo, compõe o gráfico sobre um fundo
+  // branco e devolve um JPEG. O JPEG reduz drasticamente o tamanho do arquivo
+  // (um relatório "por equipamento" com dezenas de gráficos em PNG chega a
+  // vários MB e faz a impressão do navegador falhar/cortar páginas); o fundo
+  // branco é necessário porque o JPEG não tem transparência.
+  function getImagePrint(canvasId, w, h, quality = 0.9) {
+    const chart = registry[canvasId];
+    if (!chart) return null;
+    chart.resize(w, h);
+    const src = chart.canvas;
+    const tmp = document.createElement('canvas');
+    tmp.width = src.width;
+    tmp.height = src.height;
+    const ctx = tmp.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, tmp.width, tmp.height);
+    ctx.drawImage(src, 0, 0);
+    const img = tmp.toDataURL('image/jpeg', quality);
+    chart.resize();
+    return img;
+  }
+
+  return { renderBar, renderDoughnut, renderHorizontalBar, destroy, destroyAll, getImage, getImagePrint, registry };
 })();
 
 </script>
@@ -2673,16 +2701,16 @@ const ExportModule = (function () {
     // chances de capturar um quadro em branco); agora renderizamos uma vez
     // só e capturamos todos os canvas já prontos.
     await ativarERenderizar('tab-resumo', () => Render.renderResumo(dataset));
-    const imgCicloEquip = Charts.getImage('chartCicloPorEquipamento', 760, Math.min(1100, Math.max(340, nEquip * 26)), true);
-    const imgDistCaminhoes = Charts.getImage('chartDistribuicaoCaminhoes', 560, 420, true);
-    const imgDistOffroads = Charts.getImage('chartDistribuicaoOffroads', 560, 420, true);
-    const imgDistTipo = Charts.getImage('chartDistanciaPorTipo', 620, 380, true);
+    const imgCicloEquip = Charts.getImagePrint('chartCicloPorEquipamento', 760, Math.min(1400, Math.max(340, nEquip * 26)));
+    const imgDistCaminhoes = Charts.getImagePrint('chartDistribuicaoCaminhoes', 520, 400);
+    const imgDistOffroads = Charts.getImagePrint('chartDistribuicaoOffroads', 520, 400);
+    const imgDistTipo = Charts.getImagePrint('chartDistanciaPorTipo', 620, 360);
 
     await ativarERenderizar('tab-caminhoes', () => Render.renderCaminhoesTab(dataset));
-    const imgCam = Charts.getImage('chartCicloCaminhao', 640, 440, true);
+    const imgCam = Charts.getImagePrint('chartCicloCaminhao', 620, 420);
 
     await ativarERenderizar('tab-offroads', () => Render.renderOffroadsTab(dataset));
-    const imgOff = Charts.getImage('chartCicloOffroad', 640, 440, true);
+    const imgOff = Charts.getImagePrint('chartCicloOffroad', 620, 420);
 
     return { imgCam, imgOff, imgCicloEquip, imgDistCaminhoes, imgDistOffroads, imgDistTipo };
   }
@@ -2833,7 +2861,10 @@ const ExportModule = (function () {
     // Sem animação o Chart.js ainda desenha no próximo frame; esperamos dois
     // frames para garantir que o canvas já tem conteúdo antes de capturar.
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-    const img = Charts.getImage('pdfStageCanvas', 560, 380, true);
+    // Frota grande = dezenas de gráficos num único PDF; mantemos cada imagem
+    // enxuta (dimensão e qualidade menores) para o arquivo não estourar o
+    // limite de memória da impressão do navegador.
+    const img = Charts.getImagePrint('pdfStageCanvas', 460, 320, 0.82);
     Charts.destroy('pdfStageCanvas');
     return img;
   }
