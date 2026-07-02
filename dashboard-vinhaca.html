@@ -543,68 +543,74 @@ body.print-mode #printArea {
   --text-muted: #667165;
 }
 
-.print-header { text-align: center; margin-bottom: 20px; border-bottom: 3px solid var(--primary); padding-bottom: 12px; background: #f4f6f5; padding: 16px; border-radius: 8px; }
-.print-header h1 { color: var(--primary-dark); margin: 0 0 4px; font-size: 20px; }
-.print-header p { color: var(--text-muted); font-size: 12px; margin: 0; }
+/* ================= PDF estilo dashboard (paisagem) =================
+   Cada seção do relatório é uma ".pdf-page" que ocupa exatamente uma
+   folha A4 em paisagem, com KPIs no topo e os gráficos preenchendo o
+   restante da altura (parecido com uma página do Power BI). */
 
-#printArea h2 {
-  color: #fff;
-  background: var(--primary-dark);
-  padding: 8px 12px;
-  border-radius: 6px;
-  margin-top: 26px;
-  font-size: 14px;
-}
-#printArea h4 { margin: 14px 0 6px; color: var(--slate); }
-
-.print-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
-.print-kpi {
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--primary);
-  border-radius: 6px;
-  padding: 10px 12px;
+.pdf-page {
   background: #fff;
-}
-.print-kpi span { display: block; font-size: 10.5px; color: var(--text-muted); margin-bottom: 4px; }
-.print-kpi strong { font-size: 15px; color: var(--text); font-weight: 700; }
-.print-kpi--highlight { border-left-color: var(--accent); background: #fffdf9; }
-.print-kpi--highlight strong { color: var(--secondary); }
-
-.print-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 10px; }
-.print-table th, .print-table td { border: 1px solid var(--border); padding: 5px 6px; text-align: left; }
-.print-table th { background: var(--primary-dark); color: #fff; }
-.print-table tbody tr:nth-child(even) { background: #f8faf8; }
-.print-table--small td:first-child { width: 30px; font-weight: 700; }
-
-.print-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
-/* Altura limitada: sem isto, ao imprimir em A4 um gráfico ocupa ~688px de
-   largura e fica alto demais, empurrando o conteúdo e quebrando páginas no
-   meio dos gráficos. Mantemos a proporção com width/height auto. */
-.print-charts img { display: block; margin: 0 auto; max-width: 100%; max-height: 300px; width: auto; height: auto; border: 1px solid var(--border); border-radius: 6px; }
-
-.print-rankings { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px; }
-.print-ranking-col { }
-.print-ranking-col h4 { margin: 14px 0 8px; font-size: 13px; color: var(--slate); border-left: 3px solid var(--accent); padding-left: 8px; }
-
-/* Bloco de um equipamento no relatório "por equipamento" */
-.equip-pdf-block { margin-top: 18px; }
-.equip-pdf-block + .equip-pdf-block { page-break-before: always; }
-
-@media print {
-  .print-charts { page-break-inside: avoid; }
-  .print-charts > div { page-break-inside: avoid; }
-  .print-ranking-col { page-break-inside: avoid; }
-  .print-table { page-break-inside: avoid; }
-  .print-kpis { page-break-inside: avoid; }
-  .equip-pdf-block { page-break-inside: avoid; }
-  /* Não deixa um título órfão no fim de uma página */
-  #printArea h2, #printArea h4 { page-break-after: avoid; }
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* No preview em tela aproximamos a proporção de um A4 paisagem. */
+  width: 277mm;
+  min-height: 190mm;
+  margin: 0 auto 22px;
+  padding: 10px;
+  border: 1px solid var(--border);
 }
 
+.pdf-title {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  background: var(--primary-dark); color: #fff;
+  padding: 9px 14px; border-radius: 6px; flex: 0 0 auto;
+}
+.pdf-title h2 { margin: 0; font-size: 16px; letter-spacing: .2px; }
+.pdf-title .pdf-sub { font-size: 10.5px; opacity: .85; white-space: nowrap; }
+
+.pdf-kpis { display: grid; gap: 8px; flex: 0 0 auto; }
+.pdf-kpi {
+  border: 1px solid var(--border); border-left: 4px solid var(--primary);
+  border-radius: 6px; padding: 7px 10px; background: #fff; min-width: 0;
+}
+.pdf-kpi span { display: block; font-size: 9.5px; color: var(--text-muted); margin-bottom: 3px; line-height: 1.2; }
+.pdf-kpi strong { font-size: 15px; color: var(--text); font-weight: 700; line-height: 1.1; }
+.pdf-kpi--hl { border-left-color: var(--accent); background: #fffdf9; }
+.pdf-kpi--hl strong { color: var(--secondary); }
+
+/* Área que cresce para preencher a folha e recebe os gráficos/tabelas. */
+.pdf-body { flex: 1 1 auto; display: grid; gap: 8px; min-height: 0; }
+.pdf-card {
+  border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px 8px;
+  background: #fff; display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.pdf-card h4 { margin: 0 0 4px; font-size: 11.5px; color: var(--slate); border-left: 3px solid var(--accent); padding-left: 7px; flex: 0 0 auto; }
+.pdf-chart { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.pdf-chart img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+
+.pdf-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+.pdf-table th, .pdf-table td { border: 1px solid var(--border); padding: 3px 6px; text-align: left; }
+.pdf-table th { background: var(--primary-dark); color: #fff; }
+.pdf-table tbody tr:nth-child(even) { background: #f8faf8; }
+.pdf-table td:last-child, .pdf-table th:last-child { text-align: right; white-space: nowrap; }
+.pdf-table td:first-child, .pdf-table th:first-child { width: 22px; text-align: center; }
+
 @media print {
-  @page { margin: 14mm; size: A4 portrait; }
+  @page { size: A4 landscape; margin: 8mm; }
   body.print-mode { background: #fff; }
-  #printArea h2 { page-break-before: auto; }
+  /* Zera o padding de tela do container: senão ele empurra a 1ª página para
+     baixo e cria folhas extras/em branco. */
+  body.print-mode #printArea { padding: 0; }
+  .pdf-page {
+    width: auto; min-height: 0;
+    height: 193mm;             /* 210mm - 2*8mm, com folga p/ arredondamento */
+    margin: 0; padding: 0;
+    border: none; overflow: hidden;
+    page-break-after: always;
+  }
+  .pdf-page:last-child { page-break-after: auto; }
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -2587,96 +2593,93 @@ const ExportModule = (function () {
       painelOriginal.classList.add('active');
     }
 
-    const filtroInicio = document.getElementById('filtroDataInicio')?.value || '';
-    const filtroFim = document.getElementById('filtroDataFim')?.value || '';
-    const periodoStr = filtroInicio || filtroFim
-      ? `Período: ${filtroInicio ? filtroInicio.split('-').reverse().join('/') : 'início'} a ${filtroFim ? filtroFim.split('-').reverse().join('/') : 'fim'} • `
-      : '';
+    const sub = subInfo(dataset, agora);
+    const camRows = dataset.caminhoes, offRows = dataset.offroads;
 
     area.innerHTML = `
-      <div class="print-header">
-        <h1>Relatório Executivo - Operação de Vinhaça</h1>
-        <p>${periodoStr}Gerado em ${agora} • ${dataset.totalLinhas} registros processados</p>
-      </div>
-
-      <h2>Resumo Executivo</h2>
-      <div class="print-kpis">
-        ${printKpi('Volume Total Transportado', `${Utils.formatNumber(res.volumeTotal)} m³`, true)}
-        ${printKpi('Volume Caminhões', `${Utils.formatNumber(res.volumeTotalCaminhoes)} m³`)}
-        ${printKpi('Volume Offroads', `${Utils.formatNumber(res.volumeTotalOffroads)} m³`)}
-        ${printKpi('Total Viagens Caminhões', res.totalViagensCaminhoes)}
-        ${printKpi('Total Aplicações Offroads', res.totalAplicacoesOffroads)}
-        ${printKpi('Qtd. Caminhões', res.qtdCaminhoes)}
-        ${printKpi('Qtd. Offroads', res.qtdOffroads)}
-        ${printKpi('Ciclo Médio Caminhões', Utils.formatHoras(res.cicloMedioCaminhoes))}
-        ${printKpi('Ciclo Médio Offroads', Utils.formatHoras(res.cicloMedioOffroads))}
-        ${printKpi('Eficiência Operacional', Utils.formatPercent(res.percMedioOperacional))}
-        ${printKpi('Tempo de Espera', Utils.formatPercent(res.percMedioEspera))}
-        ${printKpi('% Produtiva Caminhões', Utils.formatPercent(res.percProdutivoMedioCaminhoes))}
-        ${printKpi('% Produtiva Offroads', Utils.formatPercent(res.percProdutivoMedioOffroads))}
-      </div>
-
-      <div class="print-charts">
-        <div><h4>Distribuição dos Tempos - Caminhões</h4><img src="${imgs.imgDistCaminhoes}"/></div>
-        <div><h4>Distribuição dos Tempos - Offroads</h4><img src="${imgs.imgDistOffroads}"/></div>
-      </div>
-
-      <div class="print-charts" style="margin-top:20px">
-        <div><h4>Distância Média por Tipo</h4><img src="${imgs.imgDistTipo}"/></div>
-        <div><h4>Ciclo Médio por Equipamento</h4><img src="${imgs.imgCicloEquip}"/></div>
-      </div>
-
-      <div style="page-break-before: always;"></div>
-
-      <h2>Visão de Ciclo - Caminhões</h2>
-      <div class="print-kpis">
-        ${printKpi('Ciclo Médio', Utils.formatHoras(cam.cicloMedio))}
-        ${printKpi('Tempo Médio Carregamento', Utils.formatHoras(cam.carregamentoMedio))}
-        ${printKpi('Tempo Médio Ag. Carregamento', Utils.formatHoras(cam.agCarregamentoMedio))}
-        ${printKpi('Tempo Médio Transporte', Utils.formatHoras(cam.transporteMedio))}
-        ${printKpi('Tempo Médio Ag. Descarregamento', Utils.formatHoras(cam.agDescarregamentoMedio))}
-        ${printKpi('Tempo Médio Descarregamento', Utils.formatHoras(cam.descarregamentoMedio))}
-        ${printKpi('Tempo Médio Deslocamento Volta', Utils.formatHoras(cam.deslocamentoMedio))}
-        ${printKpi('Eficiência Operacional', Utils.formatPercent(cam.percOperacionalMedio))}
-        ${printKpi('% Produtiva', Utils.formatPercent(cam.percProdutivoMedio))}
-        ${printKpi('Qtd. Total de Ciclos', res.totalViagensCaminhoes, true)}
-        ${printKpi('Volume Total (m³)', `${Utils.formatNumber(res.volumeTotalCaminhoes)} m³`, true)}
-      </div>
-      <div class="print-charts">
-        <div style="grid-column: 1 / -1"><h4>Composição do Ciclo Médio - Caminhão</h4><img src="${imgs.imgCam}" style="max-height:300px; width:auto; display:block; margin:0 auto;"/></div>
-      </div>
-
-      <h2>Visão de Ciclo - Offroads</h2>
-      <div class="print-kpis">
-        ${printKpi('Ciclo Médio', Utils.formatHoras(off.cicloMedio))}
-        ${printKpi('Tempo Médio Aplicação', Utils.formatHoras(off.aplicacaoMedio))}
-        ${printKpi('Tempo Médio Abastecimento', Utils.formatHoras(off.abastecimentoMedio))}
-        ${printKpi('Tempo Médio Ag. Carregamento', Utils.formatHoras(off.agCarregamentoMedio))}
-        ${printKpi('Tempo Médio Falta Insumos', Utils.formatHoras(off.faltaInsumosMedio))}
-        ${printKpi('Tempo Médio Ag. Liberação', Utils.formatHoras(off.agLiberacaoMedio))}
-        ${printKpi('Tempo Médio Deslocamento', Utils.formatHoras(off.deslocamentoMedio))}
-        ${printKpi('Eficiência Operacional', Utils.formatPercent(off.percOperacionalMedio))}
-        ${printKpi('% Produtiva', Utils.formatPercent(off.percProdutivoMedio))}
-        ${printKpi('Qtd. Total de Aplicações', res.totalAplicacoesOffroads, true)}
-        ${printKpi('Volume Total (m³)', `${Utils.formatNumber(res.volumeTotalOffroads)} m³`, true)}
-      </div>
-      <div class="print-charts">
-        <div style="grid-column: 1 / -1"><h4>Composição do Ciclo Médio - Offroad</h4><img src="${imgs.imgOff}" style="max-height:300px; width:auto; display:block; margin:0 auto;"/></div>
-      </div>
-
-      <div style="page-break-before: always;"></div>
-
-      <h2>Rankings de Desempenho</h2>
-      <div class="print-rankings">
-        <div class="print-ranking-col">
-          ${printRankingTable('Caminhões - Maior Volume (m³)', topN(dataset.caminhoes, 'volumeTotal', 5, true), 'volumeTotal', 'm³')}
-          ${printRankingTable('Caminhões - Quantidade de Ciclos', topN(dataset.caminhoes, 'numCiclos', 5, true), 'numCiclos', 'ciclos')}
-          ${printRankingTable('Caminhões - Maior Ciclo', topN(dataset.caminhoes, 'cicloTotal', 5, true), 'cicloTotal', 'h')}
+      <!-- PÁGINA 1: RESUMO EXECUTIVO -->
+      <div class="pdf-page">
+        <div class="pdf-title"><h2>Resumo Executivo — Operação de Vinhaça</h2><span class="pdf-sub">${sub}</span></div>
+        <div class="pdf-kpis" style="grid-template-columns: repeat(7, 1fr);">
+          ${pdfKpi('Volume Total', `${Utils.formatNumber(res.volumeTotal)} m³`, true)}
+          ${pdfKpi('Volume Caminhões', `${Utils.formatNumber(res.volumeTotalCaminhoes)} m³`)}
+          ${pdfKpi('Volume Offroads', `${Utils.formatNumber(res.volumeTotalOffroads)} m³`)}
+          ${pdfKpi('Viagens Caminhões', res.totalViagensCaminhoes)}
+          ${pdfKpi('Aplicações Offroads', res.totalAplicacoesOffroads)}
+          ${pdfKpi('Qtd. Caminhões', res.qtdCaminhoes)}
+          ${pdfKpi('Qtd. Offroads', res.qtdOffroads)}
+          ${pdfKpi('Ciclo Médio Caminhões', Utils.formatHoras(res.cicloMedioCaminhoes))}
+          ${pdfKpi('Ciclo Médio Offroads', Utils.formatHoras(res.cicloMedioOffroads))}
+          ${pdfKpi('Eficiência Operacional', Utils.formatPercent(res.percMedioOperacional))}
+          ${pdfKpi('Tempo de Espera', Utils.formatPercent(res.percMedioEspera))}
+          ${pdfKpi('% Produtiva Caminhões', Utils.formatPercent(res.percProdutivoMedioCaminhoes))}
+          ${pdfKpi('% Produtiva Offroads', Utils.formatPercent(res.percProdutivoMedioOffroads))}
         </div>
-        <div class="print-ranking-col">
-          ${printRankingTable('Offroads - Maior Volume (m³)', topN(dataset.offroads, 'volumeTotal', 5, true), 'volumeTotal', 'm³')}
-          ${printRankingTable('Offroads - Quantidade de Aplicações', topN(dataset.offroads, 'numCiclos', 5, true), 'numCiclos', 'aplicações')}
-          ${printRankingTable('Offroads - Maior Ciclo', topN(dataset.offroads, 'cicloTotal', 5, true), 'cicloTotal', 'h')}
+        <div class="pdf-body" style="grid-template-columns: 1.15fr 1fr 1fr; grid-template-rows: 1fr 1fr;">
+          ${pdfChartCard('Ciclo Médio por Equipamento', imgs.imgCicloEquip, 'grid-column:1; grid-row:1/3;')}
+          ${pdfChartCard('Distribuição dos Tempos — Caminhões', imgs.imgDistCaminhoes, 'grid-column:2; grid-row:1;')}
+          ${pdfChartCard('Distribuição dos Tempos — Offroads', imgs.imgDistOffroads, 'grid-column:3; grid-row:1;')}
+          ${pdfChartCard('Distância Média por Tipo (km)', imgs.imgDistTipo, 'grid-column:2/4; grid-row:2;')}
+        </div>
+      </div>
+
+      <!-- PÁGINA 2: CAMINHÕES -->
+      <div class="pdf-page">
+        <div class="pdf-title"><h2>Visão de Ciclo — Caminhões</h2><span class="pdf-sub">${sub}</span></div>
+        <div class="pdf-kpis" style="grid-template-columns: repeat(6, 1fr);">
+          ${pdfKpi('Ciclo Médio', Utils.formatHoras(cam.cicloMedio))}
+          ${pdfKpi('Tempo Médio Carregamento', Utils.formatHoras(cam.carregamentoMedio))}
+          ${pdfKpi('Tempo Médio Ag. Carregamento', Utils.formatHoras(cam.agCarregamentoMedio))}
+          ${pdfKpi('Tempo Médio Transporte', Utils.formatHoras(cam.transporteMedio))}
+          ${pdfKpi('Tempo Médio Ag. Descarregamento', Utils.formatHoras(cam.agDescarregamentoMedio))}
+          ${pdfKpi('Tempo Médio Descarregamento', Utils.formatHoras(cam.descarregamentoMedio))}
+          ${pdfKpi('Tempo Médio Deslocamento Volta', Utils.formatHoras(cam.deslocamentoMedio))}
+          ${pdfKpi('Eficiência Operacional', Utils.formatPercent(cam.percOperacionalMedio))}
+          ${pdfKpi('% Produtiva', Utils.formatPercent(cam.percProdutivoMedio))}
+          ${pdfKpi('Qtd. Total de Ciclos', res.totalViagensCaminhoes, true)}
+          ${pdfKpi('Volume Total (m³)', `${Utils.formatNumber(res.volumeTotalCaminhoes)} m³`, true)}
+        </div>
+        <div class="pdf-body" style="grid-template-columns: 1fr;">
+          ${pdfChartCard('Composição do Ciclo Médio — Caminhão', imgs.imgCam)}
+        </div>
+      </div>
+
+      <!-- PÁGINA 3: OFFROADS -->
+      <div class="pdf-page">
+        <div class="pdf-title"><h2>Visão de Ciclo — Offroads</h2><span class="pdf-sub">${sub}</span></div>
+        <div class="pdf-kpis" style="grid-template-columns: repeat(6, 1fr);">
+          ${pdfKpi('Ciclo Médio', Utils.formatHoras(off.cicloMedio))}
+          ${pdfKpi('Tempo Médio Aplicação', Utils.formatHoras(off.aplicacaoMedio))}
+          ${pdfKpi('Tempo Médio Abastecimento', Utils.formatHoras(off.abastecimentoMedio))}
+          ${pdfKpi('Tempo Médio Ag. Carregamento', Utils.formatHoras(off.agCarregamentoMedio))}
+          ${pdfKpi('Tempo Médio Falta Insumos', Utils.formatHoras(off.faltaInsumosMedio))}
+          ${pdfKpi('Tempo Médio Ag. Liberação', Utils.formatHoras(off.agLiberacaoMedio))}
+          ${pdfKpi('Tempo Médio Deslocamento', Utils.formatHoras(off.deslocamentoMedio))}
+          ${pdfKpi('Eficiência Operacional', Utils.formatPercent(off.percOperacionalMedio))}
+          ${pdfKpi('% Produtiva', Utils.formatPercent(off.percProdutivoMedio))}
+          ${pdfKpi('Qtd. Total de Aplicações', res.totalAplicacoesOffroads, true)}
+          ${pdfKpi('Volume Total (m³)', `${Utils.formatNumber(res.volumeTotalOffroads)} m³`, true)}
+        </div>
+        <div class="pdf-body" style="grid-template-columns: 1fr;">
+          ${pdfChartCard('Composição do Ciclo Médio — Offroad', imgs.imgOff)}
+        </div>
+      </div>
+
+      <!-- PÁGINA 4: RANKINGS -->
+      <div class="pdf-page">
+        <div class="pdf-title"><h2>Rankings de Desempenho</h2><span class="pdf-sub">${sub}</span></div>
+        <div class="pdf-body" style="grid-template-columns: repeat(3, 1fr); grid-auto-rows: min-content; align-content: start;">
+          ${pdfRankCard('Caminhões · Maior Volume (m³)', topN(camRows, 'volumeTotal', 5, true), 'volumeTotal', 'm³')}
+          ${pdfRankCard('Caminhões · Quantidade de Ciclos', topN(camRows, 'numCiclos', 5, true), 'numCiclos', 'ciclos')}
+          ${pdfRankCard('Caminhões · Maior Ciclo', topN(camRows, 'cicloTotal', 5, true), 'cicloTotal', 'h')}
+          ${pdfRankCard('Caminhões · Menor Ciclo', topN(camRows, 'cicloTotal', 5, false), 'cicloTotal', 'h')}
+          ${pdfRankCard('Caminhões · Maior Distância', topN(camRows, 'distTotal', 5, true), 'distTotal', 'km')}
+          ${pdfRankCard('Caminhões · Maior Tempo de Espera', topN(camRows, 'tempoEspera', 5, true), 'tempoEspera', 'h')}
+          ${pdfRankCard('Offroads · Maior Volume (m³)', topN(offRows, 'volumeTotal', 5, true), 'volumeTotal', 'm³')}
+          ${pdfRankCard('Offroads · Quantidade de Aplicações', topN(offRows, 'numCiclos', 5, true), 'numCiclos', 'aplic.')}
+          ${pdfRankCard('Offroads · Maior Ciclo', topN(offRows, 'cicloTotal', 5, true), 'cicloTotal', 'h')}
+          ${pdfRankCard('Offroads · Maior Tempo de Espera', topN(offRows, 'tempoEspera', 5, true), 'tempoEspera', 'h')}
+          ${pdfRankCard('Offroads · Maior Deslocamento', topN(offRows, 'tempoDeslocamento', 5, true), 'tempoDeslocamento', 'h')}
         </div>
       </div>
     `;
@@ -2701,16 +2704,18 @@ const ExportModule = (function () {
     // chances de capturar um quadro em branco); agora renderizamos uma vez
     // só e capturamos todos os canvas já prontos.
     await ativarERenderizar('tab-resumo', () => Render.renderResumo(dataset));
-    const imgCicloEquip = Charts.getImagePrint('chartCicloPorEquipamento', 760, Math.min(1400, Math.max(340, nEquip * 26)));
-    const imgDistCaminhoes = Charts.getImagePrint('chartDistribuicaoCaminhoes', 520, 400);
-    const imgDistOffroads = Charts.getImagePrint('chartDistribuicaoOffroads', 520, 400);
-    const imgDistTipo = Charts.getImagePrint('chartDistanciaPorTipo', 620, 360);
+    // Paisagem: capturamos em resolução generosa porque os gráficos ocupam
+    // áreas grandes da folha (o object-fit:contain reduz sem distorcer).
+    const imgCicloEquip = Charts.getImagePrint('chartCicloPorEquipamento', 620, Math.min(1600, Math.max(420, nEquip * 26)));
+    const imgDistCaminhoes = Charts.getImagePrint('chartDistribuicaoCaminhoes', 520, 420);
+    const imgDistOffroads = Charts.getImagePrint('chartDistribuicaoOffroads', 520, 420);
+    const imgDistTipo = Charts.getImagePrint('chartDistanciaPorTipo', 900, 340);
 
     await ativarERenderizar('tab-caminhoes', () => Render.renderCaminhoesTab(dataset));
-    const imgCam = Charts.getImagePrint('chartCicloCaminhao', 620, 420);
+    const imgCam = Charts.getImagePrint('chartCicloCaminhao', 900, 620);
 
     await ativarERenderizar('tab-offroads', () => Render.renderOffroadsTab(dataset));
-    const imgOff = Charts.getImagePrint('chartCicloOffroad', 620, 420);
+    const imgOff = Charts.getImagePrint('chartCicloOffroad', 900, 620);
 
     return { imgCam, imgOff, imgCicloEquip, imgDistCaminhoes, imgDistOffroads, imgDistTipo };
   }
@@ -2757,27 +2762,51 @@ const ExportModule = (function () {
     };
   }
 
-  function printKpi(label, value, highlight = false) {
-    const cls = highlight ? 'print-kpi print-kpi--highlight' : 'print-kpi';
+  // Linha de subtítulo (período + geração + registros) usada nos títulos.
+  function subInfo(dataset, agora) {
+    const filtroInicio = document.getElementById('filtroDataInicio')?.value || '';
+    const filtroFim = document.getElementById('filtroDataFim')?.value || '';
+    const periodoStr = (filtroInicio || filtroFim)
+      ? `Período ${filtroInicio ? filtroInicio.split('-').reverse().join('/') : 'início'} a ${filtroFim ? filtroFim.split('-').reverse().join('/') : 'fim'} · `
+      : '';
+    return `${periodoStr}Gerado em ${agora} · ${dataset.totalLinhas} registros`;
+  }
+
+  function pdfKpi(label, value, highlight = false) {
+    const cls = highlight ? 'pdf-kpi pdf-kpi--hl' : 'pdf-kpi';
     return `<div class="${cls}"><span>${label}</span><strong>${value}</strong></div>`;
   }
 
-  function printRankingTable(title, items, field, unit) {
-    if (!items || items.length === 0) return '';
+  // Um card de gráfico que preenche a célula do grid da página.
+  function pdfChartCard(titulo, img, cellStyle = '') {
+    const inner = img
+      ? `<div class="pdf-chart"><img src="${img}"/></div>`
+      : `<div class="pdf-chart"><span class="empty-msg">Sem dados.</span></div>`;
+    return `<div class="pdf-card" style="${cellStyle}"><h4>${titulo}</h4>${inner}</div>`;
+  }
+
+  function fmtRank(value, unit) {
+    if (unit === 'h') return Utils.formatHoras(value);
+    if (unit === 'm³') return `${Utils.formatNumber(value)} m³`;
+    return `${Utils.formatNumber(value)} ${unit}`;
+  }
+
+  // Card de ranking (título + tabela top-5) para a página de Rankings.
+  function pdfRankCard(title, items, field, unit) {
+    const linhas = (!items || items.length === 0)
+      ? `<tr><td colspan="3" style="text-align:center; color:var(--text-muted)">Sem dados</td></tr>`
+      : items.map((it, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${Utils.escapeHtml(it.equipamento)}</td>
+            <td>${fmtRank(it[field], unit)}</td>
+          </tr>`).join('');
     return `
-      <div style="margin-bottom: 20px;">
-        <h4 style="margin-bottom: 8px; font-size: 13px; color: var(--slate); border-left: 3px solid var(--accent); padding-left: 8px;">${title}</h4>
-        <table class="print-table">
-          <thead><tr><th>#</th><th>Equipamento</th><th>Modelo</th><th style="text-align:right">Valor</th></tr></thead>
-          <tbody>
-            ${items.map((it, i) => `
-              <tr>
-                <td style="width:30px">${i + 1}</td>
-                <td>${Utils.escapeHtml(it.equipamento)}</td>
-                <td>${Utils.escapeHtml(it.modelo)}</td>
-                <td style="text-align:right; font-weight:600">${unit === 'h' ? Utils.formatHoras(it[field]) : (unit === 'm³' ? `${Utils.formatNumber(it[field])} m³` : `${Utils.formatNumber(it[field])} ${unit}`)}</td>
-              </tr>`).join('')}
-          </tbody>
+      <div class="pdf-card">
+        <h4>${title}</h4>
+        <table class="pdf-table">
+          <thead><tr><th>#</th><th>Equipamento</th><th>Valor</th></tr></thead>
+          <tbody>${linhas}</tbody>
         </table>
       </div>`;
   }
@@ -2814,6 +2843,7 @@ const ExportModule = (function () {
     // Renderiza os gráficos de cada equipamento em um palco invisível fora da
     // tela. Assim não precisamos alternar abas nem depender do layout atual -
     // cada gráfico é desenhado num tamanho fixo e capturado como imagem.
+    const sub = subInfo(dataset, new Date().toLocaleString('pt-BR'));
     const stage = criarPalcoGrafico();
     const blocos = [];
     try {
@@ -2822,21 +2852,14 @@ const ExportModule = (function () {
         const imgCiclo = dados.cicloLabels.length
           ? await capturarGraficoPalco(stage, dados.cicloLabels, dados.cicloValores)
           : null;
-        blocos.push(blocoEquipamentoHtml(item, dados, imgCiclo));
+        blocos.push(blocoEquipamentoHtml(item, dados, imgCiclo, sub));
       }
     } finally {
       stage.remove();
     }
 
     const area = document.getElementById('printArea');
-    const titulo = lista.length === 1
-      ? `Relatório do Equipamento ${Utils.escapeHtml(lista[0].equipamento)}`
-      : 'Relatório por Equipamento';
-
-    area.innerHTML = `
-      ${cabecalhoHtml(dataset, titulo, `${lista.length} equipamento(s)`)}
-      ${blocos.join('')}
-    `;
+    area.innerHTML = blocos.join('');
 
     document.body.classList.add('print-mode');
     window.print();
@@ -2864,7 +2887,7 @@ const ExportModule = (function () {
     // Frota grande = dezenas de gráficos num único PDF; mantemos cada imagem
     // enxuta (dimensão e qualidade menores) para o arquivo não estourar o
     // limite de memória da impressão do navegador.
-    const img = Charts.getImagePrint('pdfStageCanvas', 460, 320, 0.82);
+    const img = Charts.getImagePrint('pdfStageCanvas', 620, 460, 0.82);
     Charts.destroy('pdfStageCanvas');
     return img;
   }
@@ -2926,44 +2949,37 @@ const ExportModule = (function () {
     return { info, indicadores, cicloLabels, cicloValores };
   }
 
-  function blocoEquipamentoHtml(item, dados, imgCiclo) {
-    const indicadoresHtml = dados.indicadores.length ? `
-      <h4>Indicadores Calculados</h4>
-      <div class="print-kpis">
-        ${dados.indicadores.map(([l, v]) => printKpi(l, v)).join('')}
-      </div>` : '<p class="empty-msg">Equipamento não classificado como CAMINHÃO ou OFFROAD.</p>';
+  // Uma página-dashboard (paisagem) por equipamento: faixa de informações no
+  // topo, indicadores à esquerda e o gráfico de composição do ciclo à direita.
+  function blocoEquipamentoHtml(item, dados, imgCiclo, sub) {
+    const infoHtml = dados.info.map(([l, v]) => pdfKpi(l, v)).join('');
 
-    const graficoHtml = imgCiclo ? `
-      <div class="print-charts">
-        <div style="grid-column: 1 / -1"><h4>Composição do Ciclo</h4>
-          <img src="${imgCiclo}" style="max-height:300px; width:auto; display:block; margin:0 auto;"/>
-        </div>
-      </div>` : '';
+    let corpo;
+    if (dados.indicadores.length) {
+      corpo = `
+        <div class="pdf-body" style="grid-template-columns: 1.05fr 1fr;">
+          <div class="pdf-card">
+            <h4>Indicadores Calculados</h4>
+            <div class="pdf-kpis" style="grid-template-columns: repeat(2, 1fr); align-content: start; flex: 1 1 auto;">
+              ${dados.indicadores.map(([l, v]) => pdfKpi(l, v)).join('')}
+            </div>
+          </div>
+          ${pdfChartCard('Composição do Ciclo', imgCiclo)}
+        </div>`;
+    } else {
+      corpo = `
+        <div class="pdf-body" style="grid-template-columns: 1fr;">
+          <div class="pdf-card"><div class="pdf-chart"><span class="empty-msg">Equipamento não classificado como CAMINHÃO ou OFFROAD — sem indicadores de ciclo.</span></div></div>
+        </div>`;
+    }
 
     return `
-      <div class="equip-pdf-block">
-        <h2>${Utils.escapeHtml(item.equipamento)} — ${item.tipo}</h2>
-        <div class="print-kpis">
-          ${dados.info.map(([l, v]) => printKpi(l, v)).join('')}
+      <div class="pdf-page">
+        <div class="pdf-title"><h2>${Utils.escapeHtml(item.equipamento)} — ${item.tipo}</h2><span class="pdf-sub">${sub}</span></div>
+        <div class="pdf-kpis" style="grid-template-columns: repeat(${Math.min(8, dados.info.length)}, 1fr);">
+          ${infoHtml}
         </div>
-        ${indicadoresHtml}
-        ${graficoHtml}
-      </div>`;
-  }
-
-  // Cabeçalho padrão (título + período + data de geração).
-  function cabecalhoHtml(dataset, titulo, subtitulo = '') {
-    const agora = new Date().toLocaleString('pt-BR');
-    const filtroInicio = document.getElementById('filtroDataInicio')?.value || '';
-    const filtroFim = document.getElementById('filtroDataFim')?.value || '';
-    const periodoStr = (filtroInicio || filtroFim)
-      ? `Período: ${filtroInicio ? filtroInicio.split('-').reverse().join('/') : 'início'} a ${filtroFim ? filtroFim.split('-').reverse().join('/') : 'fim'} • `
-      : '';
-    const extra = subtitulo ? `${subtitulo} • ` : '';
-    return `
-      <div class="print-header">
-        <h1>${titulo}</h1>
-        <p>${periodoStr}${extra}Gerado em ${agora} • ${dataset.totalLinhas} registros processados</p>
+        ${corpo}
       </div>`;
   }
 
