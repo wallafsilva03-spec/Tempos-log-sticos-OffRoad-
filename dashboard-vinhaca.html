@@ -689,10 +689,9 @@ body.print-mode #printArea {
           <div class="kpi-card"><span>Distância Média Ciclo (Caminhões)</span><strong id="kpiDistCaminhoes">-</strong></div>
           <div class="kpi-card"><span>Distância Média Trecho (Offroads)</span><strong id="kpiDistOffroads">-</strong></div>
           <div class="kpi-card"><span>Total Viagens Caminhões</span><strong id="kpiTotalViagensCaminhoes">-</strong></div>
-          <div class="kpi-card"><span>Eficiência Operacional</span><strong id="kpiPercOperacional">-</strong></div>
           <div class="kpi-card"><span>Tempo de Espera</span><strong id="kpiPercEspera">-</strong></div>
-          <div class="kpi-card"><span>% Produtiva Caminhões</span><strong id="kpiPercProdutivoCaminhoes">-</strong></div>
-          <div class="kpi-card"><span>% Produtiva Offroads</span><strong id="kpiPercProdutivoOffroads">-</strong></div>
+          <div class="kpi-card"><span>Eficiência Operacional Caminhões</span><strong id="kpiPercProdutivoCaminhoes">-</strong></div>
+          <div class="kpi-card"><span>Eficiência Operacional Offroads</span><strong id="kpiPercProdutivoOffroads">-</strong></div>
           <div class="kpi-card kpi-card--highlight"><span>Volume Transportado Caminhões (m³)</span><strong id="kpiVolumeCaminhoes">-</strong></div>
         </div>
 
@@ -733,7 +732,7 @@ body.print-mode #printArea {
           <div class="kpi-card"><span>Tempo Médio Ag. Descarregamento</span><strong id="camKpiAgDescarregamento">-</strong></div>
           <div class="kpi-card"><span>Tempo Médio Descarregamento</span><strong id="camKpiDescarregamento">-</strong></div>
           <div class="kpi-card"><span>Tempo Médio Deslocamento Volta</span><strong id="camKpiDeslocamento">-</strong></div>
-          <div class="kpi-card"><span>% Produtiva</span><strong id="camKpiPercProdutivo">-</strong></div>
+          <div class="kpi-card"><span>Eficiência Operacional</span><strong id="camKpiPercProdutivo">-</strong></div>
           <div class="kpi-card"><span>Motor Ocioso (méd.)</span><strong id="camKpiMotorOcioso">-</strong></div>
           <div class="kpi-card kpi-card--highlight"><span>Quantidade de Ciclos</span><strong id="camKpiQtdCiclos">-</strong></div>
           <div class="kpi-card kpi-card--highlight"><span>Volume Total (m³)</span><strong id="camKpiVolumeTotal">-</strong></div>
@@ -781,7 +780,7 @@ body.print-mode #printArea {
           <div class="kpi-card"><span>Tempo Médio Falta Insumos</span><strong id="offKpiFaltaInsumos">-</strong></div>
           <div class="kpi-card"><span>Tempo Médio Ag. Liberação</span><strong id="offKpiAgLiberacao">-</strong></div>
           <div class="kpi-card"><span>Tempo Médio Deslocamento (trecho)</span><strong id="offKpiDeslocamento">-</strong></div>
-          <div class="kpi-card"><span>% Produtiva</span><strong id="offKpiPercProdutivo">-</strong></div>
+          <div class="kpi-card"><span>Eficiência Operacional</span><strong id="offKpiPercProdutivo">-</strong></div>
           <div class="kpi-card"><span>Motor Ocioso (méd.)</span><strong id="offKpiMotorOcioso">-</strong></div>
           <div class="kpi-card kpi-card--highlight"><span>Quantidade de Aplicações</span><strong id="offKpiQtdCiclos">-</strong></div>
           <div class="kpi-card kpi-card--highlight"><span>Volume Total (m³)</span><strong id="offKpiVolumeTotal">-</strong></div>
@@ -828,73 +827,86 @@ body.print-mode #printArea {
 
       <!-- CALCULADORA -->
       <section class="tab-panel" id="tab-calculadora">
-        <h2 class="panel-title">Calculadora de Necessidade Operacional</h2>
+        <h2 class="panel-title">Calculadora de Sincronismo (Demanda Trator)</h2>
         
         <div class="calculator-layout">
           <div class="calculator-inputs">
             <div class="chart-card">
-              <h3>Parâmetros de Entrada</h3>
+              <h3>Parâmetros da Operação</h3>
+              <div class="form-group">
+                <label for="calcFazenda">Fazenda / Local:</label>
+                <input type="text" id="calcFazenda" placeholder="Ex: Fazenda Santa Maria">
+              </div>
               <div class="form-group">
                 <label for="calcLamina">Lâmina Desejada (mm):</label>
                 <select id="calcLamina"></select>
-                <small>Defina a lâmina para o cálculo de volume necessário.</small>
+                <small>Impacta no volume consumido pelo trator.</small>
               </div>
               <div class="form-group">
-                <label for="calcArea">Área de Aplicação (ha):</label>
-                <input type="number" id="calcArea" value="1" step="1" min="0">
-                <small>Área total a ser aplicada.</small>
+                <label for="calcQtdTratores">Quantidade de Offroads em Operação:</label>
+                <input type="number" id="calcQtdTratores" value="1" step="1" min="1">
+                <small>Nº de tratores aplicando simultaneamente.</small>
               </div>
               <div class="form-group">
-                <label for="calcQtdFrota">Quantidade de Caminhões (sua frota):</label>
+                <label for="calcQtdFrota">Caminhões Disponíveis no Momento:</label>
                 <input type="number" id="calcQtdFrota" value="1" step="1" min="1">
-                <small>Nº de caminhões reais que você tem disponíveis.</small>
+                <small>Frota de transporte ativa agora.</small>
               </div>
               <div class="form-group">
-                <label for="calcHorasDia">Horas Disponíveis/Dia:</label>
-                <input type="number" id="calcHorasDia" value="18" step="1" min="1" max="24">
+                <label for="calcRaioMedio">Raio Médio do Caminhão (km):</label>
+                <input type="number" id="calcRaioMedio" value="5" step="0.1" min="0">
+                <small>Distância média entre carregamento e aplicação.</small>
+              </div>
+              <div style="margin-top: 20px;">
+                <button class="btn" id="btnCalcularDemanda" style="width: 100%; padding: 15px; font-size: 1.1em; background-color: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                  🚀 CALCULAR DEMANDA
+                </button>
               </div>
             </div>
 
             <div class="chart-card" style="margin-top: 20px;">
-              <h3>Dados Reais do Período</h3>
+              <h3>Dados Reais do Ciclo (Sistema)</h3>
               <div class="real-data-grid">
-                <div class="real-data-item"><span>Ciclo Médio (Caminhão):</span><strong id="calcRealCicloCam">-</strong></div>
-                <div class="real-data-item"><span>Ciclo Médio (Offroad):</span><strong id="calcRealCicloOff">-</strong></div>
-                <div class="real-data-item"><span>Eficiência Média:</span><strong id="calcRealEficiencia">-</strong></div>
-                <div class="real-data-item"><span>Capacidade Média:</span><strong id="calcRealCapacidade">-</strong></div>
+                <div class="real-data-item"><span>Ciclo Médio Caminhão:</span><strong id="calcRealCicloCam">-</strong></div>
+                <div class="real-data-item"><span>Ciclo Médio Offroad:</span><strong id="calcRealCicloOff">-</strong></div>
+                <div class="real-data-item"><span>Tempo de Descarga (Médio):</span><strong id="calcRealDescarga">-</strong></div>
+                <div class="real-data-item"><span>Capacidade Média Cam:</span><strong id="calcRealCapacidade">-</strong></div>
               </div>
             </div>
           </div>
 
           <div class="calculator-results">
-            <div class="chart-card highlight-card">
-              <h3>Necessidade Estimada</h3>
-              <div class="result-grid">
-                <div class="result-item">
-                  <span class="result-label">Volume Total Necessário</span>
-                  <strong class="result-value" id="calcResultVolume">-</strong>
-                  <span class="result-unit">m³</span>
+            <div class="chart-card highlight-card" style="background: linear-gradient(135deg, #fff 0%, #fff9e6 100%); border: 2px solid #ffc107;">
+              <h3 style="color: #856404;">Minha Demanda (Caminhões Necessários)</h3>
+              <div class="result-grid" style="grid-template-columns: 1fr;">
+                <div class="result-item" style="text-align: center; padding: 20px;">
+                  <span class="result-label" style="font-size: 1.1em; color: #856404;">Frota Necessária para Sincronismo</span>
+                  <strong class="result-value" id="calcResultDemandaTrator" style="font-size: 4em; color: #d39e00; display: block; margin: 10px 0;">-</strong>
+                  <span class="result-unit" style="font-size: 1.2em; color: #856404; font-weight: bold;">caminhões ativos</span>
                 </div>
-                <div class="result-item">
-                  <span class="result-label">Total de Viagens Necessárias</span>
-                  <strong class="result-value" id="calcResultViagens">-</strong>
-                  <span class="result-unit">viagens</span>
+              </div>
+              
+              <div style="padding: 15px; background: rgba(255,255,255,0.5); border-radius: 8px; margin: 0 15px 15px 15px; border: 1px solid #ffeeba;">
+                <h4 style="margin-top:0; color: #856404; border-bottom: 1px solid #ffeeba; padding-bottom: 5px;">Racional de Vazão (Volume/Hora)</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em; color: #856404;">
+                  <div><strong>Consumo Tratores:</strong> <span id="resConsumoTratores">-</span> m³/h</div>
+                  <div><strong>Entrega p/ Cam:</strong> <span id="resEntregaCaminhao">-</span> m³/h</div>
+                  <div style="grid-column: span 2; border-top: 1px solid #ffeeba; padding-top: 5px; margin-top: 5px;"><strong>Fazenda:</strong> <span id="resFazenda">-</span></div>
+                  <div><strong>Offroads Operando:</strong> <span id="resQtdTratores">1</span></div>
+                  <div><strong>Lâmina:</strong> <span id="resLamina">10</span> mm</div>
+                  <div><strong>Caminhões Disp:</strong> <span id="resQtdFrota">1</span></div>
+                  <div><strong>Raio Médio:</strong> <span id="resRaioMedio">5</span> km</div>
+                  <div><strong>Ciclo Médio:</strong> <span id="resCicloReal">-</span></div>
                 </div>
-                <div class="result-item">
-                  <span class="result-label">Viagens por Caminhão (sua frota)</span>
-                  <strong class="result-value" id="calcResultViagensPorCam">-</strong>
-                  <span class="result-unit">viagens/caminhão</span>
-                </div>
-                <div class="result-item">
-                  <span class="result-label">Frota de Caminhões Necessária</span>
-                  <strong class="result-value" id="calcResultFrotaCam">-</strong>
-                  <span class="result-unit">caminhões (p/ concluir em 1 dia)</span>
-                </div>
+              </div>
+
+              <div style="padding: 15px; border-top: 1px dashed #ffc107; color: #856404; font-size: 0.85em;">
+                <p><strong>Racional:</strong> Demanda calculada para suprir o consumo volumétrico (m³/h) dos tratores com base na capacidade de entrega de cada caminhão.</p>
               </div>
             </div>
 
             <div class="chart-card" style="margin-top: 20px; border-left: 4px solid var(--accent);">
-              <h3>💡 Insights e Gargalos Operacionais</h3>
+              <h3>💡 Insights e Sincronismo</h3>
               <div id="calcInsights" class="insights-container">
                 <p class="empty-msg">Aguardando cálculos...</p>
               </div>
@@ -1439,16 +1451,30 @@ const Calculations = (function () {
     return Utils.normalize(row.Classificacao_Ativ) === 'produtiva';
   }
 
-  function isDisponivel(row) {
-    const cat = Utils.normalize(row.Classificacao_Ativ);
-    return cat === 'produtiva' || cat === 'manutencao' || cat === 'improdutivo';
+  // Atividades excluídas do tempo total no cálculo de eficiência operacional.
+  // A eficiência é o tempo produtivo dividido pelo tempo total, desconsiderando
+  // MANUTENCAO, CONDIÇÃO CLIMÁTICA e INDÚSTRIA. A verificação usa tanto o nome
+  // da atividade quanto a classificação, com correspondência tolerante a
+  // acentos, ordinais e variações de nomenclatura.
+  const ATIVIDADES_EXCLUIDAS_EFICIENCIA = ['manutencao', 'condicao climatica', 'industria'];
+
+  function isExcluidaEficiencia(row) {
+    const atividade = Utils.normalizeAtividade(row.Atividade);
+    const classificacao = Utils.normalize(row.Classificacao_Ativ);
+    return ATIVIDADES_EXCLUIDAS_EFICIENCIA.some(function (ex) {
+      return atividade.indexOf(ex) !== -1 || classificacao.indexOf(ex) !== -1;
+    });
   }
 
+  // Eficiência operacional = tempo em atividade produtiva / tempo total,
+  // excluindo do total as atividades MANUTENCAO, CONDIÇÃO CLIMÁTICA e INDÚSTRIA.
   function calcularEficienciaOperacional(rows) {
-    const tempoDisponivel = Utils.sum(rows.filter(isDisponivel).map(r => r.TempoDecimal));
-    if (tempoDisponivel <= 0) return 0;
+    const tempoBase = Utils.sum(
+      rows.filter(function (r) { return !isExcluidaEficiencia(r); }).map(r => r.TempoDecimal)
+    );
+    if (tempoBase <= 0) return 0;
     const tempoProdutivo = Utils.sum(rows.filter(isProdutiva).map(r => r.TempoDecimal));
-    return (tempoProdutivo / tempoDisponivel) * 100;
+    return (tempoProdutivo / tempoBase) * 100;
   }
 
   function avgTempoProdutivo(rows) {
@@ -1661,6 +1687,9 @@ const Calculations = (function () {
     const percProdutivoMedioCaminhoes = Utils.avg(caminhoes.map(c => c.percProdutivo));
     const percProdutivoMedioOffroads = Utils.avg(offroads.map(o => o.percProdutivo));
 
+    const percOperacionalMedioCaminhoes = Utils.avg(caminhoes.map(c => c.percOperacional));
+    const percOperacionalMedioOffroads = Utils.avg(offroads.map(o => o.percOperacional));
+
     const volumeTotalCaminhoes = Utils.sum(caminhoes.map(c => c.volumeTotal));
     const volumeTotalOffroads = Utils.sum(offroads.map(o => o.volumeTotal));
     const volumeTotal = volumeTotalCaminhoes + volumeTotalOffroads;
@@ -1673,6 +1702,7 @@ const Calculations = (function () {
       distMediaCaminhoes, distMediaOffroads,
       percMedioOperacional, percMedioEspera,
       percProdutivoMedioCaminhoes, percProdutivoMedioOffroads,
+      percOperacionalMedioCaminhoes, percOperacionalMedioOffroads,
       volumeTotalCaminhoes, volumeTotalOffroads, volumeTotal,
       totalViagensCaminhoes, totalAplicacoesOffroads
     };
@@ -1875,8 +1905,8 @@ const Render = (function () {
     setText('kpiDistOffroads', `${Utils.formatNumber(r.distMediaOffroads)} km`);
     setText('kpiPercOperacional', Utils.formatPercent(r.percMedioOperacional));
     setText('kpiPercEspera', Utils.formatPercent(r.percMedioEspera));
-    setText('kpiPercProdutivoCaminhoes', Utils.formatPercent(r.percProdutivoMedioCaminhoes));
-    setText('kpiPercProdutivoOffroads', Utils.formatPercent(r.percProdutivoMedioOffroads));
+    setText('kpiPercProdutivoCaminhoes', Utils.formatPercent(r.percOperacionalMedioCaminhoes));
+    setText('kpiPercProdutivoOffroads', Utils.formatPercent(r.percOperacionalMedioOffroads));
     setText('kpiVolumeTotal', `${Utils.formatNumber(r.volumeTotal)} m³`);
     setText('kpiVolumeCaminhoes', `${Utils.formatNumber(r.volumeTotalCaminhoes)} m³`);
     setText('kpiVolumeOffroads', `${Utils.formatNumber(r.volumeTotalOffroads)} m³`);
@@ -1945,6 +1975,7 @@ const Render = (function () {
     const descarregamentoMedio = Utils.avg(rows.map(c => c.tempoDescarregamento));
     const deslocamentoMedio = Utils.avg(rows.map(c => c.tempoDeslocamentoVolta));
     const percProdutivoMedio = Utils.avg(rows.map(c => c.percProdutivo));
+    const percOperacionalMedio = Utils.avg(rows.map(c => c.percOperacional));
     const motorOciosoMedio = Utils.avg(rows.map(c => c.motorOcioso));
 
     setText('camKpiCiclo', Utils.formatHoras(cicloMedio));
@@ -1954,7 +1985,7 @@ const Render = (function () {
     setText('camKpiAgDescarregamento', Utils.formatHoras(agDescarregamentoMedio));
     setText('camKpiDescarregamento', Utils.formatHoras(descarregamentoMedio));
     setText('camKpiDeslocamento', Utils.formatHoras(deslocamentoMedio));
-    setText('camKpiPercProdutivo', Utils.formatPercent(percProdutivoMedio));
+    setText('camKpiPercProdutivo', Utils.formatPercent(percOperacionalMedio));
     setText('camKpiMotorOcioso', Utils.formatHoras(motorOciosoMedio));
     setText('camKpiQtdCiclos', Utils.formatNumber(Utils.sum(rows.map(c => c.numCiclos))));
     setText('camKpiVolumeTotal', `${Utils.formatNumber(Utils.sum(rows.map(c => c.volumeTotal)))} m³`);
@@ -2027,6 +2058,7 @@ const Render = (function () {
     const agLiberacaoMedio = Utils.avg(rows.map(o => o.tempoAgLiberacao));
     const deslocamentoMedio = Utils.avg(rows.map(o => o.tempoDeslocamentoTrecho));
     const percProdutivoMedio = Utils.avg(rows.map(o => o.percProdutivo));
+    const percOperacionalMedio = Utils.avg(rows.map(o => o.percOperacional));
     const motorOciosoMedio = Utils.avg(rows.map(o => o.motorOcioso));
 
     setText('offKpiCiclo', Utils.formatHoras(cicloMedio));
@@ -2036,7 +2068,7 @@ const Render = (function () {
     setText('offKpiFaltaInsumos', Utils.formatHoras(faltaInsumosMedio));
     setText('offKpiAgLiberacao', Utils.formatHoras(agLiberacaoMedio));
     setText('offKpiDeslocamento', Utils.formatHoras(deslocamentoMedio));
-    setText('offKpiPercProdutivo', Utils.formatPercent(percProdutivoMedio));
+    setText('offKpiPercProdutivo', Utils.formatPercent(percOperacionalMedio));
     setText('offKpiMotorOcioso', Utils.formatHoras(motorOciosoMedio));
     setText('offKpiQtdCiclos', Utils.formatNumber(Utils.sum(rows.map(o => o.numCiclos))));
     setText('offKpiVolumeTotal', `${Utils.formatNumber(Utils.sum(rows.map(o => o.volumeTotal)))} m³`);
@@ -2436,121 +2468,114 @@ const Render = (function () {
     // Preenche dados reais
     setText('calcRealCicloCam', Utils.formatHoras(res.cicloMedioCaminhoes));
     setText('calcRealCicloOff', Utils.formatHoras(res.cicloMedioOffroads));
-    setText('calcRealEficiencia', Utils.formatPercent(res.percMedioOperacional));
     
-    const capMedia = Utils.avg([...cam, ...off].map(e => e.capacidade));
-    setText('calcRealCapacidade', `${Utils.formatNumber(capMedia)} m³`);
+    const tDescarregamento = Utils.avg(dataset.caminhoes.map(c => c.tempoDescarregamento)) || 1;
+    setText('calcRealDescarga', Utils.formatHoras(tDescarregamento));
+    
+    const capMediaCam = Utils.avg(dataset.caminhoes.map(e => e.capacidade)) || 1;
+    setText('calcRealCapacidade', `${Utils.formatNumber(capMediaCam)} m³`);
 
-    // Listeners para recálculo
-    const inputs = ['calcLamina', 'calcArea', 'calcQtdFrota', 'calcHorasDia'];
-    inputs.forEach(id => {
-      const el = document.getElementById(id);
-      if (el.tagName === 'SELECT') {
-        el.onchange = () => calcularNecessidade(dataset);
-      } else {
-        el.oninput = () => calcularNecessidade(dataset);
-      }
-    });
+    // Botão de cálculo explícito
+    const btnCalc = document.getElementById('btnCalcularDemanda');
+    if (btnCalc) {
+      btnCalc.onclick = () => calcularNecessidade(dataset);
+    }
 
+    // Também calcula ao carregar a aba pela primeira vez
     calcularNecessidade(dataset);
   }
 
   function calcularNecessidade(dataset) {
     const res = Calculations.resumoExecutivo(dataset);
     const lamina = parseFloat(document.getElementById('calcLamina').value) || 0;
-    const area = parseFloat(document.getElementById('calcArea').value) || 0;
+    const qtdTratores = parseInt(document.getElementById('calcQtdTratores').value) || 1;
     const qtdFrota = parseInt(document.getElementById('calcQtdFrota').value) || 1;
-    const horasDia = parseFloat(document.getElementById('calcHorasDia').value) || 1;
+    const raioMedio = parseFloat(document.getElementById('calcRaioMedio').value) || 0;
+    const fazenda = document.getElementById('calcFazenda').value || '-';
 
-    // 1 mm de lâmina em 1 ha = 10 m³
-    const volumeTotalNecessario = lamina * area * 10;
+    // --- NOVO RACIONAL: VOLUME POR HORA (m³/h) ---
+    
+    // 1. Consumo Total dos Tratores (m³/h)
+    // Racional: Se o trator aplica 100m³ para 10mm (baseando no seu exemplo de 55mm = 220m³ para 4 tratores)
+    // O volume por trator é proporcional à lâmina. 
+    // Vamos considerar a vazão média real de aplicação dos tratores do sistema:
+    const vazaoMediaTrator = Utils.avg(dataset.offroads.map(o => o.volumeTotal / (o.tempoAplicacao || 1))) || 40;
+    
+    // O usuário citou: "4 trator com 55 é 220". 
+    // Isso implica que cada trator consome 55 m³/h (proporcional à lâmina 1:1 neste exemplo).
+    const consumoPorTrator = lamina; // m³/h por trator
+    const consumoTotalTratores = consumoPorTrator * qtdTratores;
 
-    // Capacidade média SOMENTE dos caminhões (valores reais do HTML)
-    const capMediaCam = Utils.avg(dataset.caminhoes.map(e => e.capacidade)) || 1;
+    // 2. Capacidade de Entrega de cada Caminhão (m³/h)
+    // Racional: (Capacidade do Caminhão) / (Tempo de Ciclo Total em horas)
+    const capMediaCam = Utils.avg(dataset.caminhoes.map(c => c.capacidade)) || 1;
+    const tCicloCamH = res.cicloMedioCaminhoes || 1;
+    const entregaPorCaminhao = capMediaCam / tCicloCamH;
 
-    // Total de viagens = volume necessário / capacidade média por caminhão
-    const viagensNecessarias = Math.ceil(volumeTotalNecessario / capMediaCam);
+    // 3. Demanda de Frota
+    const frotaDemandaTrator = entregaPorCaminhao > 0 ? (consumoTotalTratores / entregaPorCaminhao) : 0;
 
-    // Viagens que cada caminhão da SUA frota precisa fazer
-    const viagensPorCaminhao = Math.ceil(viagensNecessarias / qtdFrota);
+    // Atualiza visão lateral de contexto
+    setText('resConsumoTratores', Utils.formatNumber(consumoTotalTratores, 1));
+    setText('resEntregaCaminhao', Utils.formatNumber(entregaPorCaminhao, 1));
+    setText('resFazenda', fazenda);
+    setText('resQtdTratores', qtdTratores);
+    setText('resLamina', lamina);
+    setText('resQtdFrota', qtdFrota);
+    setText('resRaioMedio', raioMedio);
+    setText('resCicloReal', Utils.formatHoras(res.cicloMedioCaminhoes));
 
-    // Frota necessária para concluir tudo em 1 dia:
-    // Ciclos por Dia = (Horas Disponíveis * Eficiência) / Ciclo Médio
-    const eficiencia = res.percMedioOperacional / 100;
-    const ciclosDiaCam = res.cicloMedioCaminhoes > 0 ? (horasDia * eficiencia) / res.cicloMedioCaminhoes : 0;
-    const frotaCam = ciclosDiaCam > 0 ? Math.ceil(viagensNecessarias / ciclosDiaCam) : 0;
+    setText('calcResultDemandaTrator', Utils.formatNumber(frotaDemandaTrator, 1));
 
-    setText('calcResultVolume', Utils.formatNumber(volumeTotalNecessario, 0));
-    setText('calcResultViagens', Utils.formatNumber(viagensNecessarias, 0));
-    setText('calcResultViagensPorCam', Utils.formatNumber(viagensPorCaminhao, 0));
-    setText('calcResultFrotaCam', Utils.formatNumber(frotaCam, 0));
-
-    gerarInsights(dataset, res, frotaCam, qtdFrota, ciclosDiaCam, viagensNecessarias);
+    gerarInsights(dataset, res, 0, qtdFrota, 0, 0, frotaDemandaTrator);
   }
 
-  function gerarInsights(dataset, res, frotaCam, qtdFrota, ciclosDiaCam, viagensNecessarias) {
+  function gerarInsights(dataset, res, frotaCam, qtdFrota, ciclosDiaCam, viagensNecessarias, frotaDemandaTrator) {
     const container = document.getElementById('calcInsights');
     if (!container) return;
 
     const insights = [];
 
-    // Insight de Eficiência
-    if (res.percMedioOperacional < 50) {
+    // Insight de Sincronismo (Demanda do Trator) - PRIORIDADE
+    if (frotaDemandaTrator > 0) {
+      const diff = frotaDemandaTrator - qtdFrota;
+      if (diff > 0.3) {
+        insights.push({
+          type: 'warning',
+          icon: '🚨',
+          text: `**Déficit de Sincronismo:** Você tem ${qtdFrota} caminhões, mas os tratores demandam **${Utils.formatNumber(frotaDemandaTrator, 1)}** para não pararem. O trator ficará esperando caminhão.`
+        });
+      } else if (diff < -1) {
+        insights.push({
+          type: 'info',
+          icon: '🚚',
+          text: `**Excesso de Caminhões:** Você tem ${qtdFrota} caminhões para uma demanda de **${Utils.formatNumber(frotaDemandaTrator, 1)}**. Os caminhões ficarão na fila de espera.`
+        });
+      } else {
+        insights.push({
+          type: 'success',
+          icon: '✅',
+          text: `**Sincronismo Perfeito:** Sua frota de ${qtdFrota} caminhões atende exatamente o consumo dos tratores.`
+        });
+      }
+    }
+
+    // Insight de Eficiência Real
+    if (res.percMedioOperacional < 60) {
       insights.push({
         type: 'warning',
         icon: '⚠️',
-        text: `**Baixa Eficiência Operacional (${Utils.formatPercent(res.percMedioOperacional)}):** A frota passa muito tempo em atividades não produtivas. Verifique os tempos de manutenção e deslocamentos improdutivos.`
-      });
-    } else if (res.percMedioOperacional > 75) {
-      insights.push({
-        type: 'success',
-        icon: '✅',
-        text: `**Alta Eficiência Operacional:** A operação está com excelente aproveitamento do tempo disponível.`
-      });
-    }
-
-    // Insight de Espera
-    if (res.percMedioEspera > 20) {
-      insights.push({
-        type: 'warning',
-        icon: '⏳',
-        text: `**Gargalo de Espera (${Utils.formatPercent(res.percMedioEspera)}):** O tempo aguardando carregamento/liberação está elevado. Isso indica falta de sincronismo entre transporte e aplicação.`
+        text: `**Eficiência Baixa (${Utils.formatPercent(res.percMedioOperacional)}):** Independente da frota, o tempo produtivo está baixo. Verifique manutenções e esperas.`
       });
     }
 
     // Insight de Ciclo
-    const maiorCicloCam = Math.max(...dataset.caminhoes.map(c => c.cicloTotal));
-    if (maiorCicloCam > res.cicloMedioCaminhoes * 1.5) {
+    const tDescarregamento = Utils.avg(dataset.caminhoes.map(c => c.tempoDescarregamento)) || 1;
+    if (tDescarregamento > 0.8) { // Mais de 48 min descarregando
       insights.push({
         type: 'info',
-        icon: '🔍',
-        text: `**Oportunidade no Ciclo:** Existem caminhões com ciclo 50% acima da média. Padronizar as rotas e velocidades pode reduzir a frota necessária em até ${Utils.formatNumber((1 - res.cicloMedioCaminhoes/maiorCicloCam)*100, 0)}%.`
-      });
-    }
-
-    // Insight de Frota (compara necessário x a frota que você informou)
-    if (frotaCam > qtdFrota) {
-      insights.push({
-        type: 'warning',
-        icon: '🚨',
-        text: `**Déficit de Frota:** Para concluir em 1 dia você precisaria de ~${Utils.formatNumber(frotaCam, 0)} caminhões, mas informou apenas ${qtdFrota}.`
-      });
-    } else if (qtdFrota >= frotaCam && frotaCam > 0) {
-      insights.push({
-        type: 'success',
-        icon: '✅',
-        text: `**Frota Suficiente:** Sua frota de ${qtdFrota} caminhões atende à necessidade (estimada em ${Utils.formatNumber(frotaCam, 0)} para 1 dia).`
-      });
-    }
-
-    // Estimativa de dias para concluir com a frota informada
-    const viagensDiaFrota = qtdFrota * ciclosDiaCam;
-    if (viagensDiaFrota > 0) {
-      const diasEstimados = Math.ceil(viagensNecessarias / viagensDiaFrota);
-      insights.push({
-        type: 'info',
-        icon: '📅',
-        text: `**Prazo Estimado:** Com ${qtdFrota} caminhões, concluir ${Utils.formatNumber(viagensNecessarias, 0)} viagens leva cerca de ${Utils.formatNumber(diasEstimados, 0)} dia(s).`
+        icon: '⏳',
+        text: `**Tempo de Descarga:** O tempo médio de descarga (${Utils.formatHoras(tDescarregamento)}) está alto. Reduzir esse tempo aumenta a capacidade de cada caminhão.`
       });
     }
 
