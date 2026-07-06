@@ -1495,8 +1495,9 @@ const Calculations = (function () {
     const tempoAgDescarregamento = avgTempoAtividade(rows, A.agDescarregamento);
     const tempoDescarregamento = avgTempoAtividade(rows, A.descarregamento);
     const tempoDeslocamentoVolta = avgTempoAtividade(rows, A.deslocamentoVolta);
-    // Para caminhões, o volume é por viagem de ida (transporte)
-    const numCiclos = countCategoria(rows, A.transporte);
+    // Uma operação produtiva de transporte de vinhaça é UM ciclo; cada ciclo
+    // gera dois apontamentos na base, então dividimos por 2.
+    const numCiclos = Math.round(countCategoria(rows, A.transporte) / 2);
 
     const velMediaIda = avgVelocidadeAtividade(rows, A.transporte);
     const velMediaVolta = avgVelocidadeAtividade(rows, A.deslocamentoVolta);
@@ -1567,7 +1568,9 @@ const Calculations = (function () {
     // Para offroad, o volume é a cada ciclo de volume aplicado (atividade produtiva)
     // Voltando ao cálculo original: cada linha produtiva = 1 aplicação
     const rowsProdutivas = rows.filter(isProdutiva);
-    const numCiclos = rowsProdutivas.length;
+    // Uma operação produtiva de aplicação é UM ciclo; cada ciclo gera dois
+    // apontamentos produtivos na base, então dividimos por 2.
+    const numCiclos = Math.round(rowsProdutivas.length / 2);
 
     const velMediaDeslocamento = avgVelocidadeAtividade(rows, A.deslocamento);
     const distPontoCarregamento = (tempoDeslocamento * velMediaDeslocamento) / 2;
