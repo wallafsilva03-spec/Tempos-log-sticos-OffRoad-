@@ -81,7 +81,10 @@ const Calculations = (function () {
     const tempoAgDescarregamento = avgTempoAtividade(rows, A.agDescarregamento);
     const tempoDescarregamento = avgTempoAtividade(rows, A.descarregamento);
     const tempoDeslocamentoVolta = avgTempoAtividade(rows, A.deslocamentoVolta);
-    const numCiclos = countCategoria(rows, A.carregamento);
+    // Uma operação produtiva de transporte de vinhaça é UM ciclo. Cada ciclo
+    // gera dois apontamentos de carregamento na base (ida/volta da operação),
+    // então dividimos por 2 para obter o número real de ciclos.
+    const numCiclos = Math.round(countCategoria(rows, A.carregamento) / 2);
 
     const velMediaIda = avgVelocidadeAtividade(rows, A.transporte);
     const velMediaVolta = avgVelocidadeAtividade(rows, A.deslocamentoVolta);
@@ -143,7 +146,9 @@ const Calculations = (function () {
     const tempoFaltaInsumos = avgTempoAtividade(rows, A.faltaInsumos);
     const tempoAgLiberacao = avgTempoAtividade(rows, A.agLiberacao);
     const tempoDeslocamento = avgTempoAtividade(rows, A.deslocamento);
-    const numCiclos = countCategoria(rows, A.deslocamento);
+    // Mesma regra do caminhão: uma operação produtiva de aplicação é UM ciclo,
+    // e cada ciclo gera dois apontamentos de deslocamento, então dividimos por 2.
+    const numCiclos = Math.round(countCategoria(rows, A.deslocamento) / 2);
 
     const velMediaDeslocamento = avgVelocidadeAtividade(rows, A.deslocamento);
     const distPontoCarregamento = tempoDeslocamento * velMediaDeslocamento;
