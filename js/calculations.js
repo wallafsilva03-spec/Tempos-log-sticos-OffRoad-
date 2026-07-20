@@ -29,9 +29,22 @@ const Calculations = (function () {
   // de tempo de cada etapa é a MÉDIA de duração por ocorrência - o tempo
   // médio daquela etapa em UM ciclo - e não a soma acumulada do período
   // inteiro (que cresceria sem limite conforme mais dias fossem importados).
-  function avgTempoAtividade(rows, categoria) {
-    return Utils.avg(rows.filter(r => matchesCategoria(r, categoria)).map(r => r.TempoDecimal));
+  function avgTempoAtividade(rows, categoria, maxTempo) {
+    let tempos = rows.filter(r => matchesCategoria(r, categoria)).map(r => r.TempoDecimal);
+    // Alguns apontamentos ficam abertos por longos períodos (equipamento
+    // parado à noite/fim de semana) e distorcem a média de uma etapa. Quando
+    // informado, maxTempo descarta ocorrências acima desse limite (em horas),
+    // mantendo apenas os ciclos dentro da janela operacional esperada.
+    if (typeof maxTempo === 'number') {
+      tempos = tempos.filter(t => t <= maxTempo);
+    }
+    return Utils.avg(tempos);
   }
+
+  // Limite de duração (horas) para considerar um apontamento de
+  // Ag. Descarregamento como parte de um ciclo real. Acima disso é
+  // equipamento parado, não espera de descarregamento.
+  const MAX_CICLO_AG_DESCARREGAMENTO = 7;
 
   function countCategoria(rows, categoria) {
     return rows.filter(r => matchesCategoria(r, categoria)).length;
@@ -78,7 +91,7 @@ const Calculations = (function () {
     const tempoCarregamento = avgTempoAtividade(rows, A.carregamento);
     const tempoAgCarregamento = avgTempoAtividade(rows, A.agCarregamento);
     const tempoTransporte = avgTempoAtividade(rows, A.transporte);
-    const tempoAgDescarregamento = avgTempoAtividade(rows, A.agDescarregamento);
+    const tempoAgDescarregamento = avgTempoAtividade(rows, A.agDescarregamento, MAX_CICLO_AG_DESCARREGAMENTO);
     const tempoDescarregamento = avgTempoAtividade(rows, A.descarregamento);
     const tempoDeslocamentoVolta = avgTempoAtividade(rows, A.deslocamentoVolta);
     const numCiclos = countCategoria(rows, A.carregamento);
