@@ -356,7 +356,12 @@ const Render = (function () {
 
     // Participação das atividades: mostramos apenas os TOP 5 ofensores
     // (as atividades que mais consomem tempo), ordenados do maior para o menor.
-    const porAtividade = Calculations.groupBy(item.registros, 'Atividade');
+    // Excluímos as atividades produtivas (Classificacao_Ativ = PRODUTIVA) —
+    // os ofensores são justamente as etapas não produtivas.
+    const registrosOfensores = item.registros.filter(
+      r => Utils.normalize(r.Classificacao_Ativ) !== 'produtiva'
+    );
+    const porAtividade = Calculations.groupBy(registrosOfensores, 'Atividade');
     const ativPares = [];
     porAtividade.forEach((rowsAtiv, nomeAtiv) => {
       ativPares.push([nomeAtiv, round2(Utils.sum(rowsAtiv.map(r => r.TempoDecimal)))]);
