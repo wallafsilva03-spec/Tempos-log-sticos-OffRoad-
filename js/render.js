@@ -355,13 +355,17 @@ const Render = (function () {
       indicadoresHtml = '<p class="empty-msg">Equipamento não classificado (modelo fora do padrão OFFROAD/CAMINHÃO).</p>';
     }
 
-    // Participação de todas as atividades registradas (raw)
+    // Participação das atividades: mostramos apenas os TOP 5 ofensores
+    // (as atividades que mais consomem tempo), ordenados do maior para o menor.
     const porAtividade = Calculations.groupBy(item.registros, 'Atividade');
-    const ativLabels = [], ativValores = [];
+    const ativPares = [];
     porAtividade.forEach((rowsAtiv, nomeAtiv) => {
-      ativLabels.push(nomeAtiv);
-      ativValores.push(round2(Utils.sum(rowsAtiv.map(r => r.TempoDecimal))));
+      ativPares.push([nomeAtiv, round2(Utils.sum(rowsAtiv.map(r => r.TempoDecimal)))]);
     });
+    ativPares.sort((a, b) => b[1] - a[1]);
+    const topAtividades = ativPares.slice(0, 5);
+    const ativLabels = topAtividades.map(p => p[0]);
+    const ativValores = topAtividades.map(p => p[1]);
 
     painel.innerHTML = `
       <h3>${Utils.escapeHtml(item.equipamento)} <small>(${item.tipo})</small></h3>
@@ -379,7 +383,7 @@ const Render = (function () {
           <div class="chart-container"><canvas id="chartComposicaoCiclo"></canvas></div>
         </div>
         <div class="chart-box">
-          <h4>Participação das Atividades</h4>
+          <h4>Participação das Atividades — Top 5 Ofensores</h4>
           <div class="chart-container"><canvas id="chartParticipacaoAtividades"></canvas></div>
         </div>
       </div>
@@ -388,7 +392,7 @@ const Render = (function () {
         <table id="tabelaHistorico" class="display compact" style="width:100%">
           <thead><tr>
             <th>Data</th><th>Início</th><th>Fim</th><th>Atividade</th>
-            <th>Tempo Decimal</th><th>Velocidade</th><th>Fazenda</th><th>Talhão</th>
+            <th>Tempo Decimal</th><th>Velocidade</th><th>Fazenda</th>
           </tr></thead><tbody></tbody>
         </table>
       </div>
@@ -415,8 +419,7 @@ const Render = (function () {
         Utils.escapeHtml(r.Atividade),
         Utils.formatNumber(r.TempoDecimal),
         Utils.formatNumber(r.Velocidade),
-        Utils.escapeHtml(r.Fazenda),
-        Utils.escapeHtml(r.cod_talhao)
+        Utils.escapeHtml(r.Fazenda)
       ]);
 
     if (dtHistorico) dtHistorico.destroy();
