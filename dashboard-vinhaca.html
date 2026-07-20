@@ -1649,8 +1649,10 @@ const Calculations = (function () {
     // O tempo médio de aplicação é a média do tempo das linhas produtivas
     const tempoAplicacao = Utils.avg(rowsProdutivas.map(r => r.TempoDecimal));
 
-    const cicloTotal = tempoAplicacao + tempoAbastecimento + tempoAgCarregamento +
-      tempoFaltaInsumos + tempoAgLiberacao + tempoDeslocamento;
+    // O Ciclo do offroad é composto apenas por Aplicação + Abastecimento +
+    // Deslocamento (trecho). As demais etapas (Ag. Carregamento, Falta de
+    // Insumos, Ag. Liberação) são esperas/paradas e não entram no ciclo.
+    const cicloTotal = tempoAplicacao + tempoAbastecimento + tempoDeslocamentoTrecho;
 
     const motorOcioso = Utils.avg(rows.map(r => r.MotorOcioso));
 
@@ -2127,8 +2129,8 @@ const Render = (function () {
     setText('offKpiVolumeTotal', `${Utils.formatNumber(Utils.sum(rows.map(o => o.volumeTotal)))} m³`);
 
     Charts.renderDoughnut('chartCicloOffroad',
-      ['Aplicação', 'Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'],
-      [aplicacaoMedio, abastecimentoMedio, agCarregamentoMedio, faltaInsumosMedio, agLiberacaoMedio, deslocamentoMedio].map(round2)
+      ['Aplicação', 'Abastecimento', 'Deslocamento (trecho)'],
+      [aplicacaoMedio, abastecimentoMedio, deslocamentoMedio].map(round2)
     );
   }
 
@@ -2300,16 +2302,15 @@ const Render = (function () {
         ['Tempo Médio Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
         ['Tempo Médio Falta Insumos', Utils.formatHoras(item.tempoFaltaInsumos)],
         ['Tempo Médio Ag. Liberação', Utils.formatHoras(item.tempoAgLiberacao)],
-        ['Tempo Médio Deslocamento', Utils.formatHoras(item.tempoDeslocamento)],
+        ['Tempo Médio Deslocamento (trecho)', Utils.formatHoras(item.tempoDeslocamentoTrecho)],
         ['Velocidade Média', `${Utils.formatNumber(item.velMediaDeslocamento)} km/h`],
         ['Distância Média/Ciclo', `${Utils.formatNumber(item.distPontoCarregamento)} km`],
         ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)],
         ['Eficiência Operacional', Utils.formatPercent(item.percOperacional)],
         ['% Produtiva', Utils.formatPercent(item.percProdutivo)]
       ]);
-      cicloLabels = ['Aplicação', 'Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'];
-      cicloValores = [item.tempoAplicacao, item.tempoAbastecimento, item.tempoAgCarregamento, item.tempoFaltaInsumos,
-        item.tempoAgLiberacao, item.tempoDeslocamento];
+      cicloLabels = ['Aplicação', 'Abastecimento', 'Deslocamento (trecho)'];
+      cicloValores = [item.tempoAplicacao, item.tempoAbastecimento, item.tempoDeslocamentoTrecho];
     } else {
       indicadoresHtml = '<p class="empty-msg">Equipamento não classificado (modelo fora do padrão OFFROAD/CAMINHÃO).</p>';
     }
@@ -3015,16 +3016,15 @@ const ExportModule = (function () {
         ['Tempo Médio Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
         ['Tempo Médio Falta Insumos', Utils.formatHoras(item.tempoFaltaInsumos)],
         ['Tempo Médio Ag. Liberação', Utils.formatHoras(item.tempoAgLiberacao)],
-        ['Tempo Médio Deslocamento', Utils.formatHoras(item.tempoDeslocamento)],
+        ['Tempo Médio Deslocamento (trecho)', Utils.formatHoras(item.tempoDeslocamentoTrecho)],
         ['Velocidade Média', `${Utils.formatNumber(item.velMediaDeslocamento)} km/h`],
         ['Distância Média/Ciclo', `${Utils.formatNumber(item.distPontoCarregamento)} km`],
         ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)],
         ['Eficiência Operacional', Utils.formatPercent(item.percOperacional)],
         ['% Produtiva', Utils.formatPercent(item.percProdutivo)]
       ];
-      cicloLabels = ['Aplicação', 'Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'];
-      cicloValores = [item.tempoAplicacao, item.tempoAbastecimento, item.tempoAgCarregamento,
-        item.tempoFaltaInsumos, item.tempoAgLiberacao, item.tempoDeslocamento];
+      cicloLabels = ['Aplicação', 'Abastecimento', 'Deslocamento (trecho)'];
+      cicloValores = [item.tempoAplicacao, item.tempoAbastecimento, item.tempoDeslocamentoTrecho];
     }
 
     return { info, indicadores, cicloLabels, cicloValores };

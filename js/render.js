@@ -162,7 +162,7 @@ const Render = (function () {
     const agCarregamentoMedio = Utils.avg(rows.map(o => o.tempoAgCarregamento));
     const faltaInsumosMedio = Utils.avg(rows.map(o => o.tempoFaltaInsumos));
     const agLiberacaoMedio = Utils.avg(rows.map(o => o.tempoAgLiberacao));
-    const deslocamentoMedio = Utils.avg(rows.map(o => o.tempoDeslocamento));
+    const deslocamentoMedio = Utils.avg(rows.map(o => o.tempoDeslocamentoTrecho));
     const percProdutivoMedio = Utils.avg(rows.map(o => o.percProdutivo));
 
     setText('offKpiCiclo', Utils.formatHoras(cicloMedio));
@@ -175,8 +175,8 @@ const Render = (function () {
     setText('offKpiPercProdutivo', Utils.formatPercent(percProdutivoMedio));
 
     Charts.renderDoughnut('chartCicloOffroad',
-      ['Aplicação', 'Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'],
-      [aplicacaoMedio, abastecimentoMedio, agCarregamentoMedio, faltaInsumosMedio, agLiberacaoMedio, deslocamentoMedio].map(round2)
+      ['Aplicação', 'Abastecimento', 'Deslocamento (trecho)'],
+      [aplicacaoMedio, abastecimentoMedio, deslocamentoMedio].map(round2)
     );
   }
 
@@ -199,7 +199,7 @@ const Render = (function () {
       Utils.formatHoras(o.tempoAgCarregamento),
       Utils.formatHoras(o.tempoFaltaInsumos),
       Utils.formatHoras(o.tempoAgLiberacao),
-      Utils.formatHoras(o.tempoDeslocamento),
+      Utils.formatHoras(o.tempoDeslocamentoTrecho),
       `${Utils.formatNumber(o.velMediaDeslocamento)} km/h`,
       `${Utils.formatNumber(o.distPontoCarregamento)} km`,
       Utils.formatHoras(o.cicloTotal),
@@ -342,15 +342,14 @@ const Render = (function () {
         ['Tempo Médio Ag. Carregamento', Utils.formatHoras(item.tempoAgCarregamento)],
         ['Tempo Médio Falta Insumos', Utils.formatHoras(item.tempoFaltaInsumos)],
         ['Tempo Médio Ag. Liberação', Utils.formatHoras(item.tempoAgLiberacao)],
-        ['Tempo Médio Deslocamento', Utils.formatHoras(item.tempoDeslocamento)],
+        ['Tempo Médio Deslocamento (trecho)', Utils.formatHoras(item.tempoDeslocamentoTrecho)],
         ['Velocidade Média', `${Utils.formatNumber(item.velMediaDeslocamento)} km/h`],
         ['Distância Média/Ciclo', `${Utils.formatNumber(item.distPontoCarregamento)} km`],
         ['Ciclo Médio', Utils.formatHoras(item.cicloTotal)],
         ['% Produtiva', Utils.formatPercent(item.percProdutivo)]
       ]);
-      cicloLabels = ['Aplicação', 'Abastecimento', 'Ag.Carregamento', 'Falta Insumos', 'Ag.Liberação', 'Deslocamento'];
-      cicloValores = [item.tempoAplicacao, item.tempoAbastecimento, item.tempoAgCarregamento, item.tempoFaltaInsumos,
-        item.tempoAgLiberacao, item.tempoDeslocamento];
+      cicloLabels = ['Aplicação', 'Abastecimento', 'Deslocamento (trecho)'];
+      cicloValores = [item.tempoAplicacao, item.tempoAbastecimento, item.tempoDeslocamentoTrecho];
     } else {
       indicadoresHtml = '<p class="empty-msg">Equipamento não classificado (modelo fora do padrão OFFROAD/CAMINHÃO).</p>';
     }
