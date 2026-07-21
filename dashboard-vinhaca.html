@@ -2513,10 +2513,10 @@ const Render = (function () {
     const cam = dataset.caminhoes;
     const off = dataset.offroads;
 
-    // Popula seletor de lâmina (5 a 500 de 5 em 5)
+    // Popula seletor de lâmina (1 a 500 de 1 em 1)
     const selLamina = document.getElementById('calcLamina');
     if (selLamina && selLamina.options.length === 0) {
-      for (let i = 5; i <= 500; i += 5) {
+      for (let i = 1; i <= 500; i += 1) {
         const opt = document.createElement('option');
         opt.value = i;
         // 1mm em 1ha = 10m3
