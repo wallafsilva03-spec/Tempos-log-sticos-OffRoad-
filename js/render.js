@@ -27,12 +27,8 @@ const Render = (function () {
     setText('kpiPercProdutivoOffroads', Utils.formatPercent(r.percProdutivoMedioOffroads));
 
     // Gráfico 1: Ciclo por Equipamento (granularidade individual, não só a média do tipo)
-    // Caminhões com ciclo acima de 7 h são outliers (equipamento parado) e
-    // não entram neste gráfico.
     const equipamentosCiclo = [
-      ...dataset.caminhoes
-        .filter(c => c.cicloTotal <= 7)
-        .map(c => ({ equipamento: c.equipamento, ciclo: c.cicloTotal, tipo: 'CAMINHAO' })),
+      ...dataset.caminhoes.map(c => ({ equipamento: c.equipamento, ciclo: c.cicloTotal, tipo: 'CAMINHAO' })),
       ...dataset.offroads.map(o => ({ equipamento: o.equipamento, ciclo: o.cicloTotal, tipo: 'OFFROAD' }))
     ].sort((a, b) => b.ciclo - a.ciclo);
 
@@ -117,7 +113,9 @@ const Render = (function () {
     popularFiltro('filtroCaminhaoFazenda', rows.map(r => r.fazenda));
     popularFiltro('filtroCaminhaoModelo', rows.map(r => r.modelo));
 
-    const body = rows.map(c => [
+    // No detalhamento, caminhões com ciclo acima de 7 h são outliers
+    // (equipamento parado) e não são exibidos na tabela.
+    const body = rows.filter(c => c.cicloTotal <= 7).map(c => [
       Utils.escapeHtml(c.equipamento),
       Utils.escapeHtml(c.modelo),
       Utils.escapeHtml(c.frente),
