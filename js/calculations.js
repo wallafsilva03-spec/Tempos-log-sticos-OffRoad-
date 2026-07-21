@@ -156,8 +156,7 @@ const Calculations = (function () {
     const tempoFaltaInsumos = avgTempoAtividade(rows, A.faltaInsumos);
     const tempoAgLiberacao = avgTempoAtividade(rows, A.agLiberacao);
     const tempoDeslocamento = avgTempoAtividade(rows, A.deslocamento);
-    // Cada apontamento produtivo (aplicação) corresponde a UM ciclo.
-    const numCiclos = rows.filter(isProdutiva).length;
+    const numCiclos = countCategoria(rows, A.deslocamento);
 
     const velMediaDeslocamento = avgVelocidadeAtividade(rows, A.deslocamento);
     // O deslocamento apontado cobre ida + volta; o trecho é metade.
