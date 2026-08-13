@@ -22,6 +22,25 @@ dele, na mesma estrutura de pastas do repositório.
 5. Para atualizar os dados, basta importar um novo XLSX — tudo é
    reprocessado do zero.
 
+## Tempos por Atividade — OffRoad (`tempos-offroad.html`)
+
+Página nova e independente do dashboard, focada na **distribuição do tempo
+apontado** dos offroads, no formato de árvore
+`Classificação › Atividade › Equipamento`:
+
+| Coluna | O que é |
+| --- | --- |
+| Horas | Soma de `Tempo Decimal` no período filtrado |
+| % | Participação sobre o tempo total apontado dos offroads |
+| HH:MM | Média por **equipamento-dia** (horas ÷ nº de pares distintos Equipamento × Data), truncada nos minutos |
+| Ocorr. | Quantidade de apontamentos |
+
+Também é um arquivo único e autocontido (basta dar duplo clique). Traz filtros
+de período, frente, fazenda e equipamento, KPIs do topo, exportação em CSV e
+impressão/PDF. As classificações são listadas na ordem de negócio
+(PRODUTIVA, AUXILIAR, IMPRODUTIVO, MANUTENÇÃO) e, dentro delas, atividades e
+equipamentos aparecem do maior para o menor tempo.
+
 ## Estrutura
 
 ```
