@@ -44,10 +44,19 @@ equipamento e a dimensão de detalhe são por aba.
 
 ### Distância
 
-A exportação não traz hodômetro, mas traz `VELOCIDADE MEDIA` junto do tempo — e
-ela vem preenchida justamente nas etapas que rodam. A distância é calculada
-**linha a linha** (`km = horas × km/h`) e somada por etapa do ciclo, o que dá a
-coluna `Km / ciclo` e os indicadores de distância e velocidade média.
+A exportação não traz hodômetro, mas traz `VELOCIDADE MEDIA` junto do tempo. A
+distância é calculada **linha a linha** (`km = horas × km/h`) e contabilizada
+**somente nas operações em que o equipamento realmente roda**:
+
+| Ciclo | Operações que contam para distância |
+| --- | --- |
+| Caminhão | `Transporte Carregado` + `Transporte Vazio` |
+| OffRoad | `Deslocamento TPL` |
+
+Nas demais etapas a coluna `Km` fica vazia, mesmo quando o GPS registra alguma
+velocidade (carregamento, descarregamento, aplicação, manobra, pátio). A
+`Velocidade Média` também usa só essas operações, então ela é a velocidade de
+trecho e não uma média diluída pelo tempo parado.
 
 ### Calculadora de sincronismo
 

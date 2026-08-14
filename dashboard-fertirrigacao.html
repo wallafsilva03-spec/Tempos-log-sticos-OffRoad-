@@ -1239,6 +1239,10 @@ const CFG = {
       titulo:'Ciclo do caminhão',
       resumo:'Carregamento → Transporte Carregado → Descarregamento → Transporte Vazio',
       ancora:'carregamento',
+      /* Só estas operações contam para distância: são os trechos em que o
+         caminhão efetivamente roda. Carregamento, descarregamento e espera
+         ficam de fora, mesmo quando o GPS registra alguma velocidade. */
+      distancia:['transporte carregado','transporte vazio'],
       etapas:[
         {nome:'Carregamento',             ops:['carregamento']},
         {nome:'Transporte Carregado',     ops:['transporte carregado']},
@@ -1257,6 +1261,9 @@ const CFG = {
       titulo:'Ciclo do offroad',
       resumo:'Abastecimento → Aplicação → Deslocamento (roda dentro do ciclo)',
       ancora:'abastecimento insumos',
+      /* No offroad a distância é só o deslocamento. A aplicação e a manobra
+         acontecem dentro do talhão e não são trecho percorrido. */
+      distancia:['deslocamento tpl'],
       etapas:[
         {nome:'Abastecimento', ops:['abastecimento insumos','carregamento']},
         {nome:'Aplicação',     ops:['aplic vinhaca localizada']},
@@ -1615,22 +1622,29 @@ function casa(row, ops){
 function calcularCiclo(rows, tipoCiclo){
   const def = CFG.ciclos[tipoCiclo];
   if (!def || !rows.length) return null;
+  const ehDistancia = d => (def.distancia || []).some(op => d.ops.indexOf(op) !== -1);
   const medir = defs => defs.map(d => {
     const sel = rows.filter(r => casa(r, d.ops));
-    return {nome:d.nome, seg:somaSeg(sel), horas:somaHoras(sel), km:somaKm(sel), ocorr:sel.length};
+    const conta = ehDistancia(d);
+    return {nome:d.nome, seg:somaSeg(sel), horas:somaHoras(sel),
+            km: conta ? somaKm(sel) : 0, contaKm: conta, ocorr:sel.length};
   });
   const etapas = medir(def.etapas);
   const esperas = medir(def.esperas);
   const hEtapas = etapas.reduce((a,e) => a + e.seg, 0) / 3600;
   const hEsperas = esperas.reduce((a,e) => a + e.seg, 0) / 3600;
   const kmEtapas = etapas.reduce((a,e) => a + e.km, 0);
+  const hDistancia = etapas.reduce((a,e) => a + (e.contaKm ? e.horas : 0), 0);
   const total = somaHoras(rows);
   return {
     def: def, etapas: etapas, esperas: esperas,
     nCiclos: rows.filter(r => casa(r, [def.ancora])).length,
     base: equipDias(rows), total: total,
     hEtapas: hEtapas, hEsperas: hEsperas, hFora: total - hEtapas - hEsperas,
-    kmEtapas: kmEtapas, kmTotal: somaKm(rows),
+    kmEtapas: kmEtapas, hDistancia: hDistancia,
+    /* A distância total do grupo é a mesma das operações acima: fora
+       delas o km não é considerado percurso. */
+    kmTotal: kmEtapas,
     ocorrEtapas: etapas.reduce((a,e) => a + e.ocorr, 0),
     ocorrEsperas: esperas.reduce((a,e) => a + e.ocorr, 0)
   };
@@ -1660,8 +1674,8 @@ function renderKpis(painel, t, ciclo){
     /* Distância: a exportação não tem hodômetro, então o km sai de
        velocidade × tempo em cada apontamento das etapas do ciclo. */
     html += kpi('Distância por Ciclo', U.n(ciclo.kmEtapas / ciclo.nCiclos, 1) + ' km');
-    html += kpi('Velocidade Média do Ciclo',
-      U.n(ciclo.hEtapas > 0 ? ciclo.kmEtapas / ciclo.hEtapas : 0, 1) + ' km/h');
+    html += kpi('Velocidade Média',
+      U.n(ciclo.hDistancia > 0 ? ciclo.kmEtapas / ciclo.hDistancia : 0, 1) + ' km/h');
     html += kpi('Ciclos Estimados', ciclo.nCiclos.toLocaleString('pt-BR'), true);
     html += kpi('Ciclos por Equip./Dia', U.n(ciclo.nCiclos / ciclo.base, 1), true);
   } else {
@@ -1671,7 +1685,11 @@ function renderKpis(painel, t, ciclo){
     html += kpi('Equipamentos', String(t.equipamentos));
     html += kpi('Dias no Período', String(t.dias));
     html += kpi('Apontamentos', t.registros.toLocaleString('pt-BR'));
-    html += kpi('Distância Total', U.n(somaKm(rows), 0) + ' km', true);
+    const kmTotal = CFG.grupos.reduce((a,g) => {
+      const c = calcularCiclo(rows.filter(r => r.Grupo === g.id), g.ciclo);
+      return a + (c ? c.kmEtapas : 0);
+    }, 0);
+    html += kpi('Distância Total', U.n(kmTotal, 0) + ' km', true);
   }
   document.getElementById('kpis-' + painel.id).innerHTML = html;
 }
@@ -1770,7 +1788,10 @@ function renderCiclo(painel, ciclo){
     'num ponto só, enquanto o transporte é quebrado em vários registros por talhão. Por isso ' +
     '<b>Média por ciclo</b> é uma estimativa: a exportação traz o total do dia, sem hora de início e fim, ' +
     'então não dá para reconstruir cada ciclo individualmente. <b>% do ciclo</b> usa a soma das etapas ' +
-    'produtivas como 100%.';
+    'produtivas como 100%. A <b>distância</b> considera apenas ' +
+    (d.distancia || []).map(o => '<b>' + U.esc(o) + '</b>').join(' e ') +
+    ' — os trechos em que o equipamento realmente roda; nas demais etapas a coluna Km fica vazia. ' +
+    'O km sai de velocidade × tempo em cada apontamento, já que a exportação não traz hodômetro.';
 }
 
 function linhaArvore(no, t){
