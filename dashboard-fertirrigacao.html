@@ -1674,6 +1674,9 @@ function renderKpis(painel, t, ciclo){
     /* Distância: a exportação não tem hodômetro, então o km sai de
        velocidade × tempo em cada apontamento das etapas do ciclo. */
     html += kpi('Distância por Ciclo', U.n(ciclo.kmEtapas / ciclo.nCiclos, 1) + ' km');
+    /* Ida e volta estão dentro do mesmo ciclo, então o raio - a distância
+       do ponto de carga até a frente de aplicação - é a metade. */
+    html += kpi('Raio Médio', U.n(ciclo.kmEtapas / ciclo.nCiclos / 2, 1) + ' km');
     html += kpi('Velocidade Média',
       U.n(ciclo.hDistancia > 0 ? ciclo.kmEtapas / ciclo.hDistancia : 0, 1) + ' km/h');
     html += kpi('Ciclos Estimados', ciclo.nCiclos.toLocaleString('pt-BR'), true);
@@ -2246,7 +2249,8 @@ function gerarInsights(cam, off, demanda, qtdFrota, capacidade){
 
   if (off) {
     ins.push({t:'info', i:'🚜', txt:'Ciclo do offroad: **' + U.dur(off.cicloProdutivoH) + '** com ' +
-      U.n(off.kmCiclo,1) + ' km rodados e ' + U.n(off.ciclosDia,1) + ' ciclos por equipamento/dia.'});
+      U.n(off.kmCiclo,1) + ' km rodados (raio de **' + U.n(off.raioKm,1) + ' km**) e ' +
+      U.n(off.ciclosDia,1) + ' ciclos por equipamento/dia.'});
   }
 
   cont.innerHTML = ins.map(x =>
