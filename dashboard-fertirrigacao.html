@@ -1208,11 +1208,11 @@ const CFG = {
   /* Os 3 grupos de análise. A exportação traz OFF-ROAD 1 e OFF ROAD 2
      separados (frentes diferentes); aqui os dois viram um único OFFROAD. */
   grupos: [
-    {id:'FERTIRRIGACAO', painel:'fertirrigacao', nome:'Fertirrigação',
+    {id:'FERTIRRIGACAO', painel:'fertirrigacao', nome:'Fertirrigação', cor:'#1f6f43',
      match:['fertirrigacao'], ciclo:'CAMINHAO'},
-    {id:'FERTI_PLAT',    painel:'plataforma',    nome:'Fertirrigação Plataforma',
+    {id:'FERTI_PLAT',    painel:'plataforma',    nome:'Fertirrigação Plataforma', cor:'#2f6f8f',
      match:['fertirrigacao plataforma'], ciclo:'CAMINHAO'},
-    {id:'OFFROAD',       painel:'offroad',       nome:'OffRoad',
+    {id:'OFFROAD',       painel:'offroad',       nome:'OffRoad', cor:'#d9a441',
      match:['off road','offroad','off-road'], ciclo:'OFFROAD'}
   ],
 
@@ -1711,7 +1711,7 @@ function renderComparativo(){
     const ciclo = calcularCiclo(rows, g.ciclo);
     const nC = ciclo ? ciclo.nCiclos : 0;
     html += '<tr>' +
-      '<td><span class="tt-dot" style="background:' + corDaClasse('produtiva') + '"></span>' + U.esc(g.nome) + '</td>' +
+      '<td><span class="tt-dot" style="background:' + g.cor + '"></span>' + U.esc(g.nome) + '</td>' +
       '<td>' + new Set(rows.map(r => r.Equipamento)).size + '</td>' +
       '<td>' + base + '</td>' +
       '<td>' + U.n(tot,1) + '</td>' +
@@ -2069,7 +2069,13 @@ function pizza(canvasId, labels, valores, cores, unidade){
   if (state.charts[canvasId]) { state.charts[canvasId].destroy(); delete state.charts[canvasId]; }
 
   const dados = [], rot = [], cor = [];
-  valores.forEach((v,i) => { if (v > 0) { dados.push(v); rot.push(labels[i]); cor.push(cores[i % cores.length]); } });
+  valores.forEach((v,i) => {
+    if (v > 0) {
+      dados.push(v); rot.push(labels[i]);
+      // sem cor definida o Chart.js pinta a fatia de preto - cai na paleta
+      cor.push(cores[i % cores.length] || CHART_PALETTE[i % CHART_PALETTE.length]);
+    }
+  });
   if (!dados.length) return;
   const total = dados.reduce((a,b) => a + b, 0);
 
