@@ -22,6 +22,59 @@ dele, na mesma estrutura de pastas do repositório.
 5. Para atualizar os dados, basta importar um novo XLSX — tudo é
    reprocessado do zero.
 
+## CEMMA · COPLASA — Fertirrigação e OffRoad (`cemma-coplasa-ferti.html`)
+
+Página que lê a **exportação do sistema** (o `.zip` baixado do relatório ou o
+`.txt`/`.csv` de dentro dele, separado por `;`) — formato diferente do XLSX das
+outras telas. O zip é descompactado no próprio navegador, sem biblioteca externa.
+
+Separa a operação em **3 grupos**, a partir da coluna `GRUPO EQUIPAMENTO`:
+
+| Grupo | Origem na exportação | Ciclo |
+| --- | --- | --- |
+| Fertirrigação | `FERTIRRIGAÇÃO` | Caminhão |
+| Fertirrigação Plataforma | `FERTIRRIGAÇÃO PLATAFORMA` | Caminhão |
+| OffRoad | `OFF-ROAD 1` + `OFF ROAD 2` (unidos) | OffRoad |
+
+Cada grupo traz a árvore `Classificação › Atividade › Detalhe` (o detalhe é
+configurável: equipamento, grupo, unidade, fazenda ou operador) e o **ciclo
+operacional**:
+
+- **Caminhão:** Carregamento → Transporte Carregado → Descarregamento →
+  Transporte Vazio, mais as esperas (Ag. Carregamento, Ag. Descarregamento, filas).
+- **OffRoad:** Abastecimento → Aplicação → Deslocamento (roda dentro do ciclo) +
+  Manobra, mais as esperas (Falta de Insumo, Ag. Liberação de Serviço).
+
+O ciclo fecha o dia inteiro: `etapas do ciclo + esperas do ciclo + fora do ciclo
+= 24:00 por equipamento-dia`.
+
+**Sobre a contagem de ciclos:** a exportação traz o total do dia por
+equipamento/talhão, sem hora de início e fim, então não dá para reconstruir cada
+ciclo individualmente. Os ciclos são contados pelos apontamentos da etapa-âncora
+(Carregamento no caminhão, Abastecimento no offroad), que é a menos fragmentada
+por acontecer num ponto só — o transporte é quebrado em dezenas de registros por
+talhão. Por isso **Média por ciclo é uma estimativa**; as colunas Horas, % e
+HH:MM/dia não dependem dessa premissa.
+
+## Tempos por Atividade — OffRoad (`tempos-offroad.html`)
+
+Página nova e independente do dashboard, focada na **distribuição do tempo
+apontado** dos offroads, no formato de árvore
+`Classificação › Atividade › Equipamento`:
+
+| Coluna | O que é |
+| --- | --- |
+| Horas | Soma de `Tempo Decimal` no período filtrado |
+| % | Participação sobre o tempo total apontado dos offroads |
+| HH:MM | Média por **equipamento-dia** (horas ÷ nº de pares distintos Equipamento × Data), truncada nos minutos |
+| Ocorr. | Quantidade de apontamentos |
+
+Também é um arquivo único e autocontido (basta dar duplo clique). Traz filtros
+de período, frente, fazenda e equipamento, KPIs do topo, exportação em CSV e
+impressão/PDF. As classificações são listadas na ordem de negócio
+(PRODUTIVA, AUXILIAR, IMPRODUTIVO, MANUTENÇÃO) e, dentro delas, atividades e
+equipamentos aparecem do maior para o menor tempo.
+
 ## Estrutura
 
 ```

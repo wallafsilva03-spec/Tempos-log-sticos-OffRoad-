@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEMMA COPLASA FERTI</title>
+<style>
+/* ============================================================
+   CEMMA / COPLASA - Fertirrigação e OffRoad
+   Tempos por atividade e ciclo operacional, a partir da
+   exportação do sistema (arquivo .zip / .txt separado por ";").
+   ============================================================ */
+:root{
+  --primary:#1f6f43; --primary-dark:#154a2d; --primary-soft:#e8f1ec;
+  --accent:#d9a441; --danger:#b3392c; --info:#2f6f8f; --warn:#8a5a2b;
+  --ink:#1b2721; --ink-soft:#5c6b63; --line:#dfe5e1; --bg:#f4f6f5;
+  --card:#ffffff; --shadow:0 1px 3px rgba(21,74,45,.08),0 6px 18px rgba(21,74,45,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Segoe UI',Roboto,-apple-system,Arial,sans-serif;
+  background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45}
+.wrap{max-width:1320px;margin:0 auto;padding:20px 22px 60px}
+.hidden{display:none !important}
+
+/* ---------- Topo ---------- */
+.topbar{background:linear-gradient(135deg,var(--primary-dark),var(--primary));
+  color:#fff;border-radius:12px;padding:18px 22px;box-shadow:var(--shadow);
+  display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.topbar h1{margin:0;font-size:19px;font-weight:600;letter-spacing:.2px}
+.topbar .sub{margin:2px 0 0;font-size:12.5px;opacity:.85}
+.import{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{background:var(--accent);color:#3b2a06;border:none;border-radius:8px;
+  padding:9px 16px;font-size:13.5px;font-weight:600;cursor:pointer;
+  display:inline-block;transition:filter .15s}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+#fileInput{display:none}
+.file-status{font-size:12.5px;opacity:.9;max-width:300px}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;
+  border-radius:50%;display:inline-block;animation:spin .7s linear infinite;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- Avisos ---------- */
+.banner{border-radius:10px;padding:12px 16px;margin-top:14px;font-size:13px}
+.banner.error{background:#fdecea;border:1px solid #f3b7b0;color:#7d2019}
+.banner.warn{background:#fdf6e6;border:1px solid #ecd79c;color:#6b5115}
+
+/* ---------- Vazio ---------- */
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:12px;
+  padding:52px 24px;text-align:center;margin-top:18px;color:var(--ink-soft)}
+.empty .ico{font-size:40px;display:block;margin-bottom:10px}
+.empty h2{margin:0 0 6px;font-size:17px;color:var(--ink)}
+.empty p{margin:0 auto 10px;max-width:620px;font-size:13px}
+.empty code{background:#eef2f0;padding:1px 6px;border-radius:4px;font-size:12px}
+
+/* ---------- Abas de grupo ---------- */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.tab{background:var(--card);border:1px solid var(--line);border-radius:9px;
+  padding:9px 16px;font-size:13.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;
+  box-shadow:var(--shadow);transition:all .15s}
+.tab:hover{border-color:var(--primary);color:var(--primary)}
+.tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.tab .n{font-weight:400;opacity:.75;font-size:12px;margin-left:6px}
+
+/* ---------- Filtros ---------- */
+.filters{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:14px 16px;margin-top:14px;box-shadow:var(--shadow);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end}
+.field label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.4px;color:var(--ink-soft);margin-bottom:4px}
+.field select,.field input{width:100%;padding:7px 9px;border:1px solid var(--line);
+  border-radius:7px;font-size:13px;background:#fff;color:var(--ink);font-family:inherit}
+.field select:focus,.field input:focus{outline:2px solid var(--primary-soft);border-color:var(--primary)}
+.filters .btn{background:#eef2f0;color:var(--ink)}
+
+/* ---------- KPIs ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-top:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--primary);
+  border-radius:10px;padding:12px 14px;box-shadow:var(--shadow)}
+.kpi .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-soft);font-weight:600}
+.kpi .val{font-size:22px;font-weight:600;margin-top:3px;line-height:1.15}
+.kpi .hint{font-size:11.5px;color:var(--ink-soft);margin-top:2px}
+.kpi.alt{border-left-color:var(--accent)}
+.kpi.info{border-left-color:var(--info)}
+.kpi.warn{border-left-color:var(--warn)}
+.kpi.dang{border-left-color:var(--danger)}
+
+/* ---------- Cartões / tabelas ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  margin-top:18px;box-shadow:var(--shadow);overflow:hidden}
+.card-head{padding:14px 16px;border-bottom:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.card-head h2{margin:0;font-size:15.5px;font-weight:600}
+.card-head .desc{font-size:12px;color:var(--ink-soft);margin-top:2px}
+.card-head .tools{display:flex;gap:8px;align-items:center}
+.card-head .btn{background:#eef2f0;color:var(--ink);padding:6px 12px;font-size:12.5px}
+.table-scroll{overflow-x:auto}
+
+table.grid{width:100%;border-collapse:collapse;font-size:13.5px}
+table.grid thead th{background:#f7f9f8;border-bottom:2px solid var(--line);color:var(--ink-soft);
+  font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;
+  padding:10px 12px;text-align:right;white-space:nowrap}
+table.grid thead th:first-child{text-align:left}
+table.grid tbody td{padding:7px 12px;border-bottom:1px solid #eef1ef;text-align:right;
+  white-space:nowrap;font-variant-numeric:tabular-nums}
+table.grid tbody td:first-child{text-align:left;white-space:normal}
+table.grid tbody tr:hover{background:#f8faf9}
+
+tr.lvl-0{background:#fbfcfb;font-weight:600}
+tr.lvl-0 td{border-bottom:1px solid var(--line)}
+tr.lvl-1 td:first-child{padding-left:34px}
+tr.lvl-2{color:var(--ink-soft);font-size:13px}
+tr.lvl-2 td:first-child{padding-left:64px}
+tr.total{background:var(--primary-soft);font-weight:700}
+tr.total td{border-top:2px solid var(--primary);border-bottom:none}
+tr.sub{background:#f4f7f5;font-weight:600}
+tr.sub td{border-top:1px solid var(--line)}
+tr.etapa td:first-child{padding-left:26px}
+tr.dim{color:var(--ink-soft)}
+
+.toggle{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;
+  border:1px solid #b9c4bd;border-radius:3px;background:#fff;color:var(--ink-soft);
+  font-size:12px;line-height:1;cursor:pointer;margin-right:9px;vertical-align:-3px;
+  font-family:monospace;user-select:none}
+.toggle:hover{border-color:var(--primary);color:var(--primary)}
+.toggle.leaf{border:none;background:none;cursor:default;color:transparent}
+.dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:8px}
+.step{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;
+  border-radius:50%;background:var(--primary);color:#fff;font-size:11px;font-weight:700;
+  margin-right:9px;vertical-align:-4px}
+.step.wait{background:var(--danger)}
+.step.out{background:#9aa8a0}
+
+.legend{padding:11px 16px;background:#fbfcfb;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--ink-soft);line-height:1.6}
+.legend b{color:var(--ink)}
+.foot{margin-top:22px;text-align:center;font-size:11.5px;color:var(--ink-soft)}
+
+@media print{
+  body{background:#fff}
+  .topbar,.filters,.tabs,.card-head .tools{display:none !important}
+  .card{box-shadow:none;border-color:#ccc;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <div>
+      <h1>CEMMA · COPLASA &mdash; Fertirrigação e OffRoad</h1>
+      <p class="sub">Tempos por atividade e ciclo operacional &middot; processamento 100% local</p>
+    </div>
+    <div class="import">
+      <label class="btn" for="fileInput">⬆ Importar arquivo</label>
+      <input type="file" id="fileInput" accept=".zip,.txt,.csv">
+      <button class="btn ghost" id="btnPrint" disabled>🖨 PDF</button>
+      <button class="btn ghost" id="btnCsv" disabled>⬇ CSV</button>
+      <span class="file-status" id="fileStatus"><span class="spinner hidden" id="spinner"></span> Nenhum arquivo importado.</span>
+    </div>
+  </header>
+
+  <div class="banner error hidden" id="errorBanner"></div>
+  <div class="banner warn hidden" id="warnBanner"></div>
+
+  <div class="empty" id="emptyState">
+    <span class="ico">📥</span>
+    <h2>Importe a exportação do sistema</h2>
+    <p>Aceita o <b>.zip</b> baixado direto do relatório ou o <b>.txt</b>/<b>.csv</b> de dentro dele
+    (separado por <code>;</code>). O arquivo é lido no seu navegador &mdash; nada é enviado para fora.</p>
+    <p>Colunas usadas: <code>COD. EQUIPAMENTO</code>, <code>DATA/HORA LOCAL</code>,
+    <code>GRUPO EQUIPAMENTO</code>, <code>DESC.GRUPO OPERAC.</code>, <code>DESC.OPERACAO</code>,
+    <code>HRS OPERACIONAIS(SEC)</code>.</p>
+  </div>
+
+  <main id="content" class="hidden">
+    <nav class="tabs" id="tabs"></nav>
+
+    <section class="filters">
+      <div class="field"><label for="fData1">Data inicial</label><input type="date" id="fData1"></div>
+      <div class="field"><label for="fData2">Data final</label><input type="date" id="fData2"></div>
+      <div class="field"><label for="fUnidade">Unidade</label><select id="fUnidade"><option value="">Todas</option></select></div>
+      <div class="field"><label for="fFazenda">Fazenda</label><select id="fFazenda"><option value="">Todas</option></select></div>
+      <div class="field"><label for="fEquip">Equipamento</label><select id="fEquip"><option value="">Todos</option></select></div>
+      <div class="field"><label for="fNivel3">Detalhar por</label>
+        <select id="fNivel3">
+          <option value="Equipamento">Equipamento</option>
+          <option value="GrupoNorm">Grupo</option>
+          <option value="Unidade">Unidade</option>
+          <option value="Fazenda">Fazenda</option>
+          <option value="Operador">Operador</option>
+        </select>
+      </div>
+      <div class="field"><button class="btn" id="btnLimpar">Limpar filtros</button></div>
+    </section>
+
+    <section class="kpis" id="kpis"></section>
+
+    <!-- Comparativo entre grupos (aba TODOS) -->
+    <section class="card hidden" id="cardComparativo">
+      <div class="card-head">
+        <div><h2>Comparativo entre grupos</h2>
+        <div class="desc">Cada grupo com sua própria base de equipamento-dias</div></div>
+      </div>
+      <div class="table-scroll">
+        <table class="grid">
+          <thead><tr>
+            <th>Grupo</th><th>Equip.</th><th>Equip-dias</th><th>Horas</th>
+            <th>Produtiva</th><th>% Produtiva</th><th>Ciclos</th><th>Ciclos/dia</th><th>Ciclo (HH:MM)</th>
+          </tr></thead>
+          <tbody id="comparativoBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Ciclo operacional -->
+    <section class="card hidden" id="cardCiclo">
+      <div class="card-head">
+        <div><h2 id="cicloTitulo">Ciclo operacional</h2>
+        <div class="desc" id="cicloDesc"></div></div>
+      </div>
+      <div class="table-scroll">
+        <table class="grid">
+          <thead><tr>
+            <th>Etapa do ciclo</th><th>Horas</th><th>% do total</th>
+            <th>HH:MM / dia</th><th>Média por ciclo</th><th>% do ciclo</th><th>Ocorr.</th>
+          </tr></thead>
+          <tbody id="cicloBody"></tbody>
+        </table>
+      </div>
+      <div class="legend" id="cicloLegend"></div>
+    </section>
+
+    <!-- Árvore de tempos -->
+    <section class="card">
+      <div class="card-head">
+        <div><h2>Distribuição do tempo apontado</h2>
+        <div class="desc" id="tableDesc"></div></div>
+        <div class="tools">
+          <button class="btn" id="btnExpandir">Expandir tudo</button>
+          <button class="btn" id="btnRecolher">Recolher tudo</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="grid">
+          <thead><tr>
+            <th>Classificação / Atividade</th><th>Horas</th><th>%</th><th>HH:MM</th><th>Ocorr.</th>
+          </tr></thead>
+          <tbody id="treeBody"></tbody>
+        </table>
+      </div>
+      <div class="legend">
+        <b>Horas</b>: soma de <i>HRS OPERACIONAIS</i>. &nbsp;·&nbsp;
+        <b>%</b>: participação sobre o tempo total apontado do grupo. &nbsp;·&nbsp;
+        <b>HH:MM</b>: média por <b>equipamento-dia</b> &mdash; horas ÷ nº de pares distintos
+        (Equipamento × Data), truncada nos minutos. O total do grupo fecha em 24:00 por
+        equipamento-dia, porque a exportação cobre o dia inteiro.
+      </div>
+    </section>
+
+    <p class="foot" id="foot"></p>
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   1) CONFIGURAÇÃO
+   ============================================================ */
+const CFG = {
+  colunasObrigatorias: ['COD. EQUIPAMENTO','DESC.OPERACAO'],
+
+  /* Os 3 grupos de análise. A exportação traz OFF-ROAD 1 e OFF ROAD 2
+     separados (frentes diferentes); aqui os dois viram um único OFFROAD. */
+  grupos: [
+    {id:'FERTIRRIGACAO',  nome:'Fertirrigação',            match:['fertirrigacao'],           ciclo:'CAMINHAO'},
+    {id:'FERTI_PLAT',     nome:'Fertirrigação Plataforma', match:['fertirrigacao plataforma'], ciclo:'CAMINHAO'},
+    {id:'OFFROAD',        nome:'OffRoad',                  match:['off road','offroad','off-road'], ciclo:'OFFROAD'}
+  ],
+
+  ordemClasses: ['produtiva','auxiliar','improdutivo','improdutiva','nao gerenciavel',
+                 'manutencao','automacao coa','indeterminado'],
+
+  coresClasse: {
+    'produtiva':'#1f6f43','auxiliar':'#2f6f8f','improdutivo':'#b3392c','improdutiva':'#b3392c',
+    'manutencao':'#8a5a2b','nao gerenciavel':'#d9a441','automacao coa':'#6d4c41','indeterminado':'#8e9aaf'
+  },
+  corPadrao:'#8e9aaf',
+
+  /* ------------------------------------------------------------------
+     CICLOS OPERACIONAIS
+     As etapas são casadas pelo texto normalizado de DESC.OPERACAO
+     (sem acento, minúsculo, sem pontuação). "ancora" é a etapa contada
+     como 1 ciclo: escolhida por ser a menos fragmentada na exportação
+     (o carregamento/abastecimento acontece num ponto só, enquanto o
+     transporte é quebrado em vários registros por talhão).
+     ------------------------------------------------------------------ */
+  ciclos: {
+    CAMINHAO: {
+      titulo:'Ciclo do caminhão (fertirrigação)',
+      resumo:'Carregamento → Transporte Carregado → Descarregamento → Transporte Vazio',
+      ancora:'carregamento',
+      etapas:[
+        {nome:'Carregamento',            ops:['carregamento']},
+        {nome:'Transporte Carregado',    ops:['transporte carregado']},
+        {nome:'Descarregamento',         ops:['descarregamento']},
+        {nome:'Transporte Vazio',        ops:['transporte vazio']},
+        {nome:'Caminhão no Carregamento',ops:['caminhao no carregamento']}
+      ],
+      esperas:[
+        {nome:'Ag. Carregamento',   ops:['aguardando carregamento']},
+        {nome:'Fila Carregamento',  ops:['fila carregamento']},
+        {nome:'Ag. Descarregamento',ops:['aguardando descarregamento']},
+        {nome:'Fila p/ Descarregar',ops:['fila para descarregar']}
+      ]
+    },
+    OFFROAD: {
+      titulo:'Ciclo do offroad',
+      resumo:'Abastecimento → Aplicação → Deslocamento (roda dentro do ciclo)',
+      ancora:'abastecimento insumos',
+      etapas:[
+        {nome:'Abastecimento', ops:['abastecimento insumos','carregamento']},
+        {nome:'Aplicação',     ops:['aplic vinhaca localizada']},
+        {nome:'Deslocamento',  ops:['deslocamento tpl']},
+        {nome:'Manobra',       ops:['manobra']}
+      ],
+      esperas:[
+        {nome:'Falta de Insumo',        ops:['falta de insumo']},
+        {nome:'Ag. Abast. de Insumo',   ops:['aguardando abast de insumo']},
+        {nome:'Ag. Liberação Serviço',  ops:['aguard liberacao servico','aguardando liberacao servico']}
+      ]
+    }
+  }
+};
+
+/* ============================================================
+   2) UTILITÁRIOS
+   ============================================================ */
+const U = {
+  removeAccents(s){ return String(s).normalize('NFD').replace(/[̀-ͯ]/g,''); },
+  norm(s){
+    if (s === null || s === undefined) return '';
+    return U.removeAccents(String(s)).trim().toLowerCase().replace(/\s+/g,' ');
+  },
+  /* Normalização das descrições de operação: além de acento e caixa,
+     remove pontuação e hífen para casar "Abastecimento- Insumos",
+     "Abastecimento - Insumos" e "ABASTECIMENTO INSUMOS". */
+  normOp(s){
+    return U.norm(s).replace(/[.\-\/_,]/g,' ').replace(/\s+/g,' ').trim();
+  },
+  str(v){ return v === null || v === undefined ? '' : String(v).trim(); },
+  num(v){
+    if (v === null || v === undefined || v === '') return 0;
+    if (typeof v === 'number') return isFinite(v) ? v : 0;
+    const s = String(v).trim();
+    const d = parseFloat(s);
+    if (!isNaN(d) && s.indexOf(',') === -1) return d;
+    const br = parseFloat(s.replace(/\./g,'').replace(',','.'));
+    return isNaN(br) ? 0 : br;
+  },
+  /* "HH:MM:SS" -> horas decimais. Aceita mais de 2 dígitos na hora. */
+  hmsParaHoras(v){
+    const s = U.str(v);
+    const m = s.match(/^(\d+):(\d{1,2})(?::(\d{1,2}))?$/);
+    if (!m) return 0;
+    return (+m[1]) + (+m[2])/60 + (m[3] ? (+m[3])/3600 : 0);
+  },
+  /* "dd/mm/aaaa hh:mm:ss" -> "aaaa-mm-dd" (o dia é a chave de tudo). */
+  diaDeDataBR(v){
+    const m = U.str(v).match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+    const iso = U.str(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return iso ? `${iso[1]}-${iso[2]}-${iso[3]}` : '';
+  },
+  diaBR(k){ if (!k) return '—'; const [a,m,d] = k.split('-'); return `${d}/${m}/${a}`; },
+  n(v,dec=1){
+    if (!isFinite(v)) v = 0;
+    return v.toLocaleString('pt-BR',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+  },
+  pct(v,dec=1){ return U.n(v,dec) + '%'; },
+  /* Horas decimais -> HH:MM, truncando os minutos (não arredonda):
+     é assim que o relatório de referência exibe (1,0h em 72
+     equipamento-dias sai 00:00, e não 00:01). */
+  hhmm(dec){
+    if (!isFinite(dec) || dec < 0) dec = 0;
+    const t = Math.floor(dec * 60);
+    return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
+  },
+  /* Duração curta para "média por ciclo": usa minutos quando < 1h. */
+  dur(dec){
+    if (!isFinite(dec) || dec <= 0) return '—';
+    if (dec < 1) return U.n(dec*60,0) + ' min';
+    return U.hhmm(dec);
+  },
+  esc(s){
+    return String(s === null || s === undefined ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  },
+  uniq(arr){
+    return Array.from(new Set(arr.filter(v => v !== null && v !== undefined && v !== '')))
+      .sort((a,b) => String(a).localeCompare(String(b),'pt-BR'));
+  }
+};
+
+/* ============================================================
+   3) LEITURA DO ARQUIVO (.zip / .txt / .csv)
+   ============================================================ */
+
+/* Descompacta um .zip usando só APIs nativas do navegador
+   (DecompressionStream), sem biblioteca externa. Lê o diretório
+   central e devolve as entradas que interessam. */
+async function lerZip(buffer){
+  const dv = new DataView(buffer);
+  const u8 = new Uint8Array(buffer);
+
+  // Localiza o End Of Central Directory varrendo o fim do arquivo
+  let eocd = -1;
+  for (let i = u8.length - 22; i >= Math.max(0, u8.length - 66000); i--) {
+    if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error('Arquivo .zip inválido ou corrompido.');
+
+  const qtd = dv.getUint16(eocd + 10, true);
+  let ptr = dv.getUint32(eocd + 16, true);
+  const entradas = [];
+  for (let i = 0; i < qtd; i++) {
+    if (dv.getUint32(ptr, true) !== 0x02014b50) break;
+    const metodo   = dv.getUint16(ptr + 10, true);
+    const tamComp  = dv.getUint32(ptr + 20, true);
+    const nomeLen  = dv.getUint16(ptr + 28, true);
+    const extraLen = dv.getUint16(ptr + 30, true);
+    const comLen   = dv.getUint16(ptr + 32, true);
+    const offLocal = dv.getUint32(ptr + 42, true);
+    const nome = new TextDecoder('utf-8').decode(u8.subarray(ptr + 46, ptr + 46 + nomeLen));
+    entradas.push({nome, metodo, tamComp, offLocal});
+    ptr += 46 + nomeLen + extraLen + comLen;
+  }
+
+  const alvo = entradas.find(e => /\.(txt|csv)$/i.test(e.nome) && !e.nome.startsWith('__MACOSX'))
+            || entradas.find(e => !e.nome.endsWith('/') && !e.nome.startsWith('__MACOSX'));
+  if (!alvo) throw new Error('O .zip não contém nenhum arquivo .txt ou .csv.');
+
+  // Cabeçalho local: os tamanhos de nome/extra podem diferir do central
+  const nomeLenL  = dv.getUint16(alvo.offLocal + 26, true);
+  const extraLenL = dv.getUint16(alvo.offLocal + 28, true);
+  const ini = alvo.offLocal + 30 + nomeLenL + extraLenL;
+  const dados = u8.subarray(ini, ini + alvo.tamComp);
+
+  if (alvo.metodo === 0) return {nome: alvo.nome, bytes: dados};
+  if (alvo.metodo !== 8) throw new Error('Compressão do .zip não suportada. Extraia o .txt e importe ele.');
+  if (typeof DecompressionStream === 'undefined') {
+    throw new Error('Seu navegador não descompacta .zip. Extraia o arquivo .txt do zip e importe ele.');
+  }
+  const ds = new DecompressionStream('deflate-raw');
+  const stream = new Blob([dados]).stream().pipeThrough(ds);
+  const bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+  return {nome: alvo.nome, bytes};
+}
+
+/* A exportação costuma vir em UTF-8, mas versões antigas saem em
+   Windows-1252. Tenta UTF-8 estrito e, se falhar, cai para 1252. */
+function decodificar(bytes){
+  try { return new TextDecoder('utf-8', {fatal:true}).decode(bytes); }
+  catch (e) { return new TextDecoder('windows-1252').decode(bytes); }
+}
+
+/* CSV com separador ";" e suporte a campos entre aspas. */
+function parseCsv(texto, sep = ';'){
+  const linhas = [];
+  let campo = '', linha = [], aspas = false;
+  for (let i = 0; i < texto.length; i++) {
+    const c = texto[i];
+    if (aspas) {
+      if (c === '"') { if (texto[i+1] === '"') { campo += '"'; i++; } else aspas = false; }
+      else campo += c;
+    } else if (c === '"') { aspas = true; }
+    else if (c === sep) { linha.push(campo); campo = ''; }
+    else if (c === '\n') { linha.push(campo); linhas.push(linha); linha = []; campo = ''; }
+    else if (c !== '\r') { campo += c; }
+  }
+  if (campo !== '' || linha.length) { linha.push(campo); linhas.push(linha); }
+  return linhas;
+}
+
+function grupoDe(grupoEquipamento){
+  const g = U.normOp(grupoEquipamento);
+  // "fertirrigacao plataforma" antes de "fertirrigacao": o mais específico vence
+  const achado = CFG.grupos
+    .slice()
+    .sort((a,b) => Math.max(...b.match.map(m => m.length)) - Math.max(...a.match.map(m => m.length)))
+    .find(gr => gr.match.some(m => g.indexOf(m) !== -1));
+  return achado ? achado.id : 'OUTROS';
+}
+
+function montarLinhas(matriz){
+  const head = matriz[0].map(h => U.str(h).toUpperCase());
+  const idx = {};
+  head.forEach((h,i) => { if (!(h in idx)) idx[h] = i; });
+  const faltando = CFG.colunasObrigatorias.filter(c => !(c in idx));
+  if (faltando.length) {
+    throw new Error('Colunas obrigatórias ausentes: ' + faltando.join(', ') +
+      '. Confirme se é a exportação padrão separada por ";".');
+  }
+  const temSec = 'HRS OPERACIONAIS(SEC)' in idx;
+  const temHms = 'HRS OPERACIONAIS' in idx;
+  if (!temSec && !temHms) {
+    throw new Error('Nenhuma coluna de horas encontrada (HRS OPERACIONAIS(SEC) ou HRS OPERACIONAIS).');
+  }
+  const get = (l,c) => (c in idx ? U.str(l[idx[c]]) : '');
+
+  const out = [];
+  for (let i = 1; i < matriz.length; i++) {
+    const l = matriz[i];
+    if (!l || l.length < 3) continue;
+    const equip = get(l,'COD. EQUIPAMENTO');
+    if (!equip) continue;
+
+    /* Tudo é acumulado em SEGUNDOS INTEIROS e só vira hora na hora de
+       exibir. Somando seg/3600 linha a linha o erro de ponto flutuante
+       fazia o total do dia sair 23:59 em vez de 24:00 (cada equipamento-dia
+       da exportação fecha exatos 86.400 s). */
+    const seg = temSec ? Math.round(U.num(get(l,'HRS OPERACIONAIS(SEC)')))
+                       : Math.round(U.hmsParaHoras(get(l,'HRS OPERACIONAIS')) * 3600);
+    const grupoRaw = get(l,'GRUPO EQUIPAMENTO') || 'NÃO INFORMADO';
+    const operador = get(l,'COD. OPERADOR') || 'Não Informado';
+
+    out.push({
+      Equipamento: equip,
+      Modelo: get(l,'DESC.EQUIPAMENTO') || 'Não Informado',
+      DiaKey: U.diaDeDataBR(get(l,'DATA/HORA LOCAL')),
+      Unidade: get(l,'UNIDADE') || 'Não Informado',
+      GrupoRaw: grupoRaw,
+      GrupoNorm: grupoRaw,
+      Grupo: grupoDe(grupoRaw),
+      Fazenda: get(l,'COD. FAZENDA') || 'Não Informado',
+      Talhao: get(l,'COD. TALHAO'),
+      Operador: operador.length > 32 ? operador.slice(0,32) + '…' : operador,
+      Classificacao: get(l,'DESC.GRUPO OPERAC.') || 'NÃO CLASSIFICADO',
+      Atividade: get(l,'DESC.OPERACAO') || 'Não Informado',
+      AtividadeNorm: U.normOp(get(l,'DESC.OPERACAO')),
+      CodOperacao: get(l,'COD. OPERACAO'),
+      Seg: seg,
+      Horas: seg / 3600,
+      Velocidade: U.num(get(l,'VELOCIDADE MEDIA')),
+      Area: U.num(get(l,'AREA TRABALHADA ANALITICA')),
+      Combustivel: U.num(get(l,'CONSUMO DE COMBUSTIVEL'))
+    });
+  }
+  if (!out.length) throw new Error('Nenhuma linha válida encontrada no arquivo.');
+  return out;
+}
+
+async function lerArquivo(file){
+  const buf = await file.arrayBuffer();
+  let bytes = new Uint8Array(buf), nomeInterno = file.name;
+  if (/\.zip$/i.test(file.name) || (bytes[0] === 0x50 && bytes[1] === 0x4b)) {
+    const r = await lerZip(buf);
+    bytes = r.bytes; nomeInterno = r.nome;
+  }
+  const texto = decodificar(bytes);
+  const matriz = parseCsv(texto, texto.split('\n')[0].indexOf(';') !== -1 ? ';' : ',');
+  if (matriz.length < 2) throw new Error('O arquivo não tem linhas de dados.');
+  return {linhas: montarLinhas(matriz), nomeInterno};
+}
+
+/* ============================================================
+   4) ESTADO E AGREGAÇÃO
+   ============================================================ */
+const state = {
+  todas: [], filtradas: [], grupoAtivo: 'TODOS',
+  arvore: null, expandidos: new Set(), arquivo: '', gruposPresentes: []
+};
+
+function equipDias(rows){
+  const s = new Set();
+  rows.forEach(r => { if (r.DiaKey) s.add(r.Equipamento + '|' + r.DiaKey); });
+  return s.size || new Set(rows.map(r => r.Equipamento)).size || 1;
+}
+function somaSeg(rows){ return rows.reduce((a,r) => a + r.Seg, 0); }
+function somaHoras(rows){ return somaSeg(rows) / 3600; }
+function corDaClasse(nome){ return CFG.coresClasse[U.norm(nome)] || CFG.corPadrao; }
+function nomeGrupo(id){
+  if (id === 'TODOS') return 'Todos os grupos';
+  const g = CFG.grupos.find(x => x.id === id);
+  return g ? g.nome : 'Outros';
+}
+
+function aplicarFiltros(){
+  const d1 = document.getElementById('fData1').value;
+  const d2 = document.getElementById('fData2').value;
+  const uni = document.getElementById('fUnidade').value;
+  const faz = document.getElementById('fFazenda').value;
+  const eq  = document.getElementById('fEquip').value;
+
+  state.filtradas = state.todas.filter(r => {
+    if (state.grupoAtivo !== 'TODOS' && r.Grupo !== state.grupoAtivo) return false;
+    if (d1 && (!r.DiaKey || r.DiaKey < d1)) return false;
+    if (d2 && (!r.DiaKey || r.DiaKey > d2)) return false;
+    if (uni && r.Unidade !== uni) return false;
+    if (faz && r.Fazenda !== faz) return false;
+    if (eq  && r.Equipamento !== eq) return false;
+    return true;
+  });
+}
+
+/* Árvore Classificação > Atividade > (dimensão escolhida) */
+function montarArvore(rows, campoNivel3){
+  const totalHoras = somaHoras(rows);
+  const base = equipDias(rows);
+
+  // equipamento-dias por entidade do 3º nível (denominador daquelas linhas)
+  const diasPorEntidade = new Map();
+  rows.forEach(r => {
+    const k = r[campoNivel3];
+    if (!diasPorEntidade.has(k)) diasPorEntidade.set(k, new Set());
+    if (r.DiaKey) diasPorEntidade.get(k).add(r.Equipamento + '|' + r.DiaKey);
+  });
+
+  const classes = new Map();
+  rows.forEach(r => {
+    let c = classes.get(r.Classificacao);
+    if (!c) { c = {label:r.Classificacao, seg:0, ocorr:0, filhos:new Map()}; classes.set(r.Classificacao, c); }
+    c.seg += r.Seg; c.ocorr++;
+
+    let a = c.filhos.get(r.Atividade);
+    if (!a) { a = {label:r.Atividade, seg:0, ocorr:0, filhos:new Map()}; c.filhos.set(r.Atividade, a); }
+    a.seg += r.Seg; a.ocorr++;
+
+    const k = r[campoNivel3];
+    let e = a.filhos.get(k);
+    if (!e) { e = {label:k, seg:0, ocorr:0, filhos:new Map(), entidade:k}; a.filhos.set(k, e); }
+    e.seg += r.Seg; e.ocorr++;
+  });
+
+  const porHoras = m => Array.from(m.values()).sort((a,b) => b.seg - a.seg);
+  /* No 1º nível vale a ordem de negócio (produtiva primeiro), não a de
+     maior tempo — é como o relatório de referência apresenta. */
+  const porRegra = m => Array.from(m.values()).sort((a,b) => {
+    const ia = CFG.ordemClasses.indexOf(U.norm(a.label));
+    const ib = CFG.ordemClasses.indexOf(U.norm(b.label));
+    const ra = ia === -1 ? 99 : ia, rb = ib === -1 ? 99 : ib;
+    return ra !== rb ? ra - rb : b.seg - a.seg;
+  });
+
+  const nos = porRegra(classes).map(c => {
+    c.id = 'c::' + c.label; c.nivel = 0; c.cor = corDaClasse(c.label); c.horas = c.seg / 3600;
+    c.filhos = porHoras(c.filhos).map(a => {
+      a.id = c.id + '::' + a.label; a.nivel = 1; a.cor = c.cor; a.horas = a.seg / 3600;
+      a.filhos = porHoras(a.filhos).map(e => {
+        e.id = a.id + '::' + e.label; e.nivel = 2; e.cor = c.cor; e.horas = e.seg / 3600;
+        e.base = (diasPorEntidade.get(e.entidade) || new Set()).size || 1;
+        e.filhos = [];
+        return e;
+      });
+      return a;
+    });
+    return c;
+  });
+
+  return {
+    nos, totalHoras, base,
+    equipamentos: new Set(rows.map(r => r.Equipamento)).size,
+    dias: new Set(rows.map(r => r.DiaKey).filter(Boolean)).size,
+    registros: rows.length
+  };
+}
+
+/* ---------- Ciclo operacional ---------- */
+function casa(row, ops){ return ops.some(o => row.AtividadeNorm === o || row.AtividadeNorm.startsWith(o)); }
+
+function calcularCiclo(rows, tipoCiclo){
+  const def = CFG.ciclos[tipoCiclo];
+  if (!def) return null;
+  const total = somaHoras(rows);
+  const base = equipDias(rows);
+  const nCiclos = rows.filter(r => casa(r, [def.ancora])).length;
+
+  const medir = defs => defs.map(d => {
+    const sel = rows.filter(r => casa(r, d.ops));
+    return {nome:d.nome, seg:somaSeg(sel), horas:somaHoras(sel), ocorr:sel.length};
+  });
+  const etapas = medir(def.etapas);
+  const esperas = medir(def.esperas);
+
+  const hEtapas = etapas.reduce((a,e) => a + e.seg, 0) / 3600;
+  const hEsperas = esperas.reduce((a,e) => a + e.seg, 0) / 3600;
+  return {
+    def, etapas, esperas, nCiclos, base, total,
+    hEtapas, hEsperas, hFora: total - hEtapas - hEsperas,
+    ocorrEtapas: etapas.reduce((a,e) => a + e.ocorr, 0),
+    ocorrEsperas: esperas.reduce((a,e) => a + e.ocorr, 0)
+  };
+}
+
+function tipoCicloDoGrupo(id){
+  const g = CFG.grupos.find(x => x.id === id);
+  return g ? g.ciclo : null;
+}
+
+/* ============================================================
+   5) RENDERIZAÇÃO
+   ============================================================ */
+function renderTabs(){
+  const cont = document.getElementById('tabs');
+  const itens = [{id:'TODOS', nome:'Todos os grupos'}]
+    .concat(CFG.grupos.filter(g => state.gruposPresentes.includes(g.id)));
+  if (state.todas.some(r => r.Grupo === 'OUTROS')) itens.push({id:'OUTROS', nome:'Outros'});
+
+  cont.innerHTML = itens.map(g => {
+    const n = g.id === 'TODOS' ? state.todas.length : state.todas.filter(r => r.Grupo === g.id).length;
+    return `<button class="tab ${g.id === state.grupoAtivo ? 'active' : ''}" data-grupo="${g.id}">
+      ${U.esc(g.nome)}<span class="n">${n.toLocaleString('pt-BR')}</span></button>`;
+  }).join('');
+}
+
+function renderKpis(t, ciclo){
+  const prod = state.filtradas.filter(r => U.norm(r.Classificacao) === 'produtiva');
+  const hProd = somaHoras(prod);
+  const pctProd = t.totalHoras > 0 ? (hProd / t.totalHoras) * 100 : 0;
+  const hDia = t.base > 0 ? t.totalHoras / t.base : 0;
+
+  const cards = [
+    {cls:'',    lbl:'Tempo total apontado', val:U.n(t.totalHoras,1)+' h', hint:t.registros.toLocaleString('pt-BR')+' apontamentos'},
+    {cls:'alt', lbl:'Tempo produtivo',      val:U.n(hProd,1)+' h',        hint:U.pct(pctProd)+' do total'},
+    {cls:'info',lbl:'Equipamento-dias',     val:String(t.base),           hint:t.equipamentos+' equip. × '+t.dias+' dias ('+U.hhmm(hDia)+'/dia)'}
+  ];
+  if (ciclo && ciclo.nCiclos > 0) {
+    const porDia = ciclo.nCiclos / ciclo.base;
+    cards.push({cls:'warn', lbl:'Ciclos estimados', val:ciclo.nCiclos.toLocaleString('pt-BR'),
+      hint:U.n(porDia,1)+' ciclos por equip./dia'});
+    cards.push({cls:'dang', lbl:'Duração do ciclo', val:U.dur(ciclo.hEtapas / ciclo.nCiclos),
+      hint:'etapas produtivas do ciclo'});
+  } else {
+    cards.push({cls:'warn', lbl:'Classificações', val:String(t.nos.length), hint:'grupos de operação no período'});
+  }
+  document.getElementById('kpis').innerHTML = cards.map(c => `
+    <div class="kpi ${c.cls}">
+      <div class="lbl">${U.esc(c.lbl)}</div>
+      <div class="val">${U.esc(c.val)}</div>
+      <div class="hint">${U.esc(c.hint)}</div>
+    </div>`).join('');
+}
+
+function renderComparativo(){
+  const card = document.getElementById('cardComparativo');
+  if (state.grupoAtivo !== 'TODOS') { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+
+  const ids = CFG.grupos.filter(g => state.gruposPresentes.includes(g.id)).map(g => g.id);
+  const linhas = ids.map(id => {
+    const rows = state.filtradas.filter(r => r.Grupo === id);
+    if (!rows.length) return '';
+    const tot = somaHoras(rows), base = equipDias(rows);
+    const hProd = somaHoras(rows.filter(r => U.norm(r.Classificacao) === 'produtiva'));
+    const ciclo = calcularCiclo(rows, tipoCicloDoGrupo(id));
+    const nC = ciclo ? ciclo.nCiclos : 0;
+    return `<tr>
+      <td><span class="dot" style="background:${CFG.coresClasse.produtiva}"></span>${U.esc(nomeGrupo(id))}</td>
+      <td>${new Set(rows.map(r => r.Equipamento)).size}</td>
+      <td>${base}</td>
+      <td>${U.n(tot,1)}</td>
+      <td>${U.n(hProd,1)}</td>
+      <td>${U.pct(tot > 0 ? hProd/tot*100 : 0)}</td>
+      <td>${nC ? nC.toLocaleString('pt-BR') : '—'}</td>
+      <td>${nC ? U.n(nC/base,1) : '—'}</td>
+      <td>${nC ? U.dur(ciclo.hEtapas/nC) : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  const tot = somaHoras(state.filtradas);
+  const hProd = somaHoras(state.filtradas.filter(r => U.norm(r.Classificacao) === 'produtiva'));
+  document.getElementById('comparativoBody').innerHTML = linhas + `<tr class="total">
+    <td>TOTAL</td>
+    <td>${new Set(state.filtradas.map(r => r.Equipamento)).size}</td>
+    <td>${equipDias(state.filtradas)}</td>
+    <td>${U.n(tot,1)}</td>
+    <td>${U.n(hProd,1)}</td>
+    <td>${U.pct(tot > 0 ? hProd/tot*100 : 0)}</td>
+    <td>—</td><td>—</td><td>—</td>
+  </tr>`;
+}
+
+function renderCiclo(ciclo){
+  const card = document.getElementById('cardCiclo');
+  if (!ciclo) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+
+  const d = ciclo.def, base = ciclo.base, nC = ciclo.nCiclos, tot = ciclo.total;
+  document.getElementById('cicloTitulo').textContent = d.titulo;
+  document.getElementById('cicloDesc').textContent =
+    `${d.resumo} · ${nC.toLocaleString('pt-BR')} ciclos em ${base} equipamento-dias`;
+
+  const linha = (no, i, tipoClasse, denom) => {
+    const pctTotal = tot > 0 ? no.horas/tot*100 : 0;
+    const pctCiclo = denom > 0 ? no.horas/denom*100 : 0;
+    return `<tr class="etapa">
+      <td><span class="step ${tipoClasse}">${i}</span>${U.esc(no.nome)}</td>
+      <td>${U.n(no.horas,1)}</td>
+      <td>${U.pct(pctTotal)}</td>
+      <td>${U.hhmm(no.horas/base)}</td>
+      <td>${nC > 0 ? U.dur(no.horas/nC) : '—'}</td>
+      <td>${U.pct(pctCiclo)}</td>
+      <td>${no.ocorr.toLocaleString('pt-BR')}</td>
+    </tr>`;
+  };
+  const sub = (rot, horas, ocorr, denom) => `<tr class="sub">
+    <td>${U.esc(rot)}</td>
+    <td>${U.n(horas,1)}</td>
+    <td>${U.pct(tot > 0 ? horas/tot*100 : 0)}</td>
+    <td>${U.hhmm(horas/base)}</td>
+    <td>${nC > 0 ? U.dur(horas/nC) : '—'}</td>
+    <td>${denom > 0 ? U.pct(horas/denom*100) : '—'}</td>
+    <td>${ocorr ? ocorr.toLocaleString('pt-BR') : '—'}</td>
+  </tr>`;
+
+  let html = '';
+  ciclo.etapas.forEach((e,i) => { html += linha(e, i+1, '', ciclo.hEtapas); });
+  html += sub('CICLO PRODUTIVO (soma das etapas)', ciclo.hEtapas, ciclo.ocorrEtapas, ciclo.hEtapas);
+  ciclo.esperas.forEach((e,i) => { html += linha(e, '⏱', 'wait', ciclo.hEtapas); });
+  html += sub('ESPERAS LIGADAS AO CICLO', ciclo.hEsperas, ciclo.ocorrEsperas, ciclo.hEtapas);
+  html += `<tr class="sub dim">
+    <td>FORA DO CICLO (manutenção, refeição, falta de operador…)</td>
+    <td>${U.n(ciclo.hFora,1)}</td>
+    <td>${U.pct(tot > 0 ? ciclo.hFora/tot*100 : 0)}</td>
+    <td>${U.hhmm(ciclo.hFora/base)}</td>
+    <td>${nC > 0 ? U.dur(ciclo.hFora/nC) : '—'}</td>
+    <td>—</td><td>—</td>
+  </tr>`;
+  html += `<tr class="total">
+    <td>TOTAL APONTADO</td>
+    <td>${U.n(tot,1)}</td>
+    <td>${U.pct(tot > 0 ? 100 : 0)}</td>
+    <td>${U.hhmm(tot/base)}</td>
+    <td>${nC > 0 ? U.dur(tot/nC) : '—'}</td>
+    <td>—</td>
+    <td>${(ciclo.ocorrEtapas + ciclo.ocorrEsperas).toLocaleString('pt-BR')}+</td>
+  </tr>`;
+  document.getElementById('cicloBody').innerHTML = html;
+
+  const ancora = d.etapas.find(e => e.ops.indexOf(d.ancora) !== -1);
+  document.getElementById('cicloLegend').innerHTML =
+    `<b>Ciclos</b> são contados pelos apontamentos de <b>${U.esc(ancora ? ancora.nome : d.ancora)}</b> ` +
+    `(${nC.toLocaleString('pt-BR')} no período) — é a etapa menos fragmentada da exportação, ` +
+    `já que acontece num ponto só, enquanto o transporte é quebrado em vários registros por talhão. ` +
+    `Por isso <b>Média por ciclo</b> é uma estimativa: a exportação traz o total do dia, sem hora de ` +
+    `início e fim, então não dá para reconstruir cada ciclo individualmente. ` +
+    `<b>% do ciclo</b> usa a soma das etapas produtivas como 100%.`;
+}
+
+function linhaArvore(no, t){
+  const pct = t.totalHoras > 0 ? (no.horas / t.totalHoras) * 100 : 0;
+  const base = no.nivel === 2 ? (no.base || 1) : (t.base || 1);
+  const temFilhos = no.filhos && no.filhos.length > 0;
+  const aberto = state.expandidos.has(no.id);
+  const toggle = temFilhos
+    ? `<span class="toggle" data-id="${U.esc(no.id)}">${aberto ? '−' : '+'}</span>`
+    : `<span class="toggle leaf">·</span>`;
+  const dot = no.nivel === 0 ? `<span class="dot" style="background:${no.cor}"></span>` : '';
+  return `<tr class="lvl-${no.nivel}">
+    <td>${toggle}${dot}${U.esc(no.label)}</td>
+    <td>${U.n(no.horas,1)}</td>
+    <td>${U.pct(pct)}</td>
+    <td>${U.hhmm(no.horas / base)}</td>
+    <td>${no.ocorr.toLocaleString('pt-BR')}</td>
+  </tr>`;
+}
+
+function renderArvore(t){
+  const out = [];
+  (function percorrer(nos){
+    nos.forEach(no => {
+      out.push(linhaArvore(no, t));
+      if (state.expandidos.has(no.id) && no.filhos.length) percorrer(no.filhos);
+    });
+  })(t.nos);
+
+  out.push(`<tr class="total">
+    <td>TOTAL GERAL</td>
+    <td>${U.n(t.totalHoras,1)}</td>
+    <td>${U.pct(t.totalHoras > 0 ? 100 : 0)}</td>
+    <td>${U.hhmm(t.base > 0 ? t.totalHoras/t.base : 0)}</td>
+    <td>${t.registros.toLocaleString('pt-BR')}</td>
+  </tr>`);
+  document.getElementById('treeBody').innerHTML = out.join('');
+  document.getElementById('tableDesc').textContent =
+    `${nomeGrupo(state.grupoAtivo)} · ${t.equipamentos} equipamento(s) · ${t.dias} dia(s) · base de ${t.base} equipamento-dias`;
+}
+
+function render(){
+  aplicarFiltros();
+  const campo = document.getElementById('fNivel3').value;
+  const t = montarArvore(state.filtradas, campo);
+  state.arvore = t;
+
+  if (!state.filtradas.length) {
+    document.getElementById('treeBody').innerHTML =
+      `<tr><td colspan="5" style="text-align:center;padding:26px;color:#5c6b63">
+        Nenhum apontamento para os filtros selecionados.</td></tr>`;
+    document.getElementById('kpis').innerHTML = '';
+    document.getElementById('tableDesc').textContent = '';
+    document.getElementById('cardCiclo').classList.add('hidden');
+    document.getElementById('cardComparativo').classList.add('hidden');
+    return;
+  }
+  const ciclo = state.grupoAtivo === 'TODOS' ? null
+    : calcularCiclo(state.filtradas, tipoCicloDoGrupo(state.grupoAtivo));
+
+  if (state.expandidos.size === 0 && t.nos.length) state.expandidos.add(t.nos[0].id);
+
+  renderKpis(t, ciclo);
+  renderComparativo();
+  renderCiclo(ciclo);
+  renderArvore(t);
+}
+
+/* ============================================================
+   6) EVENTOS
+   ============================================================ */
+function preencherFiltros(){
+  const set = (id, valores) => {
+    const el = document.getElementById(id);
+    const atual = el.value, rotulo = el.options[0].textContent;
+    el.innerHTML = `<option value="">${rotulo}</option>` +
+      valores.map(v => `<option value="${U.esc(v)}">${U.esc(v)}</option>`).join('');
+    el.value = valores.indexOf(atual) !== -1 ? atual : '';
+  };
+  set('fUnidade', U.uniq(state.todas.map(r => r.Unidade)));
+  set('fFazenda', U.uniq(state.todas.map(r => r.Fazenda)));
+  set('fEquip',   U.uniq(state.todas.map(r => r.Equipamento)));
+  const dias = U.uniq(state.todas.map(r => r.DiaKey));
+  if (dias.length) {
+    const a = document.getElementById('fData1'), b = document.getElementById('fData2');
+    a.min = b.min = dias[0]; a.max = b.max = dias[dias.length - 1];
+  }
+}
+function mostrarErro(m){ const b = document.getElementById('errorBanner'); b.textContent = m; b.classList.remove('hidden'); }
+function mostrarAviso(m){
+  const b = document.getElementById('warnBanner');
+  if (!m) { b.classList.add('hidden'); return; }
+  b.innerHTML = m; b.classList.remove('hidden');
+}
+
+document.getElementById('fileInput').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('errorBanner').classList.add('hidden');
+  document.getElementById('warnBanner').classList.add('hidden');
+  document.getElementById('spinner').classList.remove('hidden');
+  document.getElementById('fileStatus').lastChild.textContent = ' Processando...';
+  try {
+    const {linhas, nomeInterno} = await lerArquivo(file);
+    state.todas = linhas;
+    state.arquivo = file.name;
+    state.expandidos = new Set();
+    state.gruposPresentes = CFG.grupos.filter(g => linhas.some(r => r.Grupo === g.id)).map(g => g.id);
+    state.grupoAtivo = 'TODOS';
+
+    const semGrupo = linhas.filter(r => r.Grupo === 'OUTROS');
+    const semData = linhas.filter(r => !r.DiaKey).length;
+    const avisos = [];
+    if (semGrupo.length) {
+      avisos.push(`<b>${semGrupo.length}</b> linha(s) com GRUPO EQUIPAMENTO fora dos 3 grupos ` +
+        `(${U.uniq(semGrupo.map(r => r.GrupoRaw)).join(', ')}) — aparecem na aba "Outros".`);
+    }
+    if (semData) {
+      avisos.push(`<b>${semData}</b> linha(s) sem data válida: entram nas horas e no %, ` +
+        `mas não contam para a base de equipamento-dias.`);
+    }
+    mostrarAviso(avisos.join('<br>'));
+
+    document.getElementById('emptyState').classList.add('hidden');
+    document.getElementById('content').classList.remove('hidden');
+    document.getElementById('btnPrint').disabled = false;
+    document.getElementById('btnCsv').disabled = false;
+
+    renderTabs();
+    preencherFiltros();
+    render();
+
+    const dias = U.uniq(linhas.map(r => r.DiaKey));
+    document.getElementById('foot').textContent =
+      `${nomeInterno} · ${linhas.length.toLocaleString('pt-BR')} linhas · ` +
+      `${new Set(linhas.map(r => r.Equipamento)).size} equipamentos · ` +
+      (dias.length ? `${U.diaBR(dias[0])} a ${U.diaBR(dias[dias.length-1])} · ` : '') +
+      `gerado em ${new Date().toLocaleString('pt-BR')}`;
+  } catch (err) {
+    console.error(err);
+    mostrarErro(err.message || 'Falha ao importar o arquivo.');
+  } finally {
+    document.getElementById('spinner').classList.add('hidden');
+    document.getElementById('fileStatus').lastChild.textContent =
+      ' ' + (state.todas.length ? state.arquivo : 'Nenhum arquivo importado.');
+    e.target.value = '';
+  }
+});
+
+document.getElementById('tabs').addEventListener('click', e => {
+  const b = e.target.closest('.tab');
+  if (!b) return;
+  state.grupoAtivo = b.getAttribute('data-grupo');
+  state.expandidos = new Set();
+  renderTabs();
+  render();
+});
+
+document.getElementById('treeBody').addEventListener('click', e => {
+  const t = e.target.closest('.toggle');
+  if (!t || t.classList.contains('leaf')) return;
+  const id = t.getAttribute('data-id');
+  if (state.expandidos.has(id)) state.expandidos.delete(id); else state.expandidos.add(id);
+  renderArvore(state.arvore);
+});
+
+['fData1','fData2','fUnidade','fFazenda','fEquip','fNivel3'].forEach(id => {
+  document.getElementById(id).addEventListener('change', render);
+});
+document.getElementById('btnLimpar').addEventListener('click', () => {
+  ['fData1','fData2','fUnidade','fFazenda','fEquip'].forEach(id => { document.getElementById(id).value = ''; });
+  render();
+});
+
+function idsComFilhos(nos, acc = []){
+  nos.forEach(n => { if (n.filhos.length) { acc.push(n.id); idsComFilhos(n.filhos, acc); } });
+  return acc;
+}
+document.getElementById('btnExpandir').addEventListener('click', () => {
+  if (!state.arvore) return;
+  state.expandidos = new Set(idsComFilhos(state.arvore.nos));
+  renderArvore(state.arvore);
+});
+document.getElementById('btnRecolher').addEventListener('click', () => {
+  if (!state.arvore) return;
+  state.expandidos = new Set();
+  renderArvore(state.arvore);
+});
+document.getElementById('btnPrint').addEventListener('click', () => window.print());
+
+document.getElementById('btnCsv').addEventListener('click', () => {
+  const t = state.arvore;
+  if (!t) return;
+  const nivel3 = document.getElementById('fNivel3').value;
+  const L = [['Grupo','Nivel','Classificacao','Atividade',nivel3,'Horas','%','HH:MM','Ocorrencias']];
+  const g = nomeGrupo(state.grupoAtivo);
+  const p = h => U.n(t.totalHoras > 0 ? h/t.totalHoras*100 : 0, 1);
+  t.nos.forEach(c => {
+    L.push([g,'Classificacao',c.label,'','',U.n(c.horas,2),p(c.horas),U.hhmm(c.horas/t.base),c.ocorr]);
+    c.filhos.forEach(a => {
+      L.push([g,'Atividade',c.label,a.label,'',U.n(a.horas,2),p(a.horas),U.hhmm(a.horas/t.base),a.ocorr]);
+      a.filhos.forEach(e => {
+        L.push([g,nivel3,c.label,a.label,e.label,U.n(e.horas,2),p(e.horas),U.hhmm(e.horas/(e.base||1)),e.ocorr]);
+      });
+    });
+  });
+  const csv = '﻿' + L.map(l => l.map(v => `"${String(v).replace(/"/g,'""')}"`).join(';')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'tempos-' + U.norm(g).replace(/\s+/g,'-') + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
