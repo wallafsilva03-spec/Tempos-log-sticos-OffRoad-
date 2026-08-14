@@ -2129,7 +2129,6 @@ function dadosDoCiclo(painelId){
   if (!ciclo || !ciclo.nCiclos) return null;
   const nC = ciclo.nCiclos;
   const desc = ciclo.etapas.find(e => U.norm(e.nome).indexOf('descarregamento') === 0);
-  const carregado = ciclo.etapas.find(e => U.norm(e.nome) === 'transporte carregado');
   return {
     /* Para dimensionar frota o que importa é o ciclo que o caminhão
        realmente gasta para voltar ao carregamento: etapas + esperas. */
@@ -2137,8 +2136,9 @@ function dadosDoCiclo(painelId){
     cicloProdutivoH: ciclo.hEtapas / nC,
     descargaH: desc ? desc.horas / nC : 0,
     kmCiclo: ciclo.kmEtapas / nC,
-    // Raio = trecho de ida (transporte carregado), não a volta inteira
-    raioKm: carregado ? carregado.km / nC : ciclo.kmEtapas / nC / 2,
+    /* O km do ciclo é ida e volta (carregado + vazio), então o raio -
+       a distância do carregamento até a aplicação - é a metade dele. */
+    raioKm: ciclo.kmEtapas / nC / 2,
     ciclosDia: nC / ciclo.base,
     nCiclos: nC
   };

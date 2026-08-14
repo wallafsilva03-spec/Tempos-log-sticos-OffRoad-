@@ -69,8 +69,9 @@ Mantém o racional do painel original:
 3. frota necessária = consumo dos tratores ÷ entrega por caminhão.
 
 O ciclo médio, o tempo de descarga, a distância e os ciclos/dia vêm do arquivo
-importado, e o raio médio já entra preenchido com a distância real do transporte
-carregado (dá para sobrescrever). A **capacidade do caminhão é um campo
+importado. O raio médio já entra preenchido com **metade da distância do ciclo**
+(o km do ciclo é ida carregado + volta vazio, então a distância até a aplicação é
+a metade) e pode ser sobrescrito à mão. A **capacidade do caminhão é um campo
 editável**, porque essa exportação não traz a capacidade volumétrica.
 
 ## CEMMA · COPLASA — Fertirrigação e OffRoad (`cemma-coplasa-ferti.html`)
