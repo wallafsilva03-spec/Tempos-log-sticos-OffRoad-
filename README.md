@@ -101,6 +101,22 @@ operacional**:
 O ciclo fecha o dia inteiro: `etapas do ciclo + esperas do ciclo + fora do ciclo
 = 24:00 por equipamento-dia`.
 
+### Tempos por evento
+
+Cada linha da exportação é um apontamento — um evento. Por isso a tabela do
+ciclo mostra a **duração medida** de cada evento (mediana, P90 e máximo), e não
+a média do período dividida pelo número de ciclos:
+
+| Coluna | O que é |
+| --- | --- |
+| Eventos | Quantidade de apontamentos da etapa |
+| Ev./ciclo | Apontamentos daquela etapa por ciclo — perto de 1,0 o evento é a etapa inteira; acima disso a etapa vem fragmentada por talhão |
+| Mediana / P90 / Máx | Duração dos apontamentos individuais |
+| Ciclo Típico | Soma das medianas das etapas |
+
+`Ciclo Típico` **não é** a mediana dos ciclos: fechar cada ciclo exigiria hora de
+início e fim, que a exportação não traz (ver abaixo).
+
 **Sobre a contagem de ciclos:** a exportação traz o total do dia por
 equipamento/talhão, sem hora de início e fim, então não dá para reconstruir cada
 ciclo individualmente. Os ciclos são contados pelos apontamentos da etapa-âncora
