@@ -870,7 +870,8 @@ table.tt tr.dim { color: var(--text-muted); }
             <thead><tr>
               <th>Etapa do ciclo</th><th>Horas</th><th>% do total</th>
               <th>HH:MM / dia</th><th>Eventos</th><th>Ev./ciclo</th>
-              <th>Mediana</th><th>P90</th><th>Máx</th><th>Km / ciclo</th><th>% do ciclo</th>
+              <th>Tempo de Ciclo</th><th>P25</th><th>P90</th><th>Máx</th>
+              <th>Km / ciclo</th><th>% do ciclo</th>
             </tr></thead>
             <tbody id="ciclo-fertirrigacao"></tbody>
           </table>
@@ -927,7 +928,8 @@ table.tt tr.dim { color: var(--text-muted); }
             <thead><tr>
               <th>Etapa do ciclo</th><th>Horas</th><th>% do total</th>
               <th>HH:MM / dia</th><th>Eventos</th><th>Ev./ciclo</th>
-              <th>Mediana</th><th>P90</th><th>Máx</th><th>Km / ciclo</th><th>% do ciclo</th>
+              <th>Tempo de Ciclo</th><th>P25</th><th>P90</th><th>Máx</th>
+              <th>Km / ciclo</th><th>% do ciclo</th>
             </tr></thead>
             <tbody id="ciclo-plataforma"></tbody>
           </table>
@@ -984,7 +986,8 @@ table.tt tr.dim { color: var(--text-muted); }
             <thead><tr>
               <th>Etapa do ciclo</th><th>Horas</th><th>% do total</th>
               <th>HH:MM / dia</th><th>Eventos</th><th>Ev./ciclo</th>
-              <th>Mediana</th><th>P90</th><th>Máx</th><th>Km / ciclo</th><th>% do ciclo</th>
+              <th>Tempo de Ciclo</th><th>P25</th><th>P90</th><th>Máx</th>
+              <th>Km / ciclo</th><th>% do ciclo</th>
             </tr></thead>
             <tbody id="ciclo-offroad"></tbody>
           </table>
@@ -1552,6 +1555,8 @@ function estatEventos(rows){
   const h = rows.map(r => r.Seg / 3600).sort((a,b) => a - b);
   return {
     n: h.length,
+    min: h.length ? h[0] : 0,
+    p25: percentil(h, 0.25),
     mediana: percentil(h, 0.5),
     p90: percentil(h, 0.9),
     max: h.length ? h[h.length - 1] : 0
@@ -1649,13 +1654,22 @@ function calcularCiclo(rows, tipoCiclo){
   const def = CFG.ciclos[tipoCiclo];
   if (!def || !rows.length) return null;
   const ehDistancia = d => (def.distancia || []).some(op => d.ops.indexOf(op) !== -1);
+  const nCiclos = rows.filter(r => casa(r, [def.ancora])).length;
   const medir = defs => defs.map(d => {
     const sel = rows.filter(r => casa(r, d.ops));
     const conta = ehDistancia(d);
     const ev = estatEventos(sel);
+    const evPorCiclo = nCiclos > 0 ? sel.length / nCiclos : 0;
     return {nome:d.nome, seg:somaSeg(sel), horas:somaHoras(sel),
             km: conta ? somaKm(sel) : 0, contaKm: conta, ocorr:sel.length,
-            mediana: ev.mediana, p90: ev.p90, max: ev.max};
+            evPorCiclo: evPorCiclo,
+            /* Tempo que a etapa ocupa em um ciclo, na base de referência:
+               P25 da duração dos eventos (o quarto mais rápido, o tempo
+               que a operação realmente leva quando não trava) multiplicado
+               pelos eventos por ciclo, porque as etapas de transporte vêm
+               fragmentadas por talhão e um evento é só um pedaço delas. */
+            tempoCiclo: ev.p25 * evPorCiclo,
+            p25: ev.p25, p90: ev.p90, max: ev.max};
   });
   const etapas = medir(def.etapas);
   const esperas = medir(def.esperas);
@@ -1663,19 +1677,19 @@ function calcularCiclo(rows, tipoCiclo){
   const hEsperas = esperas.reduce((a,e) => a + e.seg, 0) / 3600;
   const kmEtapas = etapas.reduce((a,e) => a + e.km, 0);
   const hDistancia = etapas.reduce((a,e) => a + (e.contaKm ? e.horas : 0), 0);
-  /* "Ciclo típico" é a soma das medianas de cada etapa. Não é a mediana
-     dos ciclos - essa exigiria hora de início e fim para fechar cada ciclo
-     individualmente, o que a exportação não traz. */
-  const medianaEtapas = etapas.reduce((a,e) => a + e.mediana, 0);
-  const medianaEsperas = esperas.reduce((a,e) => a + e.mediana, 0);
+  /* Ciclo de referência: soma do tempo de cada etapa. Não é a duração de
+     um ciclo real - fechar cada ciclo exigiria hora de início e fim, que a
+     exportação não traz. */
+  const tempoCicloEtapas = etapas.reduce((a,e) => a + e.tempoCiclo, 0);
+  const tempoCicloEsperas = esperas.reduce((a,e) => a + e.tempoCiclo, 0);
   const total = somaHoras(rows);
   return {
     def: def, etapas: etapas, esperas: esperas,
-    nCiclos: rows.filter(r => casa(r, [def.ancora])).length,
+    nCiclos: nCiclos,
     base: equipDias(rows), total: total,
     hEtapas: hEtapas, hEsperas: hEsperas, hFora: total - hEtapas - hEsperas,
     kmEtapas: kmEtapas, hDistancia: hDistancia,
-    medianaEtapas: medianaEtapas, medianaEsperas: medianaEsperas,
+    tempoCicloEtapas: tempoCicloEtapas, tempoCicloEsperas: tempoCicloEsperas,
     /* A distância total do grupo é a mesma das operações acima: fora
        delas o km não é considerado percurso. */
     kmTotal: kmEtapas,
@@ -1701,11 +1715,11 @@ function renderKpis(painel, t, ciclo){
   if (ciclo && ciclo.nCiclos > 0) {
     /* Tudo por evento: a mediana da duração dos apontamentos, não a média
        do período dividida pelo número de ciclos. */
-    html += kpi('Ciclo Típico', U.dur(ciclo.medianaEtapas));
+    html += kpi('Ciclo de Referência', U.dur(ciclo.tempoCicloEtapas));
     ciclo.etapas.forEach(e => {
-      if (e.horas > 0) html += kpi(e.nome + ' (mediana)', U.dur(e.mediana));
+      if (e.horas > 0) html += kpi(e.nome, U.dur(e.tempoCiclo));
     });
-    html += kpi('Esperas do Ciclo (mediana)', U.dur(ciclo.medianaEsperas));
+    html += kpi('Esperas do Ciclo', U.dur(ciclo.tempoCicloEsperas));
     html += kpi('% Produtiva', U.pct(pctProd));
     /* Distância: a exportação não tem hodômetro, então o km sai de
        velocidade × tempo em cada apontamento das etapas do ciclo. */
@@ -1776,7 +1790,7 @@ function renderCiclo(painel, ciclo){
   const corpo = document.getElementById('ciclo-' + painel.id);
   if (!corpo) return;
   if (!ciclo) {
-    corpo.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:22px;color:#667165">' +
+    corpo.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:22px;color:#667165">' +
       'Sem apontamentos para os filtros selecionados.</td></tr>';
     document.getElementById('ciclodesc-' + painel.id).textContent = '';
     document.getElementById('ciclonota-' + painel.id).innerHTML = '';
@@ -1793,7 +1807,8 @@ function renderCiclo(painel, ciclo){
     '<td>' + U.hhmm(no.horas/base) + '</td>' +
     '<td>' + no.ocorr.toLocaleString('pt-BR') + '</td>' +
     '<td>' + (nC > 0 ? U.n(no.ocorr/nC,1) : '—') + '</td>' +
-    '<td>' + U.dur(no.mediana) + '</td>' +
+    '<td>' + U.dur(no.tempoCiclo) + '</td>' +
+    '<td>' + U.dur(no.p25) + '</td>' +
     '<td>' + U.dur(no.p90) + '</td>' +
     '<td>' + U.dur(no.max) + '</td>' +
     '<td>' + (nC > 0 && no.km > 0 ? U.n(no.km/nC,1) : '—') + '</td>' +
@@ -1807,32 +1822,33 @@ function renderCiclo(painel, ciclo){
     '<td>' + (ocorr === null ? '—' : ocorr.toLocaleString('pt-BR')) + '</td>' +
     '<td>' + (ocorr !== null && nC > 0 ? U.n(ocorr/nC,1) : '—') + '</td>' +
     '<td>' + (mediana ? U.dur(mediana) : '—') + '</td>' +
-    '<td>—</td><td>—</td>' +
+    '<td>—</td><td>—</td><td>—</td>' +
     '<td>' + (nC > 0 && km ? U.n(km/nC,1) : '—') + '</td>' +
     '<td>' + (denom > 0 ? U.pct(horas/denom*100) : '—') + '</td></tr>';
 
   let html = '';
   ciclo.etapas.forEach((e,i) => { html += linha(e, String(i+1), '', ciclo.hEtapas); });
-  html += sub('CICLO PRODUTIVO (soma das etapas)', ciclo.hEtapas, ciclo.ocorrEtapas, ciclo.hEtapas, '', ciclo.kmEtapas, ciclo.medianaEtapas);
+  html += sub('CICLO PRODUTIVO (soma das etapas)', ciclo.hEtapas, ciclo.ocorrEtapas, ciclo.hEtapas, '', ciclo.kmEtapas, ciclo.tempoCicloEtapas);
   ciclo.esperas.forEach(e => { html += linha(e, '⏱', 'wait', ciclo.hEtapas); });
-  html += sub('ESPERAS LIGADAS AO CICLO', ciclo.hEsperas, ciclo.ocorrEsperas, ciclo.hEtapas, '', 0, ciclo.medianaEsperas);
+  html += sub('ESPERAS LIGADAS AO CICLO', ciclo.hEsperas, ciclo.ocorrEsperas, ciclo.hEtapas, '', 0, ciclo.tempoCicloEsperas);
   html += sub('FORA DO CICLO (manutenção, refeição, falta de operador…)', ciclo.hFora, null, 0, ' dim');
   html += '<tr class="tot"><td>TOTAL APONTADO</td>' +
     '<td>' + U.n(tot,1) + '</td><td>' + U.pct(tot > 0 ? 100 : 0) + '</td>' +
     '<td>' + U.hhmm(tot/base) + '</td>' +
     '<td>' + (ciclo.ocorrEtapas + ciclo.ocorrEsperas).toLocaleString('pt-BR') + '+</td>' +
-    '<td>—</td><td>—</td><td>—</td><td>—</td>' +
+    '<td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>' +
     '<td>' + (nC > 0 ? U.n(ciclo.kmTotal/nC,1) : '—') + '</td><td>—</td></tr>';
   corpo.innerHTML = html;
 
   const ancora = d.etapas.find(e => e.ops.indexOf(d.ancora) !== -1);
   document.getElementById('ciclonota-' + painel.id).innerHTML =
-    '<b>Mediana</b>, <b>P90</b> e <b>Máx</b> são a duração dos apontamentos individuais — cada linha da ' +
-    'exportação é um evento, então esses números são medidos, não médias. <b>Ev./ciclo</b> mostra quantos ' +
-    'apontamentos daquela etapa cabem em um ciclo: perto de 1,0 o evento é a etapa inteira; acima disso a ' +
-    'etapa vem fragmentada por talhão e a mediana é a de um pedaço, não da etapa toda. ' +
-    '<b>Ciclo Típico</b> é a soma das medianas das etapas — não é a mediana dos ciclos, que exigiria hora ' +
-    'de início e fim para fechar cada ciclo (a exportação traz só o total do dia, sem ordem cronológica). ' +
+    '<b>Tempo de ciclo</b> é o tempo de referência da etapa: o <b>P25</b> da duração dos eventos — o quarto ' +
+    'mais rápido, o tempo que a operação leva quando não trava — multiplicado pelos <b>Ev./ciclo</b>. Essa ' +
+    'multiplicação é necessária porque as etapas de transporte vêm fragmentadas por talhão: quando Ev./ciclo ' +
+    'fica perto de 1,0 o apontamento é a etapa inteira; acima disso ele é só um pedaço dela. ' +
+    '<b>P25</b>, <b>P90</b> e <b>Máx</b> são a duração dos apontamentos individuais, medida e não calculada. ' +
+    '<b>Ciclo de Referência</b> é a soma do tempo das etapas — não é a duração de um ciclo real, que exigiria ' +
+    'hora de início e fim para ser fechado (a exportação traz só o total do dia, sem ordem cronológica). ' +
     '<b>Ciclos</b> são contados pelos apontamentos de <b>' + U.esc(ancora ? ancora.nome : d.ancora) + '</b> (' +
     nC.toLocaleString('pt-BR') + ' no período). <b>% do ciclo</b> usa a soma das etapas ' +
     'produtivas como 100%. A <b>distância</b> considera apenas ' +
