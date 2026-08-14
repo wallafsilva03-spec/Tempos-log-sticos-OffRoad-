@@ -812,7 +812,7 @@ table.tt tr.dim { color: var(--text-muted); }
           <table class="tt">
             <thead><tr>
               <th>Grupo</th><th>Equip.</th><th>Equip-dias</th><th>Horas</th>
-              <th>Produtiva</th><th>% Produtiva</th><th>Ciclos</th><th>Ciclos/dia</th><th>Ciclo Médio</th><th>Km/ciclo</th>
+              <th>Produtiva</th><th>% Produtiva</th><th>Ciclos</th><th>Ciclos/dia</th><th>Ciclo Médio</th>
             </tr></thead>
             <tbody id="comparativoBody"></tbody>
           </table>
@@ -870,8 +870,7 @@ table.tt tr.dim { color: var(--text-muted); }
             <thead><tr>
               <th>Etapa do ciclo</th><th>Horas</th><th>% do total</th>
               <th>HH:MM / dia</th><th>Eventos</th><th>Ev./ciclo</th>
-              <th>Tempo de Ciclo</th><th>P25</th><th>P90</th><th>Máx</th>
-              <th>Km / ciclo</th><th>% do ciclo</th>
+              <th>Tempo de Ciclo</th><th>P25</th><th>P90</th><th>Máx</th><th>% do ciclo</th>
             </tr></thead>
             <tbody id="ciclo-fertirrigacao"></tbody>
           </table>
@@ -928,8 +927,7 @@ table.tt tr.dim { color: var(--text-muted); }
             <thead><tr>
               <th>Etapa do ciclo</th><th>Horas</th><th>% do total</th>
               <th>HH:MM / dia</th><th>Eventos</th><th>Ev./ciclo</th>
-              <th>Tempo de Ciclo</th><th>P25</th><th>P90</th><th>Máx</th>
-              <th>Km / ciclo</th><th>% do ciclo</th>
+              <th>Tempo de Ciclo</th><th>P25</th><th>P90</th><th>Máx</th><th>% do ciclo</th>
             </tr></thead>
             <tbody id="ciclo-plataforma"></tbody>
           </table>
@@ -986,8 +984,7 @@ table.tt tr.dim { color: var(--text-muted); }
             <thead><tr>
               <th>Etapa do ciclo</th><th>Horas</th><th>% do total</th>
               <th>HH:MM / dia</th><th>Eventos</th><th>Ev./ciclo</th>
-              <th>Tempo de Ciclo</th><th>P25</th><th>P90</th><th>Máx</th>
-              <th>Km / ciclo</th><th>% do ciclo</th>
+              <th>Tempo de Ciclo</th><th>P25</th><th>P90</th><th>Máx</th><th>% do ciclo</th>
             </tr></thead>
             <tbody id="ciclo-offroad"></tbody>
           </table>
@@ -1088,7 +1085,6 @@ table.tt tr.dim { color: var(--text-muted); }
                 <div class="real-data-item"><span>Ciclo Médio Caminhão:</span><strong id="calcRealCicloCam">-</strong></div>
                 <div class="real-data-item"><span>Ciclo Médio Offroad:</span><strong id="calcRealCicloOff">-</strong></div>
                 <div class="real-data-item"><span>Tempo de Descarga (Médio):</span><strong id="calcRealDescarga">-</strong></div>
-                <div class="real-data-item"><span>Distância por Ciclo:</span><strong id="calcRealDistancia">-</strong></div>
                 <div class="real-data-item"><span>Ciclos por Equip./Dia:</span><strong id="calcRealCiclosDia">-</strong></div>
               </div>
             </div>
@@ -1245,6 +1241,9 @@ const CFG = {
       titulo:'Ciclo do caminhão',
       resumo:'Carregamento → Transporte Carregado → Descarregamento → Transporte Vazio',
       ancora:'carregamento',
+      /* No caminhão o tempo da etapa no ciclo é a média: total do período
+         dividido pelo número de ciclos. */
+      baseTempo:'media',
       /* Só estas operações contam para distância: são os trechos em que o
          caminhão efetivamente roda. Carregamento, descarregamento e espera
          ficam de fora, mesmo quando o GPS registra alguma velocidade. */
@@ -1267,6 +1266,9 @@ const CFG = {
       titulo:'Ciclo do offroad',
       resumo:'Abastecimento → Aplicação → Deslocamento TPL',
       ancora:'abastecimento insumos',
+      /* No offroad o tempo da etapa é o P25 da duração dos eventos - o
+         quarto mais rápido, o tempo que a operação leva quando não trava. */
+      baseTempo:'p25',
       /* No offroad a distância é só o deslocamento: a aplicação acontece
          dentro do talhão e não é trecho percorrido. */
       distancia:['deslocamento tpl'],
@@ -1663,12 +1665,14 @@ function calcularCiclo(rows, tipoCiclo){
     return {nome:d.nome, seg:somaSeg(sel), horas:somaHoras(sel),
             km: conta ? somaKm(sel) : 0, contaKm: conta, ocorr:sel.length,
             evPorCiclo: evPorCiclo,
-            /* Tempo que a etapa ocupa em um ciclo, na base de referência:
-               P25 da duração dos eventos (o quarto mais rápido, o tempo
-               que a operação realmente leva quando não trava) multiplicado
-               pelos eventos por ciclo, porque as etapas de transporte vêm
-               fragmentadas por talhão e um evento é só um pedaço delas. */
-            tempoCiclo: ev.p25 * evPorCiclo,
+            /* Tempo que a etapa ocupa em um ciclo. No caminhão é a média
+               (total do período ÷ nº de ciclos). No offroad é o P25 da
+               duração dos eventos multiplicado pelos eventos por ciclo -
+               a multiplicação é necessária porque as etapas de transporte
+               vêm fragmentadas por talhão e um evento é só um pedaço. */
+            tempoCiclo: def.baseTempo === 'p25'
+              ? ev.p25 * evPorCiclo
+              : (nCiclos > 0 ? somaHoras(sel) / nCiclos : 0),
             p25: ev.p25, p90: ev.p90, max: ev.max};
   });
   const etapas = medir(def.etapas);
@@ -1715,17 +1719,17 @@ function renderKpis(painel, t, ciclo){
   if (ciclo && ciclo.nCiclos > 0) {
     /* Tudo por evento: a mediana da duração dos apontamentos, não a média
        do período dividida pelo número de ciclos. */
-    html += kpi('Ciclo de Referência', U.dur(ciclo.tempoCicloEtapas));
+    const porMedia = ciclo.def.baseTempo !== 'p25';
+    html += kpi(porMedia ? 'Ciclo Médio' : 'Ciclo de Referência', U.dur(ciclo.tempoCicloEtapas));
     ciclo.etapas.forEach(e => {
-      if (e.horas > 0) html += kpi(e.nome, U.dur(e.tempoCiclo));
+      if (e.horas > 0) html += kpi((porMedia ? 'Tempo Médio ' : '') + e.nome, U.dur(e.tempoCiclo));
     });
     html += kpi('Esperas do Ciclo', U.dur(ciclo.tempoCicloEsperas));
     html += kpi('% Produtiva', U.pct(pctProd));
     /* Distância: a exportação não tem hodômetro, então o km sai de
-       velocidade × tempo em cada apontamento das etapas do ciclo. */
-    html += kpi('Distância por Ciclo', U.n(ciclo.kmEtapas / ciclo.nCiclos, 1) + ' km');
-    /* Ida e volta estão dentro do mesmo ciclo, então o raio - a distância
-       do ponto de carga até a frente de aplicação - é a metade. */
+       velocidade × tempo em cada apontamento das etapas do ciclo. Ida e
+       volta estão dentro do mesmo ciclo, então o raio - a distância do
+       ponto de carga até a frente de aplicação - é a metade. */
     html += kpi('Raio Médio', U.n(ciclo.kmEtapas / ciclo.nCiclos / 2, 1) + ' km');
     html += kpi('Velocidade Média',
       U.n(ciclo.hDistancia > 0 ? ciclo.kmEtapas / ciclo.hDistancia : 0, 1) + ' km/h');
@@ -1769,8 +1773,7 @@ function renderComparativo(){
       '<td>' + U.pct(tot > 0 ? hProd/tot*100 : 0) + '</td>' +
       '<td>' + (nC ? nC.toLocaleString('pt-BR') : '—') + '</td>' +
       '<td>' + (nC ? U.n(nC/base,1) : '—') + '</td>' +
-      '<td>' + (nC ? U.dur(ciclo.hEtapas/nC) : '—') + '</td>' +
-      '<td>' + (nC ? U.n(ciclo.kmEtapas/nC,1) : '—') + '</td></tr>';
+      '<td>' + (nC ? U.dur(ciclo.hEtapas/nC) : '—') + '</td></tr>';
   });
 
   const todas = state.todas.filter(noPeriodo);
@@ -1782,7 +1785,7 @@ function renderComparativo(){
     '<td>' + U.n(tot,1) + '</td>' +
     '<td>' + U.n(hProd,1) + '</td>' +
     '<td>' + U.pct(tot > 0 ? hProd/tot*100 : 0) + '</td>' +
-    '<td>—</td><td>—</td><td>—</td><td>—</td></tr>';
+    '<td>—</td><td>—</td><td>—</td></tr>';
   document.getElementById('comparativoBody').innerHTML = html;
 }
 
@@ -1790,7 +1793,7 @@ function renderCiclo(painel, ciclo){
   const corpo = document.getElementById('ciclo-' + painel.id);
   if (!corpo) return;
   if (!ciclo) {
-    corpo.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:22px;color:#667165">' +
+    corpo.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:22px;color:#667165">' +
       'Sem apontamentos para os filtros selecionados.</td></tr>';
     document.getElementById('ciclodesc-' + painel.id).textContent = '';
     document.getElementById('ciclonota-' + painel.id).innerHTML = '';
@@ -1811,7 +1814,6 @@ function renderCiclo(painel, ciclo){
     '<td>' + U.dur(no.p25) + '</td>' +
     '<td>' + U.dur(no.p90) + '</td>' +
     '<td>' + U.dur(no.max) + '</td>' +
-    '<td>' + (nC > 0 && no.km > 0 ? U.n(no.km/nC,1) : '—') + '</td>' +
     '<td>' + U.pct(denom > 0 ? no.horas/denom*100 : 0) + '</td></tr>';
 
   const sub = (rot, horas, ocorr, denom, extra, km, mediana) =>
@@ -1823,7 +1825,6 @@ function renderCiclo(painel, ciclo){
     '<td>' + (ocorr !== null && nC > 0 ? U.n(ocorr/nC,1) : '—') + '</td>' +
     '<td>' + (mediana ? U.dur(mediana) : '—') + '</td>' +
     '<td>—</td><td>—</td><td>—</td>' +
-    '<td>' + (nC > 0 && km ? U.n(km/nC,1) : '—') + '</td>' +
     '<td>' + (denom > 0 ? U.pct(horas/denom*100) : '—') + '</td></tr>';
 
   let html = '';
@@ -1836,25 +1837,30 @@ function renderCiclo(painel, ciclo){
     '<td>' + U.n(tot,1) + '</td><td>' + U.pct(tot > 0 ? 100 : 0) + '</td>' +
     '<td>' + U.hhmm(tot/base) + '</td>' +
     '<td>' + (ciclo.ocorrEtapas + ciclo.ocorrEsperas).toLocaleString('pt-BR') + '+</td>' +
-    '<td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>' +
-    '<td>' + (nC > 0 ? U.n(ciclo.kmTotal/nC,1) : '—') + '</td><td>—</td></tr>';
+    '<td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>';
   corpo.innerHTML = html;
 
   const ancora = d.etapas.find(e => e.ops.indexOf(d.ancora) !== -1);
+  const porMedia = d.baseTempo !== 'p25';
   document.getElementById('ciclonota-' + painel.id).innerHTML =
-    '<b>Tempo de ciclo</b> é o tempo de referência da etapa: o <b>P25</b> da duração dos eventos — o quarto ' +
-    'mais rápido, o tempo que a operação leva quando não trava — multiplicado pelos <b>Ev./ciclo</b>. Essa ' +
-    'multiplicação é necessária porque as etapas de transporte vêm fragmentadas por talhão: quando Ev./ciclo ' +
-    'fica perto de 1,0 o apontamento é a etapa inteira; acima disso ele é só um pedaço dela. ' +
+    (porMedia
+      ? '<b>Tempo de ciclo</b> é a média da etapa: o total do período dividido pelo número de ciclos. '
+      : '<b>Tempo de ciclo</b> é o tempo de referência da etapa: o <b>P25</b> da duração dos eventos — o ' +
+        'quarto mais rápido, o tempo que a operação leva quando não trava — multiplicado pelos ' +
+        '<b>Ev./ciclo</b>. Essa multiplicação é necessária porque as etapas de transporte vêm fragmentadas ' +
+        'por talhão: quando Ev./ciclo fica perto de 1,0 o apontamento é a etapa inteira; acima disso ele é ' +
+        'só um pedaço dela. ') +
     '<b>P25</b>, <b>P90</b> e <b>Máx</b> são a duração dos apontamentos individuais, medida e não calculada. ' +
-    '<b>Ciclo de Referência</b> é a soma do tempo das etapas — não é a duração de um ciclo real, que exigiria ' +
-    'hora de início e fim para ser fechado (a exportação traz só o total do dia, sem ordem cronológica). ' +
+    '<b>' + (porMedia ? 'Ciclo Médio' : 'Ciclo de Referência') + '</b> é a soma do tempo das etapas — não é a ' +
+    'duração de um ciclo real, que exigiria hora de início e fim para ser fechado (a exportação traz só o ' +
+    'total do dia, sem ordem cronológica). ' +
     '<b>Ciclos</b> são contados pelos apontamentos de <b>' + U.esc(ancora ? ancora.nome : d.ancora) + '</b> (' +
     nC.toLocaleString('pt-BR') + ' no período). <b>% do ciclo</b> usa a soma das etapas ' +
-    'produtivas como 100%. A <b>distância</b> considera apenas ' +
+    'produtivas como 100%. O <b>Raio Médio</b> sai apenas de ' +
     (d.distancia || []).map(o => '<b>' + U.esc(o) + '</b>').join(' e ') +
-    ' — os trechos em que o equipamento realmente roda; nas demais etapas a coluna Km fica vazia. ' +
-    'O km sai de velocidade × tempo em cada apontamento, já que a exportação não traz hodômetro.';
+    ' — os trechos em que o equipamento realmente roda — e é a metade da distância do ciclo, já que ida e ' +
+    'volta estão dentro dele. O km vem de velocidade × tempo em cada apontamento, porque a exportação não ' +
+    'traz hodômetro.';
 }
 
 function linhaArvore(no, t){
@@ -1977,8 +1983,15 @@ document.querySelectorAll('.nav-item').forEach(btn => {
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    const panel = document.getElementById(btn.getAttribute('data-target'));
+    const alvo = btn.getAttribute('data-target');
+    const panel = document.getElementById(alvo);
     if (panel) panel.classList.add('active');
+    /* Um canvas dentro de painel oculto é medido em 0x0 e a pizza sai
+       vazia. Ao exibir a aba é preciso remedir os gráficos dela. */
+    const sufixo = '-' + alvo.replace('tab-', '');
+    Object.keys(state.charts).forEach(k => {
+      if (k.slice(-sufixo.length) === sufixo) state.charts[k].resize();
+    });
   });
 });
 
@@ -2231,7 +2244,6 @@ function renderCalculadora(){
   setText('calcRealCicloCam', cam ? U.dur(cam.cicloH) : '—');
   setText('calcRealCicloOff', off ? U.dur(off.cicloProdutivoH) : '—');
   setText('calcRealDescarga', cam ? U.dur(cam.descargaH) : '—');
-  setText('calcRealDistancia', cam ? U.n(cam.kmCiclo,1) + ' km' : '—');
   setText('calcRealCiclosDia', cam ? U.n(cam.ciclosDia,1) : '—');
 
   // Raio médio vem do dado real, mas o usuário pode sobrescrever
@@ -2309,14 +2321,12 @@ function gerarInsights(cam, off, demanda, qtdFrota, capacidade){
     }
   }
 
-  ins.push({t:'info', i:'📍', txt:'Distância real por ciclo: **' + U.n(cam.kmCiclo,1) + ' km** ' +
-    '(raio de ' + U.n(cam.raioKm,1) + ' km), com **' + U.n(cam.ciclosDia,1) + ' ciclos por equipamento/dia** ' +
-    'no período filtrado.'});
+  ins.push({t:'info', i:'📍', txt:'Raio médio real de **' + U.n(cam.raioKm,1) + ' km**, com **' +
+    U.n(cam.ciclosDia,1) + ' ciclos por equipamento/dia** no período filtrado.'});
 
   if (off) {
-    ins.push({t:'info', i:'🚜', txt:'Ciclo do offroad: **' + U.dur(off.cicloProdutivoH) + '** com ' +
-      U.n(off.kmCiclo,1) + ' km rodados (raio de **' + U.n(off.raioKm,1) + ' km**) e ' +
-      U.n(off.ciclosDia,1) + ' ciclos por equipamento/dia.'});
+    ins.push({t:'info', i:'🚜', txt:'Ciclo do offroad: **' + U.dur(off.cicloProdutivoH) + '**, raio de **' +
+      U.n(off.raioKm,1) + ' km** e ' + U.n(off.ciclosDia,1) + ' ciclos por equipamento/dia.'});
   }
 
   cont.innerHTML = ins.map(x =>

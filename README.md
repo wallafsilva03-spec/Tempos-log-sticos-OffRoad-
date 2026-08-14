@@ -111,20 +111,22 @@ a média do período dividida pelo número de ciclos:
 | --- | --- |
 | Eventos | Quantidade de apontamentos da etapa |
 | Ev./ciclo | Apontamentos daquela etapa por ciclo — perto de 1,0 o evento é a etapa inteira; acima disso a etapa vem fragmentada por talhão |
-| Tempo de Ciclo | `P25 × Ev./ciclo` — o tempo de referência da etapa dentro de um ciclo |
-| P25 / P90 / Máx | Duração dos apontamentos individuais |
-| Ciclo de Referência | Soma do tempo de ciclo das etapas |
+| Tempo de Ciclo | Tempo da etapa dentro de um ciclo (base diferente por grupo, ver abaixo) |
+| P25 / P90 / Máx | Duração dos apontamentos individuais, medida |
+| Ciclo Médio / de Referência | Soma do tempo de ciclo das etapas |
 
-O **P25** (quarto mais rápido) é o tempo que a operação leva quando não trava —
-serve de referência sem o efeito da cauda longa, que puxava a média para cima
-(no abastecimento do offroad a média era 44 min contra 12 min de P25). A
-multiplicação por `Ev./ciclo` é necessária porque as etapas de transporte vêm
-fragmentadas por talhão, então um apontamento é só um pedaço da etapa.
+A base do `Tempo de Ciclo` muda por grupo:
 
-`Ciclo de Referência` **não é** a duração de um ciclo real: fechar cada ciclo
-exigiria hora de início e fim, que a exportação não traz (ver abaixo). A
-calculadora de frota continua usando a média, que é a estatística correta para
-dimensionar vazão.
+- **Caminhões** — média: total da etapa no período ÷ nº de ciclos.
+- **OffRoad** — `P25 × Ev./ciclo`. O P25 (quarto mais rápido) é o tempo que a
+  operação leva quando não trava, sem o efeito da cauda longa que puxa a média
+  para cima: no abastecimento a média é 44 min contra 12 min de P25. A
+  multiplicação por `Ev./ciclo` é necessária porque o deslocamento vem
+  fragmentado por talhão, então um apontamento é só um pedaço da etapa.
+
+Nenhum dos dois **é** a duração de um ciclo real: fechar cada ciclo exigiria hora
+de início e fim, que a exportação não traz (ver abaixo). A calculadora de frota
+usa a média, que é a estatística correta para dimensionar vazão.
 
 **Sobre a contagem de ciclos:** a exportação traz o total do dia por
 equipamento/talhão, sem hora de início e fim, então não dá para reconstruir cada
