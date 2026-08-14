@@ -94,8 +94,9 @@ operacional**:
 
 - **Caminhão:** Carregamento → Transporte Carregado → Descarregamento →
   Transporte Vazio, mais as esperas (Ag. Carregamento, Ag. Descarregamento, filas).
-- **OffRoad:** Abastecimento → Aplicação → Deslocamento (roda dentro do ciclo) +
-  Manobra, mais as esperas (Falta de Insumo, Ag. Liberação de Serviço).
+- **OffRoad:** Abastecimento → Aplicação → Deslocamento TPL, mais as esperas
+  (Falta de Insumo, Ag. Liberação de Serviço). A Manobra é produtiva, mas não
+  faz parte do sequencial e entra em "fora do ciclo".
 
 O ciclo fecha o dia inteiro: `etapas do ciclo + esperas do ciclo + fora do ciclo
 = 24:00 por equipamento-dia`.

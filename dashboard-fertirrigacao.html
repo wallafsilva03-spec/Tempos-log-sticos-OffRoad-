@@ -1259,16 +1259,18 @@ const CFG = {
     },
     OFFROAD: {
       titulo:'Ciclo do offroad',
-      resumo:'Abastecimento → Aplicação → Deslocamento (roda dentro do ciclo)',
+      resumo:'Abastecimento → Aplicação → Deslocamento TPL',
       ancora:'abastecimento insumos',
-      /* No offroad a distância é só o deslocamento. A aplicação e a manobra
-         acontecem dentro do talhão e não são trecho percorrido. */
+      /* No offroad a distância é só o deslocamento: a aplicação acontece
+         dentro do talhão e não é trecho percorrido. */
       distancia:['deslocamento tpl'],
+      /* O ciclo é a sequência de três passos, nessa ordem. A Manobra é
+         produtiva, mas não é etapa do sequencial - entra em "fora do
+         ciclo", junto das demais atividades produtivas avulsas. */
       etapas:[
-        {nome:'Abastecimento', ops:['abastecimento insumos','carregamento']},
-        {nome:'Aplicação',     ops:['aplic vinhaca localizada']},
-        {nome:'Deslocamento',  ops:['deslocamento tpl']},
-        {nome:'Manobra',       ops:['manobra']}
+        {nome:'Abastecimento',    ops:['abastecimento insumos','carregamento']},
+        {nome:'Aplicação',        ops:['aplic vinhaca localizada']},
+        {nome:'Deslocamento TPL', ops:['deslocamento tpl']}
       ],
       esperas:[
         {nome:'Falta de Insumo',       ops:['falta de insumo']},
