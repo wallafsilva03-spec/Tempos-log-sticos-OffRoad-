@@ -30,15 +30,39 @@ a casca visual vieram do `Dashboard_Fertirrigação.html` sem alteração.
 
 Menu lateral:
 
-- **Resumo Executivo** — indicadores gerais, comparativo entre os 3 grupos e a
-  árvore consolidada de tempos.
+- **Resumo Executivo** — indicadores gerais, comparativo entre os 3 grupos,
+  pizzas de tempo por classificação e por grupo, e a árvore consolidada.
 - **Fertirrigação**, **Fertirrigação Plataforma**, **OffRoad** — visão de ciclo
-  (cartões + tabela do ciclo) e detalhamento por atividade de cada grupo.
+  (cartões + tabela do ciclo), duas pizzas (composição do ciclo e
+  ciclo × esperas × fora do ciclo) e detalhamento por atividade.
+- **Calculadora** — sincronismo de frota: quantos caminhões são necessários
+  para sustentar N offroads numa dada lâmina.
 - **Exportação** — PDF da aba aberta e CSV da distribuição de tempo.
 
 O filtro de período fica na barra superior e vale para tudo; unidade, fazenda,
-equipamento e a dimensão de detalhe são por aba. Não usa jQuery, DataTables,
-Chart.js nem SheetJS — por isso tem ~110 KB em vez de 1,4 MB.
+equipamento e a dimensão de detalhe são por aba.
+
+### Distância
+
+A exportação não traz hodômetro, mas traz `VELOCIDADE MEDIA` junto do tempo — e
+ela vem preenchida justamente nas etapas que rodam. A distância é calculada
+**linha a linha** (`km = horas × km/h`) e somada por etapa do ciclo, o que dá a
+coluna `Km / ciclo` e os indicadores de distância e velocidade média.
+
+### Calculadora de sincronismo
+
+Mantém o racional do painel original:
+
+1. cada trator consome por hora o equivalente à lâmina em m³ (4 tratores a 55 mm
+   = 220 m³/h);
+2. cada caminhão entrega `capacidade ÷ tempo de ciclo` (m³/h), usando o ciclo
+   real medido — etapas + esperas;
+3. frota necessária = consumo dos tratores ÷ entrega por caminhão.
+
+O ciclo médio, o tempo de descarga, a distância e os ciclos/dia vêm do arquivo
+importado, e o raio médio já entra preenchido com a distância real do transporte
+carregado (dá para sobrescrever). A **capacidade do caminhão é um campo
+editável**, porque essa exportação não traz a capacidade volumétrica.
 
 ## CEMMA · COPLASA — Fertirrigação e OffRoad (`cemma-coplasa-ferti.html`)
 
