@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Fertirrigação - CEMMA / COPLASA</title>
+
+<!-- DataTables CSS (vendorizado localmente) -->
+<style>
+:root{--dt-row-selected: 13, 110, 253;--dt-row-selected-text: 255, 255, 255;--dt-row-selected-link: 9, 10, 11;--dt-row-stripe: 0, 0, 0;--dt-row-hover: 0, 0, 0;--dt-column-ordering: 0, 0, 0;--dt-html-background: white}:root.dark{--dt-html-background: rgb(33, 37, 41)}table.dataTable td.dt-control{text-align:center;cursor:pointer}table.dataTable td.dt-control:before{display:inline-block;color:rgba(0, 0, 0, 0.5);content:"▶"}table.dataTable tr.dt-hasChild td.dt-control:before{content:"▼"}html.dark table.dataTable td.dt-control:before{color:rgba(255, 255, 255, 0.5)}html.dark table.dataTable tr.dt-hasChild td.dt-control:before{color:rgba(255, 255, 255, 0.5)}table.dataTable thead>tr>th.sorting,table.dataTable thead>tr>th.sorting_asc,table.dataTable thead>tr>th.sorting_desc,table.dataTable thead>tr>th.sorting_asc_disabled,table.dataTable thead>tr>th.sorting_desc_disabled,table.dataTable thead>tr>td.sorting,table.dataTable thead>tr>td.sorting_asc,table.dataTable thead>tr>td.sorting_desc,table.dataTable thead>tr>td.sorting_asc_disabled,table.dataTable thead>tr>td.sorting_desc_disabled{cursor:pointer;position:relative;padding-right:26px}table.dataTable thead>tr>th.sorting:before,table.dataTable thead>tr>th.sorting:after,table.dataTable thead>tr>th.sorting_asc:before,table.dataTable thead>tr>th.sorting_asc:after,table.dataTable thead>tr>th.sorting_desc:before,table.dataTable thead>tr>th.sorting_desc:after,table.dataTable thead>tr>th.sorting_asc_disabled:before,table.dataTable thead>tr>th.sorting_asc_disabled:after,table.dataTable thead>tr>th.sorting_desc_disabled:before,table.dataTable thead>tr>th.sorting_desc_disabled:after,table.dataTable thead>tr>td.sorting:before,table.dataTable thead>tr>td.sorting:after,table.dataTable thead>tr>td.sorting_asc:before,table.dataTable thead>tr>td.sorting_asc:after,table.dataTable thead>tr>td.sorting_desc:before,table.dataTable thead>tr>td.sorting_desc:after,table.dataTable thead>tr>td.sorting_asc_disabled:before,table.dataTable thead>tr>td.sorting_asc_disabled:after,table.dataTable thead>tr>td.sorting_desc_disabled:before,table.dataTable thead>tr>td.sorting_desc_disabled:after{position:absolute;display:block;opacity:.125;right:10px;line-height:9px;font-size:.8em}table.dataTable thead>tr>th.sorting:before,table.dataTable thead>tr>th.sorting_asc:before,table.dataTable thead>tr>th.sorting_desc:before,table.dataTable thead>tr>th.sorting_asc_disabled:before,table.dataTable thead>tr>th.sorting_desc_disabled:before,table.dataTable thead>tr>td.sorting:before,table.dataTable thead>tr>td.sorting_asc:before,table.dataTable thead>tr>td.sorting_desc:before,table.dataTable thead>tr>td.sorting_asc_disabled:before,table.dataTable thead>tr>td.sorting_desc_disabled:before{bottom:50%;content:"▲";content:"▲"/""}table.dataTable thead>tr>th.sorting:after,table.dataTable thead>tr>th.sorting_asc:after,table.dataTable thead>tr>th.sorting_desc:after,table.dataTable thead>tr>th.sorting_asc_disabled:after,table.dataTable thead>tr>th.sorting_desc_disabled:after,table.dataTable thead>tr>td.sorting:after,table.dataTable thead>tr>td.sorting_asc:after,table.dataTable thead>tr>td.sorting_desc:after,table.dataTable thead>tr>td.sorting_asc_disabled:after,table.dataTable thead>tr>td.sorting_desc_disabled:after{top:50%;content:"▼";content:"▼"/""}table.dataTable thead>tr>th.sorting_asc:before,table.dataTable thead>tr>th.sorting_desc:after,table.dataTable thead>tr>td.sorting_asc:before,table.dataTable thead>tr>td.sorting_desc:after{opacity:.6}table.dataTable thead>tr>th.sorting_desc_disabled:after,table.dataTable thead>tr>th.sorting_asc_disabled:before,table.dataTable thead>tr>td.sorting_desc_disabled:after,table.dataTable thead>tr>td.sorting_asc_disabled:before{display:none}table.dataTable thead>tr>th:active,table.dataTable thead>tr>td:active{outline:none}div.dataTables_scrollBody>table.dataTable>thead>tr>th:before,div.dataTables_scrollBody>table.dataTable>thead>tr>th:after,div.dataTables_scrollBody>table.dataTable>thead>tr>td:before,div.dataTables_scrollBody>table.dataTable>thead>tr>td:after{display:none}div.dataTables_processing{position:absolute;top:50%;left:50%;width:200px;margin-left:-100px;margin-top:-26px;text-align:center;padding:2px;z-index:10}div.dataTables_processing>div:last-child{position:relative;width:80px;height:15px;margin:1em auto}div.dataTables_processing>div:last-child>div{position:absolute;top:0;width:13px;height:13px;border-radius:50%;background:#0d6efd;background:rgb(var(--dt-row-selected));animation-timing-function:cubic-bezier(0, 1, 1, 0)}div.dataTables_processing>div:last-child>div:nth-child(1){left:8px;animation:datatables-loader-1 .6s infinite}div.dataTables_processing>div:last-child>div:nth-child(2){left:8px;animation:datatables-loader-2 .6s infinite}div.dataTables_processing>div:last-child>div:nth-child(3){left:32px;animation:datatables-loader-2 .6s infinite}div.dataTables_processing>div:last-child>div:nth-child(4){left:56px;animation:datatables-loader-3 .6s infinite}@keyframes datatables-loader-1{0%{transform:scale(0)}100%{transform:scale(1)}}@keyframes datatables-loader-3{0%{transform:scale(1)}100%{transform:scale(0)}}@keyframes datatables-loader-2{0%{transform:translate(0, 0)}100%{transform:translate(24px, 0)}}table.dataTable.nowrap th,table.dataTable.nowrap td{white-space:nowrap}table.dataTable th.dt-left,table.dataTable td.dt-left{text-align:left}table.dataTable th.dt-center,table.dataTable td.dt-center,table.dataTable td.dataTables_empty{text-align:center}table.dataTable th.dt-right,table.dataTable td.dt-right{text-align:right}table.dataTable th.dt-justify,table.dataTable td.dt-justify{text-align:justify}table.dataTable th.dt-nowrap,table.dataTable td.dt-nowrap{white-space:nowrap}table.dataTable thead th,table.dataTable thead td,table.dataTable tfoot th,table.dataTable tfoot td{text-align:left}table.dataTable thead th.dt-head-left,table.dataTable thead td.dt-head-left,table.dataTable tfoot th.dt-head-left,table.dataTable tfoot td.dt-head-left{text-align:left}table.dataTable thead th.dt-head-center,table.dataTable thead td.dt-head-center,table.dataTable tfoot th.dt-head-center,table.dataTable tfoot td.dt-head-center{text-align:center}table.dataTable thead th.dt-head-right,table.dataTable thead td.dt-head-right,table.dataTable tfoot th.dt-head-right,table.dataTable tfoot td.dt-head-right{text-align:right}table.dataTable thead th.dt-head-justify,table.dataTable thead td.dt-head-justify,table.dataTable tfoot th.dt-head-justify,table.dataTable tfoot td.dt-head-justify{text-align:justify}table.dataTable thead th.dt-head-nowrap,table.dataTable thead td.dt-head-nowrap,table.dataTable tfoot th.dt-head-nowrap,table.dataTable tfoot td.dt-head-nowrap{white-space:nowrap}table.dataTable tbody th.dt-body-left,table.dataTable tbody td.dt-body-left{text-align:left}table.dataTable tbody th.dt-body-center,table.dataTable tbody td.dt-body-center{text-align:center}table.dataTable tbody th.dt-body-right,table.dataTable tbody td.dt-body-right{text-align:right}table.dataTable tbody th.dt-body-justify,table.dataTable tbody td.dt-body-justify{text-align:justify}table.dataTable tbody th.dt-body-nowrap,table.dataTable tbody td.dt-body-nowrap{white-space:nowrap}table.dataTable{width:100%;margin:0 auto;clear:both;border-collapse:separate;border-spacing:0}table.dataTable thead th,table.dataTable tfoot th{font-weight:bold}table.dataTable>thead>tr>th,table.dataTable>thead>tr>td{padding:10px;border-bottom:1px solid rgba(0, 0, 0, 0.3)}table.dataTable>thead>tr>th:active,table.dataTable>thead>tr>td:active{outline:none}table.dataTable>tfoot>tr>th,table.dataTable>tfoot>tr>td{padding:10px 10px 6px 10px;border-top:1px solid rgba(0, 0, 0, 0.3)}table.dataTable tbody tr{background-color:transparent}table.dataTable tbody tr.selected>*{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.9);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.9);color:white;color:rgb(var(--dt-row-selected-text))}table.dataTable tbody tr.selected a{color:#090a0b;color:rgb(var(--dt-row-selected-link))}table.dataTable tbody th,table.dataTable tbody td{padding:8px 10px}table.dataTable.row-border>tbody>tr>th,table.dataTable.row-border>tbody>tr>td,table.dataTable.display>tbody>tr>th,table.dataTable.display>tbody>tr>td{border-top:1px solid rgba(0, 0, 0, 0.15)}table.dataTable.row-border>tbody>tr:first-child>th,table.dataTable.row-border>tbody>tr:first-child>td,table.dataTable.display>tbody>tr:first-child>th,table.dataTable.display>tbody>tr:first-child>td{border-top:none}table.dataTable.row-border>tbody>tr.selected+tr.selected>td,table.dataTable.display>tbody>tr.selected+tr.selected>td{border-top-color:#0262ef}table.dataTable.cell-border>tbody>tr>th,table.dataTable.cell-border>tbody>tr>td{border-top:1px solid rgba(0, 0, 0, 0.15);border-right:1px solid rgba(0, 0, 0, 0.15)}table.dataTable.cell-border>tbody>tr>th:first-child,table.dataTable.cell-border>tbody>tr>td:first-child{border-left:1px solid rgba(0, 0, 0, 0.15)}table.dataTable.cell-border>tbody>tr:first-child>th,table.dataTable.cell-border>tbody>tr:first-child>td{border-top:none}table.dataTable.stripe>tbody>tr.odd>*,table.dataTable.display>tbody>tr.odd>*{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.023);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-stripe), 0.023)}table.dataTable.stripe>tbody>tr.odd.selected>*,table.dataTable.display>tbody>tr.odd.selected>*{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.923);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.923)}table.dataTable.hover>tbody>tr:hover>*,table.dataTable.display>tbody>tr:hover>*{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.035);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-hover), 0.035)}table.dataTable.hover>tbody>tr.selected:hover>*,table.dataTable.display>tbody>tr.selected:hover>*{box-shadow:inset 0 0 0 9999px #0d6efd !important;box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 1) !important}table.dataTable.order-column>tbody tr>.sorting_1,table.dataTable.order-column>tbody tr>.sorting_2,table.dataTable.order-column>tbody tr>.sorting_3,table.dataTable.display>tbody tr>.sorting_1,table.dataTable.display>tbody tr>.sorting_2,table.dataTable.display>tbody tr>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.019);box-shadow:inset 0 0 0 9999px rgba(var(--dt-column-ordering), 0.019)}table.dataTable.order-column>tbody tr.selected>.sorting_1,table.dataTable.order-column>tbody tr.selected>.sorting_2,table.dataTable.order-column>tbody tr.selected>.sorting_3,table.dataTable.display>tbody tr.selected>.sorting_1,table.dataTable.display>tbody tr.selected>.sorting_2,table.dataTable.display>tbody tr.selected>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.919);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.919)}table.dataTable.display>tbody>tr.odd>.sorting_1,table.dataTable.order-column.stripe>tbody>tr.odd>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.054);box-shadow:inset 0 0 0 9999px rgba(var(--dt-column-ordering), 0.054)}table.dataTable.display>tbody>tr.odd>.sorting_2,table.dataTable.order-column.stripe>tbody>tr.odd>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.047);box-shadow:inset 0 0 0 9999px rgba(var(--dt-column-ordering), 0.047)}table.dataTable.display>tbody>tr.odd>.sorting_3,table.dataTable.order-column.stripe>tbody>tr.odd>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.039);box-shadow:inset 0 0 0 9999px rgba(var(--dt-column-ordering), 0.039)}table.dataTable.display>tbody>tr.odd.selected>.sorting_1,table.dataTable.order-column.stripe>tbody>tr.odd.selected>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.954);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.954)}table.dataTable.display>tbody>tr.odd.selected>.sorting_2,table.dataTable.order-column.stripe>tbody>tr.odd.selected>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.947);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.947)}table.dataTable.display>tbody>tr.odd.selected>.sorting_3,table.dataTable.order-column.stripe>tbody>tr.odd.selected>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.939);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.939)}table.dataTable.display>tbody>tr.even>.sorting_1,table.dataTable.order-column.stripe>tbody>tr.even>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.019);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.019)}table.dataTable.display>tbody>tr.even>.sorting_2,table.dataTable.order-column.stripe>tbody>tr.even>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.011);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.011)}table.dataTable.display>tbody>tr.even>.sorting_3,table.dataTable.order-column.stripe>tbody>tr.even>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.003);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.003)}table.dataTable.display>tbody>tr.even.selected>.sorting_1,table.dataTable.order-column.stripe>tbody>tr.even.selected>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.919);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.919)}table.dataTable.display>tbody>tr.even.selected>.sorting_2,table.dataTable.order-column.stripe>tbody>tr.even.selected>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.911);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.911)}table.dataTable.display>tbody>tr.even.selected>.sorting_3,table.dataTable.order-column.stripe>tbody>tr.even.selected>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.903);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.903)}table.dataTable.display tbody tr:hover>.sorting_1,table.dataTable.order-column.hover tbody tr:hover>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.082);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-hover), 0.082)}table.dataTable.display tbody tr:hover>.sorting_2,table.dataTable.order-column.hover tbody tr:hover>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.074);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-hover), 0.074)}table.dataTable.display tbody tr:hover>.sorting_3,table.dataTable.order-column.hover tbody tr:hover>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.062);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-hover), 0.062)}table.dataTable.display tbody tr:hover.selected>.sorting_1,table.dataTable.order-column.hover tbody tr:hover.selected>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.982);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.982)}table.dataTable.display tbody tr:hover.selected>.sorting_2,table.dataTable.order-column.hover tbody tr:hover.selected>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.974);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.974)}table.dataTable.display tbody tr:hover.selected>.sorting_3,table.dataTable.order-column.hover tbody tr:hover.selected>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.962);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.962)}table.dataTable.no-footer{border-bottom:1px solid rgba(0, 0, 0, 0.3)}table.dataTable.compact thead th,table.dataTable.compact thead td,table.dataTable.compact tfoot th,table.dataTable.compact tfoot td,table.dataTable.compact tbody th,table.dataTable.compact tbody td{padding:4px}table.dataTable th,table.dataTable td{box-sizing:content-box}.dataTables_wrapper{position:relative;clear:both}.dataTables_wrapper .dataTables_length{float:left}.dataTables_wrapper .dataTables_length select{border:1px solid #aaa;border-radius:3px;padding:5px;background-color:transparent;color:inherit;padding:4px}.dataTables_wrapper .dataTables_filter{float:right;text-align:right}.dataTables_wrapper .dataTables_filter input{border:1px solid #aaa;border-radius:3px;padding:5px;background-color:transparent;color:inherit;margin-left:3px}.dataTables_wrapper .dataTables_info{clear:both;float:left;padding-top:.755em}.dataTables_wrapper .dataTables_paginate{float:right;text-align:right;padding-top:.25em}.dataTables_wrapper .dataTables_paginate .paginate_button{box-sizing:border-box;display:inline-block;min-width:1.5em;padding:.5em 1em;margin-left:2px;text-align:center;text-decoration:none !important;cursor:pointer;color:inherit !important;border:1px solid transparent;border-radius:2px;background:transparent}.dataTables_wrapper .dataTables_paginate .paginate_button.current,.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{color:inherit !important;border:1px solid rgba(0, 0, 0, 0.3);background-color:rgba(0, 0, 0, 0.05);background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(230, 230, 230, 0.05)), color-stop(100%, rgba(0, 0, 0, 0.05)));background:-webkit-linear-gradient(top, rgba(230, 230, 230, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%);background:-moz-linear-gradient(top, rgba(230, 230, 230, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%);background:-ms-linear-gradient(top, rgba(230, 230, 230, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%);background:-o-linear-gradient(top, rgba(230, 230, 230, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%);background:linear-gradient(to bottom, rgba(230, 230, 230, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%)}.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active{cursor:default;color:#666 !important;border:1px solid transparent;background:transparent;box-shadow:none}.dataTables_wrapper .dataTables_paginate .paginate_button:hover{color:white !important;border:1px solid #111;background-color:#111;background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #585858), color-stop(100%, #111));background:-webkit-linear-gradient(top, #585858 0%, #111 100%);background:-moz-linear-gradient(top, #585858 0%, #111 100%);background:-ms-linear-gradient(top, #585858 0%, #111 100%);background:-o-linear-gradient(top, #585858 0%, #111 100%);background:linear-gradient(to bottom, #585858 0%, #111 100%)}.dataTables_wrapper .dataTables_paginate .paginate_button:active{outline:none;background-color:#0c0c0c;background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #2b2b2b), color-stop(100%, #0c0c0c));background:-webkit-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);background:-moz-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);background:-ms-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);background:-o-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);background:linear-gradient(to bottom, #2b2b2b 0%, #0c0c0c 100%);box-shadow:inset 0 0 3px #111}.dataTables_wrapper .dataTables_paginate .ellipsis{padding:0 1em}.dataTables_wrapper .dataTables_length,.dataTables_wrapper .dataTables_filter,.dataTables_wrapper .dataTables_info,.dataTables_wrapper .dataTables_processing,.dataTables_wrapper .dataTables_paginate{color:inherit}.dataTables_wrapper .dataTables_scroll{clear:both}.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody{-webkit-overflow-scrolling:touch}.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>thead>tr>th,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>thead>tr>td,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>tbody>tr>th,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>tbody>tr>td{vertical-align:middle}.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>thead>tr>th>div.dataTables_sizing,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>thead>tr>td>div.dataTables_sizing,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>tbody>tr>th>div.dataTables_sizing,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>tbody>tr>td>div.dataTables_sizing{height:0;overflow:hidden;margin:0 !important;padding:0 !important}.dataTables_wrapper.no-footer .dataTables_scrollBody{border-bottom:1px solid rgba(0, 0, 0, 0.3)}.dataTables_wrapper.no-footer div.dataTables_scrollHead table.dataTable,.dataTables_wrapper.no-footer div.dataTables_scrollBody>table{border-bottom:none}.dataTables_wrapper:after{visibility:hidden;display:block;content:"";clear:both;height:0}@media screen and (max-width: 767px){.dataTables_wrapper .dataTables_info,.dataTables_wrapper .dataTables_paginate{float:none;text-align:center}.dataTables_wrapper .dataTables_paginate{margin-top:.5em}}@media screen and (max-width: 640px){.dataTables_wrapper .dataTables_length,.dataTables_wrapper .dataTables_filter{float:none;text-align:center}.dataTables_wrapper .dataTables_filter{margin-top:.5em}}html.dark{--dt-row-hover: 255, 255, 255;--dt-row-stripe: 255, 255, 255;--dt-column-ordering: 255, 255, 255}html.dark table.dataTable>thead>tr>th,html.dark table.dataTable>thead>tr>td{border-bottom:1px solid #595b5e}html.dark table.dataTable>thead>tr>th:active,html.dark table.dataTable>thead>tr>td:active{outline:none}html.dark table.dataTable>tfoot>tr>th,html.dark table.dataTable>tfoot>tr>td{border-top:1px solid #595b5e}html.dark table.dataTable.row-border>tbody>tr>th,html.dark table.dataTable.row-border>tbody>tr>td,html.dark table.dataTable.display>tbody>tr>th,html.dark table.dataTable.display>tbody>tr>td{border-top:1px solid #404346}html.dark table.dataTable.row-border>tbody>tr.selected+tr.selected>td,html.dark table.dataTable.display>tbody>tr.selected+tr.selected>td{border-top-color:#0257d5}html.dark table.dataTable.cell-border>tbody>tr>th,html.dark table.dataTable.cell-border>tbody>tr>td{border-top:1px solid #404346;border-right:1px solid #404346}html.dark table.dataTable.cell-border>tbody>tr>th:first-child,html.dark table.dataTable.cell-border>tbody>tr>td:first-child{border-left:1px solid #404346}html.dark .dataTables_wrapper .dataTables_filter input,html.dark .dataTables_wrapper .dataTables_length select{border:1px solid rgba(255, 255, 255, 0.2);background-color:var(--dt-html-background)}html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current,html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{border:1px solid #595b5e;background:rgba(255, 255, 255, 0.15)}html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active{color:#666 !important}html.dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover{border:1px solid #353535;background:#353535}html.dark .dataTables_wrapper .dataTables_paginate .paginate_button:active{background:#3a3a3a}
+
+</style>
+<!-- App CSS -->
+<style>
+/* ============================================================
+   STYLE.CSS - Tema corporativo agroindustrial
+   ============================================================ */
+
+:root {
+  --primary: #1f6f43;
+  --primary-dark: #154a2d;
+  --secondary: #8a5a2b;
+  --accent: #d9a441;
+  --danger: #b3392c;
+  --info: #2f6f8f;
+  --slate: #334155;
+  --bg: #f4f6f5;
+  --card-bg: #ffffff;
+  --border: #e2e6e4;
+  --text: #1f2a24;
+  --text-muted: #667165;
+  --sidebar-w: 260px;
+  /* Paleta Grupo Moreno */
+  --gm-green: #0F9147;
+  --gm-lime: #8DC63F;
+  --gm-blue: #1B2C8A;
+  --brandbar-h: 74px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* -------------------- LAYOUT -------------------- */
+
+/* -------------------- BRAND HEADER (GRUPO MORENO) -------------------- */
+
+.brand-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--brandbar-h);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  border-bottom: 3px solid transparent;
+  border-image: linear-gradient(90deg, var(--gm-green) 0 33%, var(--gm-lime) 33% 66%, var(--gm-blue) 66% 100%) 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.brand-header img { height: 48px; width: auto; display: block; }
+.brand-titles { display: flex; flex-direction: column; line-height: 1.15; }
+.brand-titles .gm-name {
+  font-size: 20px; font-weight: 800; letter-spacing: 1.5px;
+  color: var(--gm-blue); text-transform: uppercase;
+}
+.brand-titles .gm-dept {
+  font-size: 12px; font-weight: 700; letter-spacing: .8px;
+  color: var(--gm-green); text-transform: uppercase;
+}
+.brand-tags { margin-left: auto; display: flex; gap: 6px; }
+.brand-tags span {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .6px;
+  color: #fff; padding: 4px 10px; border-radius: 5px; text-transform: uppercase;
+}
+.brand-tags span:nth-child(1) { background: var(--gm-green); }
+.brand-tags span:nth-child(2) { background: var(--gm-lime); }
+.brand-tags span:nth-child(3) { background: var(--gm-blue); }
+@media (max-width: 720px) {
+  .brand-tags { display: none; }
+}
+body.print-mode .brand-header { display: none; }
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, var(--primary-dark), #0e2f1c);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--brandbar-h);
+  height: calc(100vh - var(--brandbar-h));
+}
+
+.sidebar-brand {
+  padding: 22px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+
+.sidebar-brand h1 {
+  font-size: 17px;
+  margin: 0 0 2px;
+  font-weight: 700;
+}
+
+.sidebar-brand span {
+  font-size: 12px;
+  color: rgba(255,255,255,.65);
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 10px;
+  flex: 1;
+}
+
+.nav-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,.85);
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+  transition: background .15s;
+}
+
+.nav-item:hover { background: rgba(255,255,255,.08); }
+.nav-item.active { background: var(--accent); color: #1f2a24; font-weight: 600; }
+
+.sidebar-footer {
+  padding: 14px 20px;
+  font-size: 11px;
+  color: rgba(255,255,255,.5);
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* -------------------- TOPBAR -------------------- */
+
+.topbar {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.file-import {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background .15s, transform .1s;
+}
+
+.btn:hover { background: var(--primary-dark); }
+.btn:active { transform: scale(.98); }
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+.btn-outline:hover { background: var(--primary); color: #fff; }
+
+#fileInput { display: none; }
+
+.file-status {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.loading-indicator {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--info);
+}
+
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(47,111,143,.25);
+  border-top-color: var(--info);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* -------------------- BANNERS -------------------- */
+
+.error-banner, .warning-banner {
+  display: none;
+  margin: 14px 26px 0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
+}
+.error-banner { background: #fdecea; color: var(--danger); border: 1px solid #f3c1ba; }
+.warning-banner { background: #fff6e0; color: #8a6300; border: 1px solid #f0dca0; }
+
+/* -------------------- EMPTY STATE -------------------- */
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state h2 { color: var(--text); margin-bottom: 6px; }
+.empty-state .icon { font-size: 48px; margin-bottom: 14px; }
+
+/* -------------------- CONTENT / TABS -------------------- */
+
+.app-content { display: none; padding: 24px 26px 60px; }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn .2s ease; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.panel-title {
+  font-size: 20px;
+  margin: 0 0 18px;
+  color: var(--primary-dark);
+}
+
+.section-subtitle {
+  font-size: 15px;
+  color: var(--slate);
+  margin: 24px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.section-subtitle:first-of-type { margin-top: 0; }
+
+/* -------------------- KPI CARDS -------------------- */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  border-left: 4px solid var(--primary);
+}
+
+.kpi-card span { display: block; font-size: 12.5px; color: var(--text-muted); margin-bottom: 6px; }
+.kpi-card strong { font-size: 22px; color: var(--text); }
+.kpi-card--highlight { border-left: 4px solid var(--accent); background: #fffdf9; }
+.kpi-card--highlight strong { color: var(--secondary); }
+
+/* -------------------- CHARTS -------------------- */
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.chart-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.chart-card h3 { margin: 0 0 10px; font-size: 15px; color: var(--slate); }
+.chart-container { position: relative; height: 260px; }
+.chart-container--tall { height: 420px; }
+.chart-card--wide { grid-column: 1 / -1; }
+
+.mini-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.mini-legend .dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.dot--caminhao { background: var(--primary); }
+.dot--offroad { background: var(--info); }
+
+.equip-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.chart-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.chart-box h4 { margin: 0 0 10px; font-size: 14px; }
+.chart-box .chart-container { height: 240px; }
+
+@media (max-width: 800px) {
+  .equip-charts { grid-template-columns: 1fr; }
+}
+
+/* -------------------- FILTERS -------------------- */
+
+.filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.filters-bar select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+  min-width: 160px;
+  background: #fff;
+}
+
+/* -------------------- TABLES -------------------- */
+
+.table-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  overflow-x: auto;
+}
+
+table.dataTable { font-size: 12.8px; width: 100% !important; }
+table.dataTable thead th {
+  background: var(--primary-dark);
+  color: #fff;
+  padding: 10px 8px !important;
+}
+table.dataTable tbody td { padding: 8px !important; }
+table.dataTable tbody tr:nth-child(even) { background: #f8faf8; }
+
+/* -------------------- CALCULADORA TAB -------------------- */
+.calculator-layout {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 20px;
+}
+@media (max-width: 1000px) {
+  .calculator-layout { grid-template-columns: 1fr; }
+}
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--text); }
+.form-group input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
+.form-group small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+.real-data-grid { display: grid; gap: 10px; }
+.real-data-item { display: flex; justify-content: space-between; font-size: 13px; padding-bottom: 6px; border-bottom: 1px dashed var(--border); }
+.real-data-item span { color: var(--text-muted); }
+.real-data-item strong { color: var(--primary-dark); }
+
+.highlight-card { background: linear-gradient(135deg, #fff 0%, #f0f7f2 100%); border-top: 4px solid var(--primary); }
+.result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 10px; }
+.result-item { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 15px; background: #fff; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.result-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+.result-value { font-size: 28px; font-weight: 800; color: var(--primary); line-height: 1; }
+.result-unit { font-size: 11px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.insights-container { display: flex; flex-direction: column; gap: 12px; }
+.insight-item { display: flex; gap: 10px; padding: 10px; border-radius: 8px; font-size: 13px; line-height: 1.4; }
+.insight-item--warning { background: #fff9f0; border: 1px solid #ffe8cc; color: #855d21; }
+.insight-item--success { background: #f0fdf4; border: 1px solid #dcfce7; color: #166534; }
+.insight-item--info { background: #f0f9ff; border: 1px solid #e0f2fe; color: #0369a1; }
+.insight-icon { font-size: 16px; flex-shrink: 0; }
+
+/* -------------------- EQUIPAMENTOS TAB -------------------- */
+
+.equip-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .equip-layout { grid-template-columns: 1fr; }
+}
+
+.equip-list-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  max-height: 700px;
+  overflow-y: auto;
+}
+
+.equip-list-card input[type="search"] {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.equip-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  padding: 10px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.equip-item:hover { background: #f2f6f3; }
+.equip-item.active { background: #e6f2ea; border-left: 3px solid var(--primary); }
+
+.equip-nome { font-weight: 600; font-size: 13.5px; }
+.equip-modelo { font-size: 11.5px; color: var(--text-muted); }
+
+.equip-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: #fff;
+}
+.equip-badge--caminhao { background: var(--info); }
+.equip-badge--offroad { background: var(--secondary); }
+.equip-badge--outro { background: var(--text-muted); }
+
+.equip-detail-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.equip-section { margin-bottom: 22px; }
+.equip-section h4 { margin: 0 0 10px; color: var(--primary-dark); font-size: 14px; }
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+.info-grid > div { display: flex; flex-direction: column; gap: 2px; }
+.info-label { font-size: 11.5px; color: var(--text-muted); }
+.info-value { font-size: 14px; font-weight: 600; }
+
+.indicador-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+.indicador-card {
+  background: #f8faf8;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.indicador-label { font-size: 11px; color: var(--text-muted); }
+.indicador-valor { font-size: 15px; font-weight: 700; color: var(--primary-dark); }
+
+/* -------------------- RANKINGS -------------------- */
+
+.rank-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.rank-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.rank-card h4 { margin: 0 0 10px; font-size: 14px; color: var(--slate); }
+
+.rank-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.rank-table td { padding: 6px 4px; border-bottom: 1px solid var(--border); }
+.rank-table tr:first-child td { font-weight: 700; color: var(--primary-dark); }
+
+.empty-msg { color: var(--text-muted); font-size: 13px; padding: 10px 0; }
+
+/* -------------------- EXPORTAÇÃO -------------------- */
+
+.export-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  max-width: 520px;
+}
+.export-card p { color: var(--text-muted); margin-bottom: 20px; }
+.export-equip-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.export-equip-controls label { font-weight: 600; color: var(--text); font-size: 13.5px; }
+.export-equip-controls select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: #fff; color: var(--text); cursor: pointer; min-width: 220px; }
+
+/* -------------------- PRINT AREA (PDF) -------------------- */
+
+#printArea { display: none; }
+
+body.print-mode .app-shell { display: none; }
+body.print-mode #printArea {
+  display: block;
+  padding: 20px;
+  background: #fff;
+  /* Garante que as variáveis CSS do tema estejam disponíveis */
+  --primary: #1f6f43;
+  --primary-dark: #154a2d;
+  --secondary: #8a5a2b;
+  --accent: #d9a441;
+  --danger: #b3392c;
+  --info: #2f6f8f;
+  --slate: #334155;
+  --bg: #f4f6f5;
+  --card-bg: #ffffff;
+  --border: #e2e6e4;
+  --text: #1f2a24;
+  --text-muted: #667165;
+}
+
+/* ================= PDF estilo dashboard (paisagem) =================
+   Cada seção do relatório é uma ".pdf-page" que ocupa exatamente uma
+   folha A4 em paisagem, com KPIs no topo e os gráficos preenchendo o
+   restante da altura (parecido com uma página do Power BI). */
+
+.pdf-page {
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* No preview em tela aproximamos a proporção de um A4 paisagem. */
+  width: 277mm;
+  min-height: 190mm;
+  margin: 0 auto 22px;
+  padding: 10px;
+  border: 1px solid var(--border);
+}
+
+.pdf-title {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  background: var(--primary-dark); color: #fff;
+  padding: 9px 14px; border-radius: 6px; flex: 0 0 auto;
+}
+.pdf-title h2 { margin: 0; font-size: 16px; letter-spacing: .2px; }
+.pdf-title .pdf-sub { font-size: 10.5px; opacity: .85; white-space: nowrap; }
+
+.pdf-kpis { display: grid; gap: 8px; flex: 0 0 auto; }
+.pdf-kpi {
+  border: 1px solid var(--border); border-left: 4px solid var(--primary);
+  border-radius: 6px; padding: 7px 10px; background: #fff; min-width: 0;
+}
+.pdf-kpi span { display: block; font-size: 9.5px; color: var(--text-muted); margin-bottom: 3px; line-height: 1.2; }
+.pdf-kpi strong { font-size: 15px; color: var(--text); font-weight: 700; line-height: 1.1; }
+.pdf-kpi--hl { border-left-color: var(--accent); background: #fffdf9; }
+.pdf-kpi--hl strong { color: var(--secondary); }
+
+/* Área que cresce para preencher a folha e recebe os gráficos/tabelas. */
+.pdf-body { flex: 1 1 auto; display: grid; gap: 8px; min-height: 0; }
+.pdf-card {
+  border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px 8px;
+  background: #fff; display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.pdf-card h4 { margin: 0 0 4px; font-size: 11.5px; color: var(--slate); border-left: 3px solid var(--accent); padding-left: 7px; flex: 0 0 auto; }
+.pdf-chart { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.pdf-chart img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+
+.pdf-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+.pdf-table th, .pdf-table td { border: 1px solid var(--border); padding: 3px 6px; text-align: left; }
+.pdf-table th { background: var(--primary-dark); color: #fff; }
+.pdf-table tbody tr:nth-child(even) { background: #f8faf8; }
+.pdf-table td:last-child, .pdf-table th:last-child { text-align: right; white-space: nowrap; }
+.pdf-table td:first-child, .pdf-table th:first-child { width: 22px; text-align: center; }
+
+@media print {
+  @page { size: A4 landscape; margin: 8mm; }
+  body.print-mode { background: #fff; }
+  /* Zera o padding de tela do container: senão ele empurra a 1ª página para
+     baixo e cria folhas extras/em branco. */
+  body.print-mode #printArea { padding: 0; }
+  .pdf-page {
+    width: auto; min-height: 0;
+    height: 193mm;             /* 210mm - 2*8mm, com folga p/ arredondamento */
+    margin: 0; padding: 0;
+    border: none; overflow: hidden;
+    page-break-after: always;
+  }
+  .pdf-page:last-child { page-break-after: auto; }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+}
+
+</style>
+<!-- Complemento das tabelas de tempos -->
+<style>
+/* ============================================================
+   Complemento para as tabelas de tempos e de ciclo.
+   Segue as mesmas variáveis de cor e o mesmo cabeçalho escuro
+   das tabelas do painel — não altera nenhuma regra existente.
+   ============================================================ */
+table.tt { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.tt thead th {
+  background: var(--primary-dark);
+  color: #fff;
+  padding: 10px 8px;
+  text-align: right;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  white-space: nowrap;
+}
+table.tt thead th:first-child { text-align: left; }
+table.tt tbody td {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+table.tt tbody td:first-child { text-align: left; white-space: normal; }
+table.tt tbody tr:hover { background: #f8faf9; }
+
+table.tt tr.n0 { background: #fbfcfb; font-weight: 600; }
+table.tt tr.n0 td { border-bottom: 1px solid #cfd8d3; }
+table.tt tr.n1 td:first-child { padding-left: 34px; }
+table.tt tr.n2 { color: var(--text-muted); font-size: 13px; }
+table.tt tr.n2 td:first-child { padding-left: 64px; }
+table.tt tr.tot { background: #eaf2ed; font-weight: 700; }
+table.tt tr.tot td { border-top: 2px solid var(--primary); border-bottom: none; }
+table.tt tr.sub { background: #f2f6f3; font-weight: 600; }
+table.tt tr.sub td { border-top: 1px solid var(--border); }
+table.tt tr.etapa td:first-child { padding-left: 24px; }
+table.tt tr.dim { color: var(--text-muted); }
+
+.tt-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border: 1px solid #b9c4bd; border-radius: 3px;
+  background: #fff; color: var(--text-muted); font-size: 12px; line-height: 1;
+  cursor: pointer; margin-right: 9px; vertical-align: -3px;
+  font-family: monospace; user-select: none;
+}
+.tt-toggle:hover { border-color: var(--primary); color: var(--primary); }
+.tt-toggle.leaf { border: none; background: none; cursor: default; color: transparent; }
+.tt-dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 8px; }
+.tt-step {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 19px; height: 19px; border-radius: 50%; background: var(--primary);
+  color: #fff; font-size: 11px; font-weight: 700; margin-right: 9px; vertical-align: -4px;
+}
+.tt-step.wait { background: var(--danger); }
+.tt-note {
+  margin-top: 10px; font-size: 11.5px; color: var(--text-muted); line-height: 1.6;
+}
+.tt-note b { color: var(--text); }
+.tt-sub { font-size: 12.5px; color: var(--text-muted); margin: -6px 0 12px; }
+.filters-bar label {
+  align-self: center; font-size: 12.5px; color: var(--text-muted); font-weight: 600;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ==================== CABEÇALHO GRUPO MORENO ==================== -->
+<header class="brand-header">
+  <img src="data:image/png;base64,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" alt="Grupo Moreno">
+  <div class="brand-titles">
+    <span class="gm-name">Grupo Moreno</span>
+    <span class="gm-dept">COA - Central de Opera&ccedil;&otilde;es Agr&iacute;cola &mdash; Fertirriga&ccedil;&atilde;o</span>
+  </div>
+  <div class="brand-tags">
+    <span>Fortalecer</span><span>Conectar</span><span>Crescer</span>
+  </div>
+</header>
+
+<div class="app-shell">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h1>CEMMA · COPLASA</h1>
+      <span>Fertirriga&ccedil;&atilde;o e OffRoad</span>
+    </div>
+    <ul class="nav-list">
+      <li><button class="nav-item active" data-target="tab-resumo">📊 Resumo Executivo</button></li>
+      <li><button class="nav-item" data-target="tab-fertirrigacao">💧 Fertirriga&ccedil;&atilde;o</button></li>
+      <li><button class="nav-item" data-target="tab-plataforma">🏗️ Fertirriga&ccedil;&atilde;o Plataforma</button></li>
+      <li><button class="nav-item" data-target="tab-offroad">🚜 OffRoad</button></li>
+      <li><button class="nav-item" data-target="tab-exportacao">📄 Exporta&ccedil;&atilde;o</button></li>
+    </ul>
+    <div class="sidebar-footer">Processamento 100% local · sem servidor</div>
+  </aside>
+
+  <!-- ==================== MAIN ==================== -->
+  <div class="main">
+
+    <header class="topbar">
+      <div class="file-import">
+        <label class="btn" for="fileInput">⬆ Importar arquivo</label>
+        <input type="file" id="fileInput" accept=".zip,.txt,.csv" style="display:none">
+        <span class="loading-indicator" id="loadingIndicator"><span class="spinner"></span> Processando...</span>
+        <span class="file-status" id="fileStatus">Nenhum arquivo importado ainda.</span>
+      </div>
+      <div class="global-filters" id="globalFilters" style="display: none; margin-left: auto; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <label style="font-weight: 600; color: var(--text); font-size: 13.5px;">Período:</label>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label for="filtroDataInicio" style="font-size: 12.5px; color: var(--text-muted);">De</label>
+          <input type="date" id="filtroDataInicio" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px; background: #fff; color: var(--text); cursor: pointer;">
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label for="filtroDataFim" style="font-size: 12.5px; color: var(--text-muted);">até</label>
+          <input type="date" id="filtroDataFim" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px; background: #fff; color: var(--text); cursor: pointer;">
+        </div>
+        <button id="btnLimparFiltroData" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 12.5px; background: var(--slate); color: #fff; cursor: pointer; font-weight: 600;">Limpar</button>
+      </div>
+    </header>
+
+    <div class="error-banner" id="errorBanner"></div>
+    <div class="warning-banner" id="warningBanner"></div>
+
+    <!-- Estado vazio (antes de importar) -->
+    <div class="empty-state" id="emptyState">
+      <div class="icon">📂</div>
+      <h2>Nenhum dado carregado</h2>
+      <p>Importe o <strong>.zip</strong> baixado do relatório ou o <strong>.txt</strong>/<strong>.csv</strong>
+         de dentro dele (separado por <code>;</code>) para gerar as análises automaticamente.</p>
+    </div>
+
+    <!-- ==================== APP CONTENT ==================== -->
+    <div class="app-content" id="appContent">
+
+      <!-- RESUMO EXECUTIVO -->
+      <section class="tab-panel active" id="tab-resumo">
+        <h2 class="panel-title">Resumo Executivo</h2>
+        <div class="kpi-grid" id="kpis-resumo"></div>
+
+        <h3 class="section-subtitle">Comparativo entre grupos</h3>
+        <div class="table-card">
+          <table class="tt">
+            <thead><tr>
+              <th>Grupo</th><th>Equip.</th><th>Equip-dias</th><th>Horas</th>
+              <th>Produtiva</th><th>% Produtiva</th><th>Ciclos</th><th>Ciclos/dia</th><th>Ciclo Médio</th>
+            </tr></thead>
+            <tbody id="comparativoBody"></tbody>
+          </table>
+        </div>
+
+        <h3 class="section-subtitle">Distribuição do tempo apontado &mdash; consolidado</h3>
+        <p class="tt-sub" id="desc-resumo"></p>
+        <div class="filters-bar">
+          <select id="f-resumo-unidade"><option value="">Unidade (Todas)</option></select>
+          <select id="f-resumo-fazenda"><option value="">Fazenda (Todas)</option></select>
+          <select id="f-resumo-equip"><option value="">Equipamento (Todos)</option></select>
+          <label for="f-resumo-nivel3">Detalhar por</label>
+          <select id="f-resumo-nivel3">
+            <option value="GrupoNorm">Grupo</option>
+            <option value="Equipamento">Equipamento</option>
+            <option value="Unidade">Unidade</option>
+            <option value="Fazenda">Fazenda</option>
+            <option value="Operador">Operador</option>
+          </select>
+          <button class="btn" data-expandir="resumo">Expandir tudo</button>
+          <button class="btn" data-recolher="resumo">Recolher tudo</button>
+        </div>
+        <div class="table-card">
+          <table class="tt">
+            <thead><tr>
+              <th>Classificação / Atividade</th><th>Horas</th><th>%</th><th>HH:MM</th><th>Ocorr.</th>
+            </tr></thead>
+            <tbody id="tree-resumo"></tbody>
+          </table>
+          <p class="tt-note" id="nota-resumo"></p>
+        </div>
+      </section>
+
+      <!-- FERTIRRIGAÇÃO -->
+      <section class="tab-panel" id="tab-fertirrigacao">
+        <h2 class="panel-title">Fertirriga&ccedil;&atilde;o</h2>
+
+        <h3 class="section-subtitle">Visão de Ciclo</h3>
+        <div class="kpi-grid" id="kpis-fertirrigacao"></div>
+        <p class="tt-sub" id="ciclodesc-fertirrigacao"></p>
+        <div class="table-card">
+          <table class="tt">
+            <thead><tr>
+              <th>Etapa do ciclo</th><th>Horas</th><th>% do total</th>
+              <th>HH:MM / dia</th><th>Média por ciclo</th><th>% do ciclo</th><th>Ocorr.</th>
+            </tr></thead>
+            <tbody id="ciclo-fertirrigacao"></tbody>
+          </table>
+          <p class="tt-note" id="ciclonota-fertirrigacao"></p>
+        </div>
+
+        <h3 class="section-subtitle">Detalhamento por Atividade</h3>
+        <p class="tt-sub" id="desc-fertirrigacao"></p>
+        <div class="filters-bar">
+          <select id="f-fertirrigacao-unidade"><option value="">Unidade (Todas)</option></select>
+          <select id="f-fertirrigacao-fazenda"><option value="">Fazenda (Todas)</option></select>
+          <select id="f-fertirrigacao-equip"><option value="">Equipamento (Todos)</option></select>
+          <label for="f-fertirrigacao-nivel3">Detalhar por</label>
+          <select id="f-fertirrigacao-nivel3">
+            <option value="Equipamento">Equipamento</option>
+            <option value="Unidade">Unidade</option>
+            <option value="Fazenda">Fazenda</option>
+            <option value="Operador">Operador</option>
+          </select>
+          <button class="btn" data-expandir="fertirrigacao">Expandir tudo</button>
+          <button class="btn" data-recolher="fertirrigacao">Recolher tudo</button>
+        </div>
+        <div class="table-card">
+          <table class="tt">
+            <thead><tr>
+              <th>Classificação / Atividade</th><th>Horas</th><th>%</th><th>HH:MM</th><th>Ocorr.</th>
+            </tr></thead>
+            <tbody id="tree-fertirrigacao"></tbody>
+          </table>
+          <p class="tt-note" id="nota-fertirrigacao"></p>
+        </div>
+      </section>
+
+      <!-- FERTIRRIGAÇÃO PLATAFORMA -->
+      <section class="tab-panel" id="tab-plataforma">
+        <h2 class="panel-title">Fertirriga&ccedil;&atilde;o Plataforma</h2>
+
+        <h3 class="section-subtitle">Visão de Ciclo</h3>
+        <div class="kpi-grid" id="kpis-plataforma"></div>
+        <p class="tt-sub" id="ciclodesc-plataforma"></p>
+        <div class="table-card">
+          <table class="tt">
+            <thead><tr>
+              <th>Etapa do ciclo</th><th>Horas</th><th>% do total</th>
+              <th>HH:MM / dia</th><th>Média por ciclo</th><th>% do ciclo</th><th>Ocorr.</th>
+            </tr></thead>
+            <tbody id="ciclo-plataforma"></tbody>
+          </table>
+          <p class="tt-note" id="ciclonota-plataforma"></p>
+        </div>
+
+        <h3 class="section-subtitle">Detalhamento por Atividade</h3>
+        <p class="tt-sub" id="desc-plataforma"></p>
+        <div class="filters-bar">
+          <select id="f-plataforma-unidade"><option value="">Unidade (Todas)</option></select>
+          <select id="f-plataforma-fazenda"><option value="">Fazenda (Todas)</option></select>
+          <select id="f-plataforma-equip"><option value="">Equipamento (Todos)</option></select>
+          <label for="f-plataforma-nivel3">Detalhar por</label>
+          <select id="f-plataforma-nivel3">
+            <option value="Equipamento">Equipamento</option>
+            <option value="Unidade">Unidade</option>
+            <option value="Fazenda">Fazenda</option>
+            <option value="Operador">Operador</option>
+          </select>
+          <button class="btn" data-expandir="plataforma">Expandir tudo</button>
+          <button class="btn" data-recolher="plataforma">Recolher tudo</button>
+        </div>
+        <div class="table-card">
+          <table class="tt">
+            <thead><tr>
+              <th>Classificação / Atividade</th><th>Horas</th><th>%</th><th>HH:MM</th><th>Ocorr.</th>
+            </tr></thead>
+            <tbody id="tree-plataforma"></tbody>
+          </table>
+          <p class="tt-note" id="nota-plataforma"></p>
+        </div>
+      </section>
+
+      <!-- OFFROAD -->
+      <section class="tab-panel" id="tab-offroad">
+        <h2 class="panel-title">OffRoad</h2>
+
+        <h3 class="section-subtitle">Visão de Ciclo</h3>
+        <div class="kpi-grid" id="kpis-offroad"></div>
+        <p class="tt-sub" id="ciclodesc-offroad"></p>
+        <div class="table-card">
+          <table class="tt">
+            <thead><tr>
+              <th>Etapa do ciclo</th><th>Horas</th><th>% do total</th>
+              <th>HH:MM / dia</th><th>Média por ciclo</th><th>% do ciclo</th><th>Ocorr.</th>
+            </tr></thead>
+            <tbody id="ciclo-offroad"></tbody>
+          </table>
+          <p class="tt-note" id="ciclonota-offroad"></p>
+        </div>
+
+        <h3 class="section-subtitle">Detalhamento por Atividade</h3>
+        <p class="tt-sub" id="desc-offroad"></p>
+        <div class="filters-bar">
+          <select id="f-offroad-unidade"><option value="">Unidade (Todas)</option></select>
+          <select id="f-offroad-fazenda"><option value="">Fazenda (Todas)</option></select>
+          <select id="f-offroad-equip"><option value="">Equipamento (Todos)</option></select>
+          <label for="f-offroad-nivel3">Detalhar por</label>
+          <select id="f-offroad-nivel3">
+            <option value="Equipamento">Equipamento</option>
+            <option value="Unidade">Unidade</option>
+            <option value="Fazenda">Fazenda</option>
+            <option value="Operador">Operador</option>
+          </select>
+          <button class="btn" data-expandir="offroad">Expandir tudo</button>
+          <button class="btn" data-recolher="offroad">Recolher tudo</button>
+        </div>
+        <div class="table-card">
+          <table class="tt">
+            <thead><tr>
+              <th>Classificação / Atividade</th><th>Horas</th><th>%</th><th>HH:MM</th><th>Ocorr.</th>
+            </tr></thead>
+            <tbody id="tree-offroad"></tbody>
+          </table>
+          <p class="tt-note" id="nota-offroad"></p>
+        </div>
+      </section>
+
+      <!-- EXPORTAÇÃO -->
+      <section class="tab-panel" id="tab-exportacao">
+        <h2 class="panel-title">Exporta&ccedil;&atilde;o</h2>
+        <div class="export-card">
+          <p>Gere o <strong>PDF</strong> da aba aberta no momento, com os indicadores, o ciclo
+             operacional e a distribuição do tempo apontado.</p>
+          <button class="btn" id="btnGerarPdf">📄 Gerar PDF</button>
+        </div>
+
+        <div class="export-card" style="margin-top: 20px;">
+          <p>Exporte a <strong>distribuição do tempo</strong> em CSV (separado por <code>;</code>,
+             pronto para abrir no Excel), com as três camadas: classificação, atividade e detalhe.</p>
+          <div class="export-equip-controls" style="margin-bottom:14px;">
+            <label for="exportGrupoSelect">Grupo:</label>
+            <select id="exportGrupoSelect">
+              <option value="resumo">Consolidado (todos os grupos)</option>
+              <option value="fertirrigacao">Fertirrigação</option>
+              <option value="plataforma">Fertirrigação Plataforma</option>
+              <option value="offroad">OffRoad</option>
+            </select>
+          </div>
+          <button class="btn" id="btnGerarCsv">⬇ Baixar CSV</button>
+        </div>
+
+        <div class="export-card" style="margin-top: 20px;">
+          <p id="infoArquivo" style="margin:0;color:var(--text-muted);font-size:13px;"></p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ============================================================
+   DASHBOARD FERTIRRIGAÇÃO - CEMMA / COPLASA
+   Tempos por atividade e ciclo operacional a partir da
+   exportação do sistema (.zip do relatório ou .txt/.csv
+   separado por ";"). Processamento 100% local.
+   ============================================================ */
+
+/* ============================================================
+   1) CONFIGURAÇÃO
+   ============================================================ */
+const CFG = {
+  colunasObrigatorias: ['COD. EQUIPAMENTO','DESC.OPERACAO'],
+
+  /* Os 3 grupos de análise. A exportação traz OFF-ROAD 1 e OFF ROAD 2
+     separados (frentes diferentes); aqui os dois viram um único OFFROAD. */
+  grupos: [
+    {id:'FERTIRRIGACAO', painel:'fertirrigacao', nome:'Fertirrigação', cor:'#1f6f43',
+     match:['fertirrigacao'], ciclo:'CAMINHAO'},
+    {id:'FERTI_PLAT',    painel:'plataforma',    nome:'Fertirrigação Plataforma', cor:'#2f6f8f',
+     match:['fertirrigacao plataforma'], ciclo:'CAMINHAO'},
+    {id:'OFFROAD',       painel:'offroad',       nome:'OffRoad', cor:'#d9a441',
+     match:['off road','offroad','off-road'], ciclo:'OFFROAD'}
+  ],
+
+  ordemClasses: ['produtiva','auxiliar','improdutivo','improdutiva','nao gerenciavel',
+                 'manutencao','automacao coa','indeterminado'],
+
+  coresClasse: {
+    'produtiva':'#1f6f43','auxiliar':'#2f6f8f','improdutivo':'#b3392c','improdutiva':'#b3392c',
+    'manutencao':'#8a5a2b','nao gerenciavel':'#d9a441','automacao coa':'#6d4c41',
+    'indeterminado':'#8e9aaf'
+  },
+  corPadrao:'#8e9aaf',
+
+  /* ------------------------------------------------------------------
+     CICLOS OPERACIONAIS
+     As etapas são casadas pelo texto normalizado de DESC.OPERACAO
+     (sem acento, minúsculo, sem pontuação). "ancora" é a etapa contada
+     como 1 ciclo: escolhida por ser a menos fragmentada na exportação
+     (o carregamento/abastecimento acontece num ponto só, enquanto o
+     transporte é quebrado em vários registros por talhão).
+     ------------------------------------------------------------------ */
+  ciclos: {
+    CAMINHAO: {
+      titulo:'Ciclo do caminhão',
+      resumo:'Carregamento → Transporte Carregado → Descarregamento → Transporte Vazio',
+      ancora:'carregamento',
+      etapas:[
+        {nome:'Carregamento',             ops:['carregamento']},
+        {nome:'Transporte Carregado',     ops:['transporte carregado']},
+        {nome:'Descarregamento',          ops:['descarregamento']},
+        {nome:'Transporte Vazio',         ops:['transporte vazio']},
+        {nome:'Caminhão no Carregamento', ops:['caminhao no carregamento']}
+      ],
+      esperas:[
+        {nome:'Ag. Carregamento',    ops:['aguardando carregamento']},
+        {nome:'Fila Carregamento',   ops:['fila carregamento']},
+        {nome:'Ag. Descarregamento', ops:['aguardando descarregamento']},
+        {nome:'Fila p/ Descarregar', ops:['fila para descarregar']}
+      ]
+    },
+    OFFROAD: {
+      titulo:'Ciclo do offroad',
+      resumo:'Abastecimento → Aplicação → Deslocamento (roda dentro do ciclo)',
+      ancora:'abastecimento insumos',
+      etapas:[
+        {nome:'Abastecimento', ops:['abastecimento insumos','carregamento']},
+        {nome:'Aplicação',     ops:['aplic vinhaca localizada']},
+        {nome:'Deslocamento',  ops:['deslocamento tpl']},
+        {nome:'Manobra',       ops:['manobra']}
+      ],
+      esperas:[
+        {nome:'Falta de Insumo',       ops:['falta de insumo']},
+        {nome:'Ag. Abast. de Insumo',  ops:['aguardando abast de insumo']},
+        {nome:'Ag. Liberação Serviço', ops:['aguard liberacao servico','aguardando liberacao servico']}
+      ]
+    }
+  }
+};
+
+/* Painéis da navegação lateral. O "resumo" consolida os 3 grupos. */
+const PAINEIS = [
+  {id:'resumo',        grupo:'TODOS',         nome:'Consolidado'},
+  {id:'fertirrigacao', grupo:'FERTIRRIGACAO', nome:'Fertirrigação'},
+  {id:'plataforma',    grupo:'FERTI_PLAT',    nome:'Fertirrigação Plataforma'},
+  {id:'offroad',       grupo:'OFFROAD',       nome:'OffRoad'}
+];
+
+/* ============================================================
+   2) UTILITÁRIOS
+   ============================================================ */
+const U = {
+  removeAccents(s){ return String(s).normalize('NFD').replace(/[̀-ͯ]/g,''); },
+  norm(s){
+    if (s === null || s === undefined) return '';
+    return U.removeAccents(String(s)).trim().toLowerCase().replace(/\s+/g,' ');
+  },
+  /* Normalização das descrições de operação: além de acento e caixa,
+     remove pontuação e hífen para casar "Abastecimento- Insumos",
+     "Abastecimento - Insumos" e "ABASTECIMENTO INSUMOS". */
+  normOp(s){ return U.norm(s).replace(/[.\-\/_,]/g,' ').replace(/\s+/g,' ').trim(); },
+  str(v){ return v === null || v === undefined ? '' : String(v).trim(); },
+  num(v){
+    if (v === null || v === undefined || v === '') return 0;
+    if (typeof v === 'number') return isFinite(v) ? v : 0;
+    const s = String(v).trim();
+    const d = parseFloat(s);
+    if (!isNaN(d) && s.indexOf(',') === -1) return d;
+    const br = parseFloat(s.replace(/\./g,'').replace(',','.'));
+    return isNaN(br) ? 0 : br;
+  },
+  /* "HH:MM:SS" -> horas decimais. Aceita mais de 2 dígitos na hora. */
+  hmsParaHoras(v){
+    const m = U.str(v).match(/^(\d+):(\d{1,2})(?::(\d{1,2}))?$/);
+    if (!m) return 0;
+    return (+m[1]) + (+m[2])/60 + (m[3] ? (+m[3])/3600 : 0);
+  },
+  /* "dd/mm/aaaa hh:mm:ss" -> "aaaa-mm-dd" (o dia é a chave de tudo). */
+  diaDeDataBR(v){
+    const m = U.str(v).match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (m) return m[3] + '-' + m[2] + '-' + m[1];
+    const iso = U.str(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return iso ? iso[1] + '-' + iso[2] + '-' + iso[3] : '';
+  },
+  diaBR(k){ if (!k) return '—'; const p = k.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; },
+  n(v,dec){
+    if (dec === undefined) dec = 1;
+    if (!isFinite(v)) v = 0;
+    return v.toLocaleString('pt-BR',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+  },
+  pct(v,dec){ return U.n(v, dec === undefined ? 1 : dec) + '%'; },
+  /* Horas decimais -> HH:MM, truncando os minutos (não arredonda):
+     é assim que o relatório de referência exibe (1,0h em 72
+     equipamento-dias sai 00:00, e não 00:01). */
+  hhmm(dec){
+    if (!isFinite(dec) || dec < 0) dec = 0;
+    const t = Math.floor(dec * 60);
+    return String(Math.floor(t/60)).padStart(2,'0') + ':' + String(t%60).padStart(2,'0');
+  },
+  /* Duração curta para "média por ciclo": minutos quando menor que 1h. */
+  dur(dec){
+    if (!isFinite(dec) || dec <= 0) return '—';
+    return dec < 1 ? U.n(dec*60,0) + ' min' : U.hhmm(dec);
+  },
+  esc(s){
+    return String(s === null || s === undefined ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  },
+  uniq(arr){
+    return Array.from(new Set(arr.filter(v => v !== null && v !== undefined && v !== '')))
+      .sort((a,b) => String(a).localeCompare(String(b),'pt-BR'));
+  }
+};
+
+/* ============================================================
+   3) LEITURA DO ARQUIVO (.zip / .txt / .csv)
+   ============================================================ */
+
+/* Descompacta um .zip usando só APIs nativas do navegador
+   (DecompressionStream), sem biblioteca externa. */
+async function lerZip(buffer){
+  const dv = new DataView(buffer);
+  const u8 = new Uint8Array(buffer);
+
+  let eocd = -1;
+  for (let i = u8.length - 22; i >= Math.max(0, u8.length - 66000); i--) {
+    if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error('Arquivo .zip inválido ou corrompido.');
+
+  const qtd = dv.getUint16(eocd + 10, true);
+  let ptr = dv.getUint32(eocd + 16, true);
+  const entradas = [];
+  for (let i = 0; i < qtd; i++) {
+    if (dv.getUint32(ptr, true) !== 0x02014b50) break;
+    const metodo   = dv.getUint16(ptr + 10, true);
+    const tamComp  = dv.getUint32(ptr + 20, true);
+    const nomeLen  = dv.getUint16(ptr + 28, true);
+    const extraLen = dv.getUint16(ptr + 30, true);
+    const comLen   = dv.getUint16(ptr + 32, true);
+    const offLocal = dv.getUint32(ptr + 42, true);
+    const nome = new TextDecoder('utf-8').decode(u8.subarray(ptr + 46, ptr + 46 + nomeLen));
+    entradas.push({nome:nome, metodo:metodo, tamComp:tamComp, offLocal:offLocal});
+    ptr += 46 + nomeLen + extraLen + comLen;
+  }
+
+  const alvo = entradas.find(e => /\.(txt|csv)$/i.test(e.nome) && e.nome.indexOf('__MACOSX') !== 0)
+            || entradas.find(e => e.nome.slice(-1) !== '/' && e.nome.indexOf('__MACOSX') !== 0);
+  if (!alvo) throw new Error('O .zip não contém nenhum arquivo .txt ou .csv.');
+
+  // O cabeçalho local pode ter tamanhos de nome/extra diferentes do central
+  const nomeLenL  = dv.getUint16(alvo.offLocal + 26, true);
+  const extraLenL = dv.getUint16(alvo.offLocal + 28, true);
+  const ini = alvo.offLocal + 30 + nomeLenL + extraLenL;
+  const dados = u8.subarray(ini, ini + alvo.tamComp);
+
+  if (alvo.metodo === 0) return {nome: alvo.nome, bytes: dados};
+  if (alvo.metodo !== 8) throw new Error('Compressão do .zip não suportada. Extraia o .txt e importe ele.');
+  if (typeof DecompressionStream === 'undefined') {
+    throw new Error('Seu navegador não descompacta .zip. Extraia o arquivo .txt do zip e importe ele.');
+  }
+  const stream = new Blob([dados]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  const bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+  return {nome: alvo.nome, bytes: bytes};
+}
+
+/* A exportação costuma vir em UTF-8, mas versões antigas saem em
+   Windows-1252. Tenta UTF-8 estrito e, se falhar, cai para 1252. */
+function decodificar(bytes){
+  try { return new TextDecoder('utf-8', {fatal:true}).decode(bytes); }
+  catch (e) { return new TextDecoder('windows-1252').decode(bytes); }
+}
+
+/* CSV com separador ";" e suporte a campos entre aspas. */
+function parseCsv(texto, sep){
+  const linhas = [];
+  let campo = '', linha = [], aspas = false;
+  for (let i = 0; i < texto.length; i++) {
+    const c = texto[i];
+    if (aspas) {
+      if (c === '"') { if (texto[i+1] === '"') { campo += '"'; i++; } else aspas = false; }
+      else campo += c;
+    } else if (c === '"') { aspas = true; }
+    else if (c === sep) { linha.push(campo); campo = ''; }
+    else if (c === '\n') { linha.push(campo); linhas.push(linha); linha = []; campo = ''; }
+    else if (c !== '\r') { campo += c; }
+  }
+  if (campo !== '' || linha.length) { linha.push(campo); linhas.push(linha); }
+  return linhas;
+}
+
+function grupoDe(grupoEquipamento){
+  const g = U.normOp(grupoEquipamento);
+  // "fertirrigacao plataforma" antes de "fertirrigacao": o mais específico vence
+  const achado = CFG.grupos.slice()
+    .sort((a,b) => Math.max.apply(null, b.match.map(m => m.length)) -
+                   Math.max.apply(null, a.match.map(m => m.length)))
+    .find(gr => gr.match.some(m => g.indexOf(m) !== -1));
+  return achado ? achado.id : 'OUTROS';
+}
+
+function montarLinhas(matriz){
+  const head = matriz[0].map(h => U.str(h).toUpperCase());
+  const idx = {};
+  head.forEach((h,i) => { if (!(h in idx)) idx[h] = i; });
+  const faltando = CFG.colunasObrigatorias.filter(c => !(c in idx));
+  if (faltando.length) {
+    throw new Error('Colunas obrigatórias ausentes: ' + faltando.join(', ') +
+      '. Confirme se é a exportação padrão separada por ";".');
+  }
+  const temSec = 'HRS OPERACIONAIS(SEC)' in idx;
+  const temHms = 'HRS OPERACIONAIS' in idx;
+  if (!temSec && !temHms) {
+    throw new Error('Nenhuma coluna de horas encontrada (HRS OPERACIONAIS(SEC) ou HRS OPERACIONAIS).');
+  }
+  const get = (l,c) => (c in idx ? U.str(l[idx[c]]) : '');
+
+  const out = [];
+  for (let i = 1; i < matriz.length; i++) {
+    const l = matriz[i];
+    if (!l || l.length < 3) continue;
+    const equip = get(l,'COD. EQUIPAMENTO');
+    if (!equip) continue;
+
+    /* Tudo é acumulado em SEGUNDOS INTEIROS e só vira hora na exibição.
+       Somando seg/3600 linha a linha o erro de ponto flutuante fazia o
+       total do dia sair 23:59 em vez de 24:00 (cada equipamento-dia da
+       exportação fecha exatos 86.400 s). */
+    const seg = temSec ? Math.round(U.num(get(l,'HRS OPERACIONAIS(SEC)')))
+                       : Math.round(U.hmsParaHoras(get(l,'HRS OPERACIONAIS')) * 3600);
+    const grupoRaw = get(l,'GRUPO EQUIPAMENTO') || 'NÃO INFORMADO';
+    const operador = get(l,'COD. OPERADOR') || 'Não Informado';
+
+    out.push({
+      Equipamento: equip,
+      Modelo: get(l,'DESC.EQUIPAMENTO') || 'Não Informado',
+      DiaKey: U.diaDeDataBR(get(l,'DATA/HORA LOCAL')),
+      Unidade: get(l,'UNIDADE') || 'Não Informado',
+      GrupoRaw: grupoRaw,
+      GrupoNorm: grupoRaw,
+      Grupo: grupoDe(grupoRaw),
+      Fazenda: get(l,'COD. FAZENDA') || 'Não Informado',
+      Talhao: get(l,'COD. TALHAO'),
+      Operador: operador.length > 32 ? operador.slice(0,32) + '…' : operador,
+      Classificacao: get(l,'DESC.GRUPO OPERAC.') || 'NÃO CLASSIFICADO',
+      Atividade: get(l,'DESC.OPERACAO') || 'Não Informado',
+      AtividadeNorm: U.normOp(get(l,'DESC.OPERACAO')),
+      CodOperacao: get(l,'COD. OPERACAO'),
+      Seg: seg,
+      Horas: seg / 3600
+    });
+  }
+  if (!out.length) throw new Error('Nenhuma linha válida encontrada no arquivo.');
+  return out;
+}
+
+async function lerArquivo(file){
+  const buf = await file.arrayBuffer();
+  let bytes = new Uint8Array(buf), nomeInterno = file.name;
+  if (/\.zip$/i.test(file.name) || (bytes[0] === 0x50 && bytes[1] === 0x4b)) {
+    const r = await lerZip(buf);
+    bytes = r.bytes; nomeInterno = r.nome;
+  }
+  const texto = decodificar(bytes);
+  const matriz = parseCsv(texto, texto.split('\n')[0].indexOf(';') !== -1 ? ';' : ',');
+  if (matriz.length < 2) throw new Error('O arquivo não tem linhas de dados.');
+  return {linhas: montarLinhas(matriz), nomeInterno: nomeInterno};
+}
+
+/* ============================================================
+   4) ESTADO E AGREGAÇÃO
+   ============================================================ */
+const state = {
+  todas: [], arquivo: '', nomeInterno: '',
+  arvores: {}, ciclos: {}, expandidos: {}, linhasPorPainel: {}
+};
+PAINEIS.forEach(p => { state.expandidos[p.id] = new Set(); });
+
+function equipDias(rows){
+  const s = new Set();
+  rows.forEach(r => { if (r.DiaKey) s.add(r.Equipamento + '|' + r.DiaKey); });
+  return s.size || new Set(rows.map(r => r.Equipamento)).size || 1;
+}
+function somaSeg(rows){ return rows.reduce((a,r) => a + r.Seg, 0); }
+function somaHoras(rows){ return somaSeg(rows) / 3600; }
+function corDaClasse(nome){ return CFG.coresClasse[U.norm(nome)] || CFG.corPadrao; }
+function defGrupo(id){ return CFG.grupos.find(g => g.id === id) || null; }
+
+/* Filtra pelas datas globais (topbar) + filtros do próprio painel. */
+function linhasDoPainel(painel){
+  const d1 = document.getElementById('filtroDataInicio').value;
+  const d2 = document.getElementById('filtroDataFim').value;
+  const uni = document.getElementById('f-' + painel.id + '-unidade').value;
+  const faz = document.getElementById('f-' + painel.id + '-fazenda').value;
+  const eq  = document.getElementById('f-' + painel.id + '-equip').value;
+
+  return state.todas.filter(r => {
+    if (painel.grupo !== 'TODOS' && r.Grupo !== painel.grupo) return false;
+    if (d1 && (!r.DiaKey || r.DiaKey < d1)) return false;
+    if (d2 && (!r.DiaKey || r.DiaKey > d2)) return false;
+    if (uni && r.Unidade !== uni) return false;
+    if (faz && r.Fazenda !== faz) return false;
+    if (eq  && r.Equipamento !== eq) return false;
+    return true;
+  });
+}
+
+/* Árvore Classificação > Atividade > (dimensão escolhida) */
+function montarArvore(rows, campoNivel3){
+  const base = equipDias(rows);
+
+  // equipamento-dias por entidade do 3º nível (denominador daquelas linhas)
+  const diasPorEntidade = new Map();
+  rows.forEach(r => {
+    const k = r[campoNivel3];
+    if (!diasPorEntidade.has(k)) diasPorEntidade.set(k, new Set());
+    if (r.DiaKey) diasPorEntidade.get(k).add(r.Equipamento + '|' + r.DiaKey);
+  });
+
+  const classes = new Map();
+  rows.forEach(r => {
+    let c = classes.get(r.Classificacao);
+    if (!c) { c = {label:r.Classificacao, seg:0, ocorr:0, filhos:new Map()}; classes.set(r.Classificacao, c); }
+    c.seg += r.Seg; c.ocorr++;
+
+    let a = c.filhos.get(r.Atividade);
+    if (!a) { a = {label:r.Atividade, seg:0, ocorr:0, filhos:new Map()}; c.filhos.set(r.Atividade, a); }
+    a.seg += r.Seg; a.ocorr++;
+
+    const k = r[campoNivel3];
+    let e = a.filhos.get(k);
+    if (!e) { e = {label:k, seg:0, ocorr:0, filhos:new Map(), entidade:k}; a.filhos.set(k, e); }
+    e.seg += r.Seg; e.ocorr++;
+  });
+
+  const porHoras = m => Array.from(m.values()).sort((a,b) => b.seg - a.seg);
+  /* No 1º nível vale a ordem de negócio (produtiva primeiro), não a de
+     maior tempo — é como o relatório de referência apresenta. */
+  const porRegra = m => Array.from(m.values()).sort((a,b) => {
+    const ia = CFG.ordemClasses.indexOf(U.norm(a.label));
+    const ib = CFG.ordemClasses.indexOf(U.norm(b.label));
+    const ra = ia === -1 ? 99 : ia, rb = ib === -1 ? 99 : ib;
+    return ra !== rb ? ra - rb : b.seg - a.seg;
+  });
+
+  const nos = porRegra(classes).map(c => {
+    c.id = 'c::' + c.label; c.nivel = 0; c.cor = corDaClasse(c.label); c.horas = c.seg / 3600;
+    c.filhos = porHoras(c.filhos).map(a => {
+      a.id = c.id + '::' + a.label; a.nivel = 1; a.cor = c.cor; a.horas = a.seg / 3600;
+      a.filhos = porHoras(a.filhos).map(e => {
+        e.id = a.id + '::' + e.label; e.nivel = 2; e.cor = c.cor; e.horas = e.seg / 3600;
+        e.base = (diasPorEntidade.get(e.entidade) || new Set()).size || 1;
+        e.filhos = [];
+        return e;
+      });
+      return a;
+    });
+    return c;
+  });
+
+  return {
+    nos: nos, totalHoras: somaHoras(rows), base: base,
+    equipamentos: new Set(rows.map(r => r.Equipamento)).size,
+    dias: new Set(rows.map(r => r.DiaKey).filter(Boolean)).size,
+    registros: rows.length
+  };
+}
+
+/* ---------- Ciclo operacional ---------- */
+function casa(row, ops){
+  return ops.some(o => row.AtividadeNorm === o || row.AtividadeNorm.indexOf(o) === 0);
+}
+
+function calcularCiclo(rows, tipoCiclo){
+  const def = CFG.ciclos[tipoCiclo];
+  if (!def || !rows.length) return null;
+  const medir = defs => defs.map(d => {
+    const sel = rows.filter(r => casa(r, d.ops));
+    return {nome:d.nome, seg:somaSeg(sel), horas:somaHoras(sel), ocorr:sel.length};
+  });
+  const etapas = medir(def.etapas);
+  const esperas = medir(def.esperas);
+  const hEtapas = etapas.reduce((a,e) => a + e.seg, 0) / 3600;
+  const hEsperas = esperas.reduce((a,e) => a + e.seg, 0) / 3600;
+  const total = somaHoras(rows);
+  return {
+    def: def, etapas: etapas, esperas: esperas,
+    nCiclos: rows.filter(r => casa(r, [def.ancora])).length,
+    base: equipDias(rows), total: total,
+    hEtapas: hEtapas, hEsperas: hEsperas, hFora: total - hEtapas - hEsperas,
+    ocorrEtapas: etapas.reduce((a,e) => a + e.ocorr, 0),
+    ocorrEsperas: esperas.reduce((a,e) => a + e.ocorr, 0)
+  };
+}
+
+/* ============================================================
+   5) RENDERIZAÇÃO
+   ============================================================ */
+function kpi(rotulo, valor, destaque){
+  return '<div class="kpi-card' + (destaque ? ' kpi-card--highlight' : '') + '">' +
+         '<span>' + U.esc(rotulo) + '</span><strong>' + U.esc(valor) + '</strong></div>';
+}
+
+function renderKpis(painel, t, ciclo){
+  const rows = state.linhasPorPainel[painel.id];
+  const hProd = somaHoras(rows.filter(r => U.norm(r.Classificacao) === 'produtiva'));
+  const pctProd = t.totalHoras > 0 ? (hProd / t.totalHoras) * 100 : 0;
+
+  let html = '';
+  if (ciclo && ciclo.nCiclos > 0) {
+    html += kpi('Ciclo Médio', U.dur(ciclo.hEtapas / ciclo.nCiclos));
+    ciclo.etapas.forEach(e => {
+      if (e.horas > 0) html += kpi('Tempo Médio ' + e.nome, U.dur(e.horas / ciclo.nCiclos));
+    });
+    html += kpi('Esperas do Ciclo', U.dur(ciclo.hEsperas / ciclo.nCiclos));
+    html += kpi('% Produtiva', U.pct(pctProd));
+    html += kpi('Ciclos Estimados', ciclo.nCiclos.toLocaleString('pt-BR'), true);
+    html += kpi('Ciclos por Equip./Dia', U.n(ciclo.nCiclos / ciclo.base, 1), true);
+  } else {
+    html += kpi('Tempo Total Apontado', U.n(t.totalHoras,1) + ' h');
+    html += kpi('Tempo Produtivo', U.n(hProd,1) + ' h');
+    html += kpi('% Produtiva', U.pct(pctProd));
+    html += kpi('Equipamentos', String(t.equipamentos));
+    html += kpi('Dias no Período', String(t.dias));
+    html += kpi('Equipamento-dias', String(t.base));
+    html += kpi('Apontamentos', t.registros.toLocaleString('pt-BR'));
+    html += kpi('Média por Equip./Dia', U.hhmm(t.base > 0 ? t.totalHoras / t.base : 0), true);
+  }
+  document.getElementById('kpis-' + painel.id).innerHTML = html;
+}
+
+function renderComparativo(){
+  const d1 = document.getElementById('filtroDataInicio').value;
+  const d2 = document.getElementById('filtroDataFim').value;
+  const noPeriodo = r => (!d1 || (r.DiaKey && r.DiaKey >= d1)) && (!d2 || (r.DiaKey && r.DiaKey <= d2));
+
+  let html = '';
+  CFG.grupos.forEach(g => {
+    const rows = state.todas.filter(r => r.Grupo === g.id && noPeriodo(r));
+    if (!rows.length) return;
+    const tot = somaHoras(rows), base = equipDias(rows);
+    const hProd = somaHoras(rows.filter(r => U.norm(r.Classificacao) === 'produtiva'));
+    const ciclo = calcularCiclo(rows, g.ciclo);
+    const nC = ciclo ? ciclo.nCiclos : 0;
+    html += '<tr>' +
+      '<td><span class="tt-dot" style="background:' + g.cor + '"></span>' + U.esc(g.nome) + '</td>' +
+      '<td>' + new Set(rows.map(r => r.Equipamento)).size + '</td>' +
+      '<td>' + base + '</td>' +
+      '<td>' + U.n(tot,1) + '</td>' +
+      '<td>' + U.n(hProd,1) + '</td>' +
+      '<td>' + U.pct(tot > 0 ? hProd/tot*100 : 0) + '</td>' +
+      '<td>' + (nC ? nC.toLocaleString('pt-BR') : '—') + '</td>' +
+      '<td>' + (nC ? U.n(nC/base,1) : '—') + '</td>' +
+      '<td>' + (nC ? U.dur(ciclo.hEtapas/nC) : '—') + '</td></tr>';
+  });
+
+  const todas = state.todas.filter(noPeriodo);
+  const tot = somaHoras(todas);
+  const hProd = somaHoras(todas.filter(r => U.norm(r.Classificacao) === 'produtiva'));
+  html += '<tr class="tot"><td>TOTAL</td>' +
+    '<td>' + new Set(todas.map(r => r.Equipamento)).size + '</td>' +
+    '<td>' + equipDias(todas) + '</td>' +
+    '<td>' + U.n(tot,1) + '</td>' +
+    '<td>' + U.n(hProd,1) + '</td>' +
+    '<td>' + U.pct(tot > 0 ? hProd/tot*100 : 0) + '</td>' +
+    '<td>—</td><td>—</td><td>—</td></tr>';
+  document.getElementById('comparativoBody').innerHTML = html;
+}
+
+function renderCiclo(painel, ciclo){
+  const corpo = document.getElementById('ciclo-' + painel.id);
+  if (!corpo) return;
+  if (!ciclo) {
+    corpo.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:22px;color:#667165">' +
+      'Sem apontamentos para os filtros selecionados.</td></tr>';
+    document.getElementById('ciclodesc-' + painel.id).textContent = '';
+    document.getElementById('ciclonota-' + painel.id).innerHTML = '';
+    return;
+  }
+  const d = ciclo.def, base = ciclo.base, nC = ciclo.nCiclos, tot = ciclo.total;
+  document.getElementById('ciclodesc-' + painel.id).textContent =
+    d.resumo + ' · ' + nC.toLocaleString('pt-BR') + ' ciclos em ' + base + ' equipamento-dias';
+
+  const linha = (no, marca, classe, denom) =>
+    '<tr class="etapa"><td><span class="tt-step ' + classe + '">' + marca + '</span>' + U.esc(no.nome) + '</td>' +
+    '<td>' + U.n(no.horas,1) + '</td>' +
+    '<td>' + U.pct(tot > 0 ? no.horas/tot*100 : 0) + '</td>' +
+    '<td>' + U.hhmm(no.horas/base) + '</td>' +
+    '<td>' + (nC > 0 ? U.dur(no.horas/nC) : '—') + '</td>' +
+    '<td>' + U.pct(denom > 0 ? no.horas/denom*100 : 0) + '</td>' +
+    '<td>' + no.ocorr.toLocaleString('pt-BR') + '</td></tr>';
+
+  const sub = (rot, horas, ocorr, denom, extra) =>
+    '<tr class="sub' + (extra || '') + '"><td>' + U.esc(rot) + '</td>' +
+    '<td>' + U.n(horas,1) + '</td>' +
+    '<td>' + U.pct(tot > 0 ? horas/tot*100 : 0) + '</td>' +
+    '<td>' + U.hhmm(horas/base) + '</td>' +
+    '<td>' + (nC > 0 ? U.dur(horas/nC) : '—') + '</td>' +
+    '<td>' + (denom > 0 ? U.pct(horas/denom*100) : '—') + '</td>' +
+    '<td>' + (ocorr === null ? '—' : ocorr.toLocaleString('pt-BR')) + '</td></tr>';
+
+  let html = '';
+  ciclo.etapas.forEach((e,i) => { html += linha(e, String(i+1), '', ciclo.hEtapas); });
+  html += sub('CICLO PRODUTIVO (soma das etapas)', ciclo.hEtapas, ciclo.ocorrEtapas, ciclo.hEtapas);
+  ciclo.esperas.forEach(e => { html += linha(e, '⏱', 'wait', ciclo.hEtapas); });
+  html += sub('ESPERAS LIGADAS AO CICLO', ciclo.hEsperas, ciclo.ocorrEsperas, ciclo.hEtapas);
+  html += sub('FORA DO CICLO (manutenção, refeição, falta de operador…)', ciclo.hFora, null, 0, ' dim');
+  html += '<tr class="tot"><td>TOTAL APONTADO</td>' +
+    '<td>' + U.n(tot,1) + '</td><td>' + U.pct(tot > 0 ? 100 : 0) + '</td>' +
+    '<td>' + U.hhmm(tot/base) + '</td>' +
+    '<td>' + (nC > 0 ? U.dur(tot/nC) : '—') + '</td><td>—</td>' +
+    '<td>' + (ciclo.ocorrEtapas + ciclo.ocorrEsperas).toLocaleString('pt-BR') + '+</td></tr>';
+  corpo.innerHTML = html;
+
+  const ancora = d.etapas.find(e => e.ops.indexOf(d.ancora) !== -1);
+  document.getElementById('ciclonota-' + painel.id).innerHTML =
+    '<b>Ciclos</b> são contados pelos apontamentos de <b>' + U.esc(ancora ? ancora.nome : d.ancora) + '</b> (' +
+    nC.toLocaleString('pt-BR') + ' no período) — é a etapa menos fragmentada da exportação, já que acontece ' +
+    'num ponto só, enquanto o transporte é quebrado em vários registros por talhão. Por isso ' +
+    '<b>Média por ciclo</b> é uma estimativa: a exportação traz o total do dia, sem hora de início e fim, ' +
+    'então não dá para reconstruir cada ciclo individualmente. <b>% do ciclo</b> usa a soma das etapas ' +
+    'produtivas como 100%.';
+}
+
+function linhaArvore(no, t){
+  const pct = t.totalHoras > 0 ? (no.horas / t.totalHoras) * 100 : 0;
+  const base = no.nivel === 2 ? (no.base || 1) : (t.base || 1);
+  const temFilhos = no.filhos && no.filhos.length > 0;
+  const aberto = no.aberto;
+  const toggle = temFilhos
+    ? '<span class="tt-toggle" data-id="' + U.esc(no.id) + '">' + (aberto ? '−' : '+') + '</span>'
+    : '<span class="tt-toggle leaf">·</span>';
+  const dot = no.nivel === 0 ? '<span class="tt-dot" style="background:' + no.cor + '"></span>' : '';
+  return '<tr class="n' + no.nivel + '"><td>' + toggle + dot + U.esc(no.label) + '</td>' +
+    '<td>' + U.n(no.horas,1) + '</td>' +
+    '<td>' + U.pct(pct) + '</td>' +
+    '<td>' + U.hhmm(no.horas / base) + '</td>' +
+    '<td>' + no.ocorr.toLocaleString('pt-BR') + '</td></tr>';
+}
+
+function renderArvore(painel){
+  const t = state.arvores[painel.id];
+  const corpo = document.getElementById('tree-' + painel.id);
+  if (!t || !t.registros) {
+    corpo.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:22px;color:#667165">' +
+      'Nenhum apontamento para os filtros selecionados.</td></tr>';
+    document.getElementById('desc-' + painel.id).textContent = '';
+    return;
+  }
+  const abertos = state.expandidos[painel.id];
+  const out = [];
+  (function percorrer(nos){
+    nos.forEach(no => {
+      no.aberto = abertos.has(no.id);
+      out.push(linhaArvore(no, t));
+      if (no.aberto && no.filhos.length) percorrer(no.filhos);
+    });
+  })(t.nos);
+
+  out.push('<tr class="tot"><td>TOTAL GERAL</td>' +
+    '<td>' + U.n(t.totalHoras,1) + '</td>' +
+    '<td>' + U.pct(t.totalHoras > 0 ? 100 : 0) + '</td>' +
+    '<td>' + U.hhmm(t.base > 0 ? t.totalHoras/t.base : 0) + '</td>' +
+    '<td>' + t.registros.toLocaleString('pt-BR') + '</td></tr>');
+  corpo.innerHTML = out.join('');
+
+  document.getElementById('desc-' + painel.id).textContent =
+    t.equipamentos + ' equipamento(s) · ' + t.dias + ' dia(s) · base de ' + t.base + ' equipamento-dias';
+  document.getElementById('nota-' + painel.id).innerHTML =
+    '<b>Horas</b>: soma de HRS OPERACIONAIS. · <b>%</b>: participação sobre o tempo total apontado. · ' +
+    '<b>HH:MM</b>: média por <b>equipamento-dia</b> — horas ÷ nº de pares distintos (Equipamento × Data), ' +
+    'truncada nos minutos. O total fecha em 24:00 por equipamento-dia, porque a exportação cobre o dia inteiro.';
+}
+
+function renderPainel(painel){
+  const rows = linhasDoPainel(painel);
+  state.linhasPorPainel[painel.id] = rows;
+  const campo = document.getElementById('f-' + painel.id + '-nivel3').value;
+  const t = montarArvore(rows, campo);
+  state.arvores[painel.id] = t;
+
+  const g = defGrupo(painel.grupo);
+  const ciclo = g ? calcularCiclo(rows, g.ciclo) : null;
+  state.ciclos[painel.id] = ciclo;
+
+  // Abre a primeira classificação por padrão (Produtiva, pela ordem de negócio)
+  if (state.expandidos[painel.id].size === 0 && t.nos.length) {
+    state.expandidos[painel.id].add(t.nos[0].id);
+  }
+
+  renderKpis(painel, t, ciclo);
+  if (g) renderCiclo(painel, ciclo);
+  renderArvore(painel);
+}
+
+function renderTudo(){
+  state.linhasPorPainel = {};
+  PAINEIS.forEach(renderPainel);
+  renderComparativo();
+}
+
+/* ============================================================
+   6) EVENTOS
+   ============================================================ */
+function preencherFiltros(){
+  PAINEIS.forEach(p => {
+    const rows = p.grupo === 'TODOS' ? state.todas : state.todas.filter(r => r.Grupo === p.grupo);
+    const set = (sufixo, valores) => {
+      const el = document.getElementById('f-' + p.id + '-' + sufixo);
+      const atual = el.value, rotulo = el.options[0].textContent;
+      el.innerHTML = '<option value="">' + rotulo + '</option>' +
+        valores.map(v => '<option value="' + U.esc(v) + '">' + U.esc(v) + '</option>').join('');
+      el.value = valores.indexOf(atual) !== -1 ? atual : '';
+    };
+    set('unidade', U.uniq(rows.map(r => r.Unidade)));
+    set('fazenda', U.uniq(rows.map(r => r.Fazenda)));
+    set('equip',   U.uniq(rows.map(r => r.Equipamento)));
+  });
+  const dias = U.uniq(state.todas.map(r => r.DiaKey));
+  if (dias.length) {
+    const a = document.getElementById('filtroDataInicio'), b = document.getElementById('filtroDataFim');
+    a.min = b.min = dias[0]; a.max = b.max = dias[dias.length - 1];
+  }
+}
+
+function mostrarErro(msg){
+  const el = document.getElementById('errorBanner');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+function mostrarAviso(msg){
+  const el = document.getElementById('warningBanner');
+  el.innerHTML = msg || '';
+  el.style.display = msg ? 'block' : 'none';
+}
+
+/* Navegação lateral - mesma mecânica do painel original */
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById(btn.getAttribute('data-target'));
+    if (panel) panel.classList.add('active');
+  });
+});
+
+document.getElementById('fileInput').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  mostrarErro(''); mostrarAviso('');
+  document.getElementById('loadingIndicator').style.display = 'flex';
+  document.getElementById('fileStatus').textContent = 'Processando ' + file.name + '...';
+  try {
+    const r = await lerArquivo(file);
+    state.todas = r.linhas;
+    state.arquivo = file.name;
+    state.nomeInterno = r.nomeInterno;
+    PAINEIS.forEach(p => { state.expandidos[p.id] = new Set(); });
+
+    const semGrupo = r.linhas.filter(x => x.Grupo === 'OUTROS');
+    const semData = r.linhas.filter(x => !x.DiaKey).length;
+    const avisos = [];
+    if (semGrupo.length) {
+      avisos.push('<b>' + semGrupo.length + '</b> linha(s) com GRUPO EQUIPAMENTO fora dos 3 grupos (' +
+        U.uniq(semGrupo.map(x => x.GrupoRaw)).join(', ') + ') — entram no consolidado, mas não têm aba própria.');
+    }
+    if (semData) {
+      avisos.push('<b>' + semData + '</b> linha(s) sem data válida: entram nas horas e no %, ' +
+        'mas não contam para a base de equipamento-dias.');
+    }
+    mostrarAviso(avisos.join('<br>'));
+
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+    document.getElementById('globalFilters').style.display = 'flex';
+
+    preencherFiltros();
+    renderTudo();
+
+    const dias = U.uniq(r.linhas.map(x => x.DiaKey));
+    document.getElementById('fileStatus').textContent = file.name;
+    document.getElementById('infoArquivo').textContent =
+      r.nomeInterno + ' · ' + r.linhas.length.toLocaleString('pt-BR') + ' linhas · ' +
+      new Set(r.linhas.map(x => x.Equipamento)).size + ' equipamentos · ' +
+      (dias.length ? U.diaBR(dias[0]) + ' a ' + U.diaBR(dias[dias.length-1]) + ' · ' : '') +
+      'gerado em ' + new Date().toLocaleString('pt-BR');
+  } catch (err) {
+    console.error(err);
+    mostrarErro(err.message || 'Falha ao importar o arquivo.');
+    document.getElementById('fileStatus').textContent = 'Nenhum arquivo importado ainda.';
+  } finally {
+    document.getElementById('loadingIndicator').style.display = 'none';
+    e.target.value = '';
+  }
+});
+
+/* Expandir / recolher / clique no [+] de cada painel */
+function idsComFilhos(nos, acc){
+  acc = acc || [];
+  nos.forEach(n => { if (n.filhos.length) { acc.push(n.id); idsComFilhos(n.filhos, acc); } });
+  return acc;
+}
+PAINEIS.forEach(p => {
+  const corpo = document.getElementById('tree-' + p.id);
+  corpo.addEventListener('click', ev => {
+    const t = ev.target.closest('.tt-toggle');
+    if (!t || t.classList.contains('leaf')) return;
+    const id = t.getAttribute('data-id');
+    const set = state.expandidos[p.id];
+    if (set.has(id)) set.delete(id); else set.add(id);
+    renderArvore(p);
+  });
+  ['unidade','fazenda','equip','nivel3'].forEach(s => {
+    document.getElementById('f-' + p.id + '-' + s).addEventListener('change', () => {
+      renderPainel(p);
+    });
+  });
+});
+document.querySelectorAll('[data-expandir]').forEach(b => {
+  b.addEventListener('click', () => {
+    const id = b.getAttribute('data-expandir');
+    const p = PAINEIS.find(x => x.id === id);
+    state.expandidos[id] = new Set(idsComFilhos(state.arvores[id].nos));
+    renderArvore(p);
+  });
+});
+document.querySelectorAll('[data-recolher]').forEach(b => {
+  b.addEventListener('click', () => {
+    const id = b.getAttribute('data-recolher');
+    state.expandidos[id] = new Set();
+    renderArvore(PAINEIS.find(x => x.id === id));
+  });
+});
+
+['filtroDataInicio','filtroDataFim'].forEach(id => {
+  document.getElementById(id).addEventListener('change', renderTudo);
+});
+document.getElementById('btnLimparFiltroData').addEventListener('click', () => {
+  document.getElementById('filtroDataInicio').value = '';
+  document.getElementById('filtroDataFim').value = '';
+  renderTudo();
+});
+
+document.getElementById('btnGerarPdf').addEventListener('click', () => window.print());
+
+document.getElementById('btnGerarCsv').addEventListener('click', () => {
+  const id = document.getElementById('exportGrupoSelect').value;
+  const p = PAINEIS.find(x => x.id === id);
+  const t = state.arvores[id];
+  if (!t) { mostrarErro('Importe um arquivo antes de exportar.'); return; }
+  const nivel3 = document.getElementById('f-' + id + '-nivel3').value;
+  const L = [['Grupo','Nivel','Classificacao','Atividade',nivel3,'Horas','%','HH:MM','Ocorrencias']];
+  const pc = h => U.n(t.totalHoras > 0 ? h/t.totalHoras*100 : 0, 1);
+  t.nos.forEach(c => {
+    L.push([p.nome,'Classificacao',c.label,'','',U.n(c.horas,2),pc(c.horas),U.hhmm(c.horas/t.base),c.ocorr]);
+    c.filhos.forEach(a => {
+      L.push([p.nome,'Atividade',c.label,a.label,'',U.n(a.horas,2),pc(a.horas),U.hhmm(a.horas/t.base),a.ocorr]);
+      a.filhos.forEach(e => {
+        L.push([p.nome,nivel3,c.label,a.label,e.label,U.n(e.horas,2),pc(e.horas),U.hhmm(e.horas/(e.base||1)),e.ocorr]);
+      });
+    });
+  });
+  const csv = '﻿' + L.map(l => l.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(';')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'tempos-' + id + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+</script>
+</body>
+</html>

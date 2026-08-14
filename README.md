@@ -22,6 +22,24 @@ dele, na mesma estrutura de pastas do repositório.
 5. Para atualizar os dados, basta importar um novo XLSX — tudo é
    reprocessado do zero.
 
+## Dashboard Fertirrigação (`dashboard-fertirrigacao.html`) — **recomendado**
+
+Mesma análise da página abaixo, porém no layout do painel operacional do
+Grupo Moreno: cabeçalho da marca, menu lateral e cartões de indicador. O CSS e
+a casca visual vieram do `Dashboard_Fertirrigação.html` sem alteração.
+
+Menu lateral:
+
+- **Resumo Executivo** — indicadores gerais, comparativo entre os 3 grupos e a
+  árvore consolidada de tempos.
+- **Fertirrigação**, **Fertirrigação Plataforma**, **OffRoad** — visão de ciclo
+  (cartões + tabela do ciclo) e detalhamento por atividade de cada grupo.
+- **Exportação** — PDF da aba aberta e CSV da distribuição de tempo.
+
+O filtro de período fica na barra superior e vale para tudo; unidade, fazenda,
+equipamento e a dimensão de detalhe são por aba. Não usa jQuery, DataTables,
+Chart.js nem SheetJS — por isso tem ~110 KB em vez de 1,4 MB.
+
 ## CEMMA · COPLASA — Fertirrigação e OffRoad (`cemma-coplasa-ferti.html`)
 
 Página que lê a **exportação do sistema** (o `.zip` baixado do relatório ou o
