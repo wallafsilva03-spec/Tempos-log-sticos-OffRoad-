@@ -159,7 +159,9 @@ const Calculations = (function () {
     const numCiclos = countCategoria(rows, A.deslocamento);
 
     const velMediaDeslocamento = avgVelocidadeAtividade(rows, A.deslocamento);
-    const distPontoCarregamento = tempoDeslocamento * velMediaDeslocamento;
+    // O deslocamento apontado cobre ida + volta; o trecho é metade.
+    const tempoDeslocamentoTrecho = tempoDeslocamento / 2;
+    const distPontoCarregamento = (tempoDeslocamento * velMediaDeslocamento) / 2;
 
     // O offroad não tinha nenhuma atividade "produtiva" (aplicação de
     // vinhaça) nas categorias originais - ela usa códigos próprios que
@@ -168,8 +170,10 @@ const Calculations = (function () {
     // Ciclo Total do offroad não incluía o tempo do trabalho em si.
     const tempoAplicacao = avgTempoProdutivo(rows);
 
-    const cicloTotal = tempoAplicacao + tempoAbastecimento + tempoAgCarregamento +
-      tempoFaltaInsumos + tempoAgLiberacao + tempoDeslocamento;
+    // O Ciclo do offroad é composto apenas por Aplicação + Abastecimento +
+    // Deslocamento (trecho). As demais etapas (Ag. Carregamento, Falta de
+    // Insumos, Ag. Liberação) são esperas/paradas e não entram no ciclo.
+    const cicloTotal = tempoAplicacao + tempoAbastecimento + tempoDeslocamentoTrecho;
 
     const tempoEspera = tempoAgCarregamento + tempoAgLiberacao + tempoFaltaInsumos;
     const percProd = percProdutivo(rows);
@@ -188,6 +192,7 @@ const Calculations = (function () {
       tempoFaltaInsumos,
       tempoAgLiberacao,
       tempoDeslocamento,
+      tempoDeslocamentoTrecho,
       velMediaDeslocamento,
       distPontoCarregamento,
       cicloTotal,
